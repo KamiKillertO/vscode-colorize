@@ -1,0 +1,18 @@
+environment:
+  ELECTRON_RUN_AS_NODE: 1
+  VSCODE_BUILD_VERBOSE: true
+
+platform:
+  - x86
+  - x64
+
+install:
+  - ps: Install-Product node 4
+  - yarn
+
+test_script:
+  - node --version
+  - yarn --version
+  - npm run vscode:prepublish
+#  - .\scripts\test.bat
+#  - .\scripts\test-integration.bat
