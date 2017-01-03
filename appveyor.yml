@@ -10,10 +10,14 @@ install:
   - ps: Install-Product node 4
   - yarn
 
+cache:
+ - "%LOCALAPPDATA%\\Yarn"
+
 test_script:
   - node --version
   - yarn --version
   - npm run vscode:prepublish
+  - npm test --silent
 #  - .\scripts\test.bat
 #  - .\scripts\test-integration.bat
 
