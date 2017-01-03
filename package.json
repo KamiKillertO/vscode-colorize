@@ -1,0 +1,43 @@
+{
+    "name": "colorize",
+    "displayName": "colorize",
+    "description": "A simple extension to help visualize css colors.",
+    "version": "0.0.1",
+    "publisher": "KamiKillertO",
+	"license": "Apache-2.0",
+    "engines": {
+        "vscode": "^1.5.0"
+    },
+    "categories": [
+        "Other"
+    ],
+	"keywords": [
+		"hsl",
+		"rgb",
+		"color",
+		"css",
+		"hexa"
+	],
+    "activationEvents": [
+        "onCommand:extension.sayHello"
+    ],
+    "main": "./out/src/extension",
+    "contributes": {
+        "commands": [{
+            "command": "extension.sayHello",
+            "title": "Hello World"
+        }]
+    },
+    "scripts": {
+        "vscode:prepublish": "tsc -p ./",
+        "compile": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install"
+    },
+    "devDependencies": {
+        "typescript": "^2.0.3",
+        "vscode": "^1.0.0",
+        "mocha": "^2.3.3",
+        "@types/node": "^6.0.40",
+        "@types/mocha": "^2.2.32"
+    }
+}
