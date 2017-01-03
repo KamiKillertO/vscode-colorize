@@ -16,3 +16,6 @@ test_script:
   - npm run vscode:prepublish
 #  - .\scripts\test.bat
 #  - .\scripts\test-integration.bat
+
+# Don't actually build.
+build: off
