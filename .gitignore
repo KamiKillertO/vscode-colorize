@@ -18,4 +18,5 @@ npm-debug.log
 testem.log
 
 .env*
-out
+.vscode-test
+
