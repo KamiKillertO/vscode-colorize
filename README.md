@@ -21,7 +21,7 @@ Calling out known issues can help limit users opening duplicate issues against y
 
 ## Release Notes
 
-### Latest 0.1.0 (2017.01.16)
+### Latest 0.1.0 (2017.01.17)
 
 - First Release
 - Add support for css hexa colors
