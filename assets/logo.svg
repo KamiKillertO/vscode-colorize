@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style id="bx-google-fonts">@import url(https://fonts.googleapis.com/css?family=Roboto:100,100italic,300,300italic,400,400italic,500,500italic,700,700italic,900,900italic);</style>
+    <linearGradient id="lgrad" x1="0px" y1="0.5" x2="1" y2="0.75">
+      <stop offset="0" stop-color="#34314c" stop-opacity="1"/>
+      <stop offset="0.25" stop-color="#34314c" stop-opacity="1"/>
+      <stop offset="0.25" stop-color="#47b8e0" stop-opacity="1"/>
+      <stop offset="0.5" stop-color="#47b8e0" stop-opacity="1"/>
+      <stop offset="0.5" stop-color="#ffc952" stop-opacity="1"/>
+      <stop offset="0.75" stop-color="#ffc952" stop-opacity="1"/>
+      <stop offset="0.75" stop-color="#ff7473" stop-opacity="1"/>
+      <stop offset="1" stop-color="#ff7473" stop-opacity="1"/>
+    </linearGradient>
+  </defs>
+  <rect y="48" width="128" height="32" fill="url(#lgrad)"/>
+  <text x="5" y="73.579" style="fill: rgb(255, 255, 255); font-size: 28px; white-space: pre;">#colorize</text>
+</svg>
