@@ -3,7 +3,7 @@
 Colorize will scan your css files looking for colors and generate a background for each of them.  
 The background is generated from the color.
 
-![](assets/demo.gif)
+![](https://raw.githubusercontent.com/KamiKillertO/vscode_colorize/master/assets/demo.gif)
 
 ## Features
 
