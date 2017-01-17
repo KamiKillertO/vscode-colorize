@@ -28,7 +28,7 @@ export function activate(context: ExtensionContext) {
   let timeout = null;
   let editor = window.activeTextEditor;
 
-  function triggerUpdateDecorations(/*range*/) {
+  function triggerUpdateDecorations( /*range*/ ) {
     if (timeout) {
       clearTimeout(timeout);
     }
@@ -36,14 +36,15 @@ export function activate(context: ExtensionContext) {
     timeout = setTimeout(updateDecorations, 500);
   }
 
-  function updateDecorations( /*editor: TextEditor, editedRange: Range*/) {
+  function updateDecorations( /*editor: TextEditor, editedRange: Range*/ ) {
     if (!editor) {
       return;
     }
 
-      let disposed = decorations.filter(decoration => {
-        decoration.checkDecoration(editor)
-        return decoration.disposed;
+
+    let disposed = decorations.filter(decoration => {
+      decoration.checkDecoration(editor);
+      return decoration.disposed;
     });
 
     let text = window.activeTextEditor.document.getText();
@@ -56,7 +57,7 @@ export function activate(context: ExtensionContext) {
       text = text.substr(match.index + match[1].length);
       let alreadyIn = decorations.find(decoration => decoration.textPosition.start.isEqual(startPos) && decoration.textPosition.end.isEqual(endPos));
       if (alreadyIn) {
-      	continue;
+        continue;
       }
       let range = new Range(startPos, endPos);
 
@@ -78,7 +79,7 @@ export function activate(context: ExtensionContext) {
 
   workspace.onDidChangeTextDocument(event => {
     if (editor && event.document === editor.document) {
-      triggerUpdateDecorations(/*event.contentChanges*/);
+      triggerUpdateDecorations( /*event.contentChanges*/ );
     }
   }, null, context.subscriptions);
 }
@@ -87,7 +88,7 @@ export function activate(context: ExtensionContext) {
 function generateDecorator(color: string): TextEditorDecorationType {
   let textColor = null;
   let luminance = ColorUtil.luminance(color);
-  if (luminance <  0.7) {
+  if (luminance < 0.7) {
     textColor = '#fff';
   } else {
     textColor = '#000';
@@ -103,7 +104,7 @@ function generateDecorator(color: string): TextEditorDecorationType {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() { }
+export function deactivate() {}
 
 
 class ColorDecoration {
@@ -120,7 +121,7 @@ class ColorDecoration {
     this._match = match;
   }
   public checkDecoration(editor: TextEditor): void {
-    let character_after = editor.document.lineAt(this.textPosition.start.line).text.substring(this.textPosition.end.character, this.textPosition.end.character + 1)
+    let character_after = editor.document.lineAt(this.textPosition.start.line).text.substring(this.textPosition.end.character, this.textPosition.end.character + 1);
     let text = editor.document.lineAt(this.textPosition.start.line).text.substring(this.textPosition.start.character, this.textPosition.end.character + 1);
     if (!this._matcher.test(text) || character_after === "") {
       this._decoration.dispose();
@@ -139,7 +140,9 @@ class ColorDecoration {
     this._decoration.dispose();
     let decoration = generateDecorator(this._match);
     this._decoration = decoration;
-    editor.setDecorations(this._decoration, [{ range: this.textPosition }]);
+    editor.setDecorations(this._decoration, [{
+      range: this.textPosition
+    }]);
   }
   public dispose(): void {
     this._decoration.dispose();
