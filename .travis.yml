@@ -21,7 +21,7 @@ before_install:
 install:
   - npm install -g yarn
   - yarn
-  - npm run vscode:prepublish
+  - yarn run vscode:prepublish
 
 script:
-  - npm test --silent
+  - yarn test --silent

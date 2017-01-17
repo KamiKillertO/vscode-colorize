@@ -1,10 +1,11 @@
 {
-  "name": "colorize",
+  "name": "vscode-colorize",
   "displayName": "colorize",
-  "description": "A simple extension to help visualize css colors.",
-  "version": "0.0.1",
+  "description": "A vscode extension to help visualize css colors in files.",
+  "version": "0.1.0",
   "publisher": "KamiKillertO",
   "license": "Apache-2.0",
+  "icon": "assets/logo.png",
   "engines": {
     "vscode": "^1.5.0"
   },
@@ -14,21 +15,35 @@
   "keywords": [
     "hsl",
     "rgb",
+    "rgba",
     "color",
     "css",
-    "hexa"
+    "hexa",
+    "sass",
+    "scss",
+    "less"
   ],
+  "galleryBanner": {
+    "color": "#87CEFA",
+    "theme": "dark"
+  },
   "activationEvents": [
-    "onCommand:extension.sayHello"
+    "onLanguage:css",
+    "onLanguage:sass",
+    "onLanguage:scss",
+    "onLanguage:less"
   ],
   "main": "./out/src/extension",
   "contributes": {
-    "commands": [
-      {
-        "command": "extension.sayHello",
-        "title": "Hello World"
-      }
-    ]
+    "commands": []
+  },
+  "bugs": {
+    "url": "https://github.com/KamiKillertO/vscode_colorize/issues"
+  },
+  "homepage": "https://github.com/KamiKillertO/vscode_colorize",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KamiKillertO/vscode_colorize.git"
   },
   "scripts": {
     "vscode:prepublish": "tsc -p ./",
@@ -40,13 +55,13 @@
   },
   "devDependencies": {
     "@types/chai": "3.4.34",
-    "@types/mocha": "2.2.35",
-    "@types/node": "^6.0.40",
+    "@types/mocha": "2.2.37",
+    "@types/node": "6.0.50",
     "chai": "3.5.0",
     "mocha": "3.2.0",
     "node-pre-gyp": "0.6.32",
-    "tslint": "4.2.0",
-    "typescript": "2.1.4",
+    "tslint": "4.3.1",
+    "typescript": "2.1.5",
     "vscode": "1.0.3"
   }
 }
