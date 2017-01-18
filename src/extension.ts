@@ -55,10 +55,11 @@ export function activate(context: ExtensionContext) {
       let endPos = editor.document.positionAt(start + match.index + match[1].length);
       start += match.index + match[1].length;
       text = text.substr(match.index + match[1].length);
-      let alreadyIn = decorations.find(decoration => decoration.textPosition.start.isEqual(startPos) && decoration.textPosition.end.isEqual(endPos));
-      if (alreadyIn) {
-        continue;
-      }
+      // let alreadyIn = decorations.find(decoration => decoration.textPosition.start.isEqual(startPos) && decoration.textPosition.end.isEqual(endPos));
+      // console.log(alreadyIn);
+      // if (alreadyIn) {
+      //   continue;
+      // }
       let range = new Range(startPos, endPos);
 
       let decoration = generateDecorator(match[1]);
@@ -123,12 +124,13 @@ class ColorDecoration {
   public checkDecoration(editor: TextEditor): void {
     let character_after = editor.document.lineAt(this.textPosition.start.line).text.substring(this.textPosition.end.character, this.textPosition.end.character + 1);
     let text = editor.document.lineAt(this.textPosition.start.line).text.substring(this.textPosition.start.character, this.textPosition.end.character + 1);
-    if (!this._matcher.test(text) || character_after === "") {
+
+    if (!text.match(this._matcher)) {
       this._decoration.dispose();
       this.disposed = true;
       return;
     }
-    if (text === this._match) {
+    if (text === this._match && character_after !== "") {
       return;
     }
     this._match = text;
