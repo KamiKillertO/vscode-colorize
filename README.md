@@ -3,6 +3,8 @@
 [![codebeat badge](https://codebeat.co/badges/71c89f96-3953-49b5-a5ae-8f40ad1359fd)](https://codebeat.co/projects/github-com-kamikillerto-vscode_colorize)
 [![Build Status](https://travis-ci.org/KamiKillertO/vscode_colorize.svg?branch=master)](https://travis-ci.org/KamiKillertO/vscode_colorize)
 [![Build status](https://ci.appveyor.com/api/projects/status/errygb6n97kiq75a?svg=true)](https://ci.appveyor.com/project/KamiKillertO/vscode-colorize)
+[![Licence](https://img.shields.io/github/license/KamiKillertO/vscode_colorize.svg)](https://github.com/KamiKillertO/vscode_colorize)
+![VS Code Marketplace](http://vsmarketplacebadge.apphb.com/version-short/kamikillerto.vscode-colorize.svg)
 
 Instantly visualize your css colors
 
@@ -22,7 +24,12 @@ Calling out known issues can help limit users opening duplicate issues against y
 
 ## Release Notes
 
-### Latest 0.1.0 (2017.01.17)
+## Latest 0.1.1 (2017.01.18)
+
+- README update
+- Update logo
+
+### 0.1.0 (2017.01.17)
 
 - First Release
 - Add support for css hexa colors
