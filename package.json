@@ -2,8 +2,8 @@
   "name": "vscode-colorize",
   "displayName": "colorize",
   "description": "A vscode extension to help visualize css colors in files.",
-  "version": "0.1.0",
-  "publisher": "KamiKillertO",
+  "version": "0.1.1",
+  "publisher": "kamikillerto",
   "license": "Apache-2.0",
   "icon": "assets/logo.png",
   "engines": {
@@ -13,18 +13,14 @@
     "Other"
   ],
   "keywords": [
-    "hsl",
-    "rgb",
-    "rgba",
     "color",
     "css",
     "hexa",
-    "sass",
-    "scss",
-    "less"
+    "hsl",
+    "rgb",
+    "preprocessor"
   ],
   "galleryBanner": {
-    "color": "#87CEFA",
     "theme": "dark"
   },
   "activationEvents": [
@@ -43,7 +39,7 @@
   "homepage": "https://github.com/KamiKillertO/vscode_colorize",
   "repository": {
     "type": "git",
-    "url": "https://github.com/KamiKillertO/vscode_colorize.git"
+    "url": "https://github.com/KamiKillertO/vscode_colorize"
   },
   "scripts": {
     "vscode:prepublish": "tsc -p ./",
@@ -56,7 +52,7 @@
   "devDependencies": {
     "@types/chai": "3.4.34",
     "@types/mocha": "2.2.37",
-    "@types/node": "6.0.50",
+    "@types/node": "6.0.60",
     "chai": "3.5.0",
     "mocha": "3.2.0",
     "node-pre-gyp": "0.6.32",
