@@ -24,7 +24,11 @@ Calling out known issues can help limit users opening duplicate issues against y
 
 ## Release Notes
 
-## Latest 0.1.1 (2017.01.18)
+## Latest 0.1.2 (2017.01.18)
+
+- Fix background update
+
+## 0.1.1 (2017.01.18)
 
 - README update
 - Update logo
