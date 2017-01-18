@@ -3,7 +3,7 @@
   "displayName": "colorize",
   "description": "A vscode extension to help visualize css colors in files.",
   "version": "0.1.0",
-  "publisher": "KamiKillertO",
+  "publisher": "kamikillerto",
   "license": "Apache-2.0",
   "icon": "assets/logo.png",
   "engines": {
@@ -13,18 +13,14 @@
     "Other"
   ],
   "keywords": [
-    "hsl",
-    "rgb",
-    "rgba",
     "color",
     "css",
     "hexa",
-    "sass",
-    "scss",
-    "less"
+    "hsl",
+    "rgb",
+    "preprocessor"
   ],
   "galleryBanner": {
-    "color": "#87CEFA",
     "theme": "dark"
   },
   "activationEvents": [
