@@ -38,8 +38,7 @@
   },
   "homepage": "https://github.com/KamiKillertO/vscode_colorize",
   "repository": {
-    "type": "git",
-    "url": "https://github.com/KamiKillertO/vscode_colorize"
+    "url": "https://github.com/KamiKillertO/vscode_colorize.git"
   },
   "scripts": {
     "vscode:prepublish": "tsc -p ./",
