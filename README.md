@@ -7,7 +7,7 @@ Instantly visualize your css colors
 This extension scan your css files looking for colors and generate a colored background for each of them.  
 The background is generated from the color.
 
-![](https://raw.githubusercontent.com/KamiKillertO/vscode_colorize/master/assets/demo.gif)
+![](https://raw.githubusercontent.com/KamiKillertO/vscode-colorize/master/assets/demo.gif)
 
 ## Features
 
@@ -56,4 +56,4 @@ See [CHANGELOG](CHANGELOG.md) for more information.
 
 ## Contributing
 
-Bugs, feature requests and more, in [GitHub Issues](https://github.com/KamiKillertO/vscode_colorize/issues).
+Bugs, feature requests and more, in [GitHub Issues](https://github.com/KamiKillertO/vscode-colorize/issues).
