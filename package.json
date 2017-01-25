@@ -20,6 +20,13 @@
     "rgb",
     "preprocessor"
   ],
+  "repository": {
+    "url": "https://github.com/KamiKillertO/vscode-colorize.git"
+  },
+  "bugs": {
+    "url": "https://github.com/KamiKillertO/vscode-colorize/issues"
+  },
+  "homepage": "https://github.com/KamiKillertO/vscode-colorize",
   "galleryBanner": {
     "theme": "light"
   },
@@ -32,13 +39,6 @@
   "main": "./out/src/extension",
   "contributes": {
     "commands": []
-  },
-  "bugs": {
-    "url": "https://github.com/KamiKillertO/vscode_colorize/issues"
-  },
-  "homepage": "https://github.com/KamiKillertO/vscode_colorize",
-  "repository": {
-    "url": "https://github.com/KamiKillertO/vscode_colorize.git"
   },
   "scripts": {
     "vscode:prepublish": "tsc -p ./",
