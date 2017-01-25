@@ -21,7 +21,7 @@
     "preprocessor"
   ],
   "galleryBanner": {
-    "theme": "dark"
+    "theme": "light"
   },
   "activationEvents": [
     "onLanguage:css",
