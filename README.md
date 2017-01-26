@@ -7,16 +7,24 @@ Instantly visualize css colors in your css/sass/scss/less files.
 This extension scan your styles files looking for colors and generate a colored background for each of them.  
 The background is generated/updated from the color.
 
-![](https://raw.githubusercontent.com/KamiKillertO/vscode-colorize/master/assets/demo.gif)
+![](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/demo.gif)
 
 ## Features
 
 - Generate colored background for css hexa color
 - Update the background when the color is updated
 
-## Known Issues
+## Roadmap
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+- [x] Generate background for hexa colors
+- [x] Update background on color updates
+- [ ] Generate background for rgb colors
+- [ ] Generate background for rgba colors
+- [ ] Generate background for hsl colors
+- [ ] Generate background for hsla colors
+- [ ] Generate background for Predefined/Cross-browser colors
+- [ ] Generate background for preprocessor variables
+- [ ] Generate background for css variables
 
 ## Release Notes
 
@@ -43,18 +51,6 @@ Calling out known issues can help limit users opening duplicate issues against y
 - Background update on color update
 
 See [CHANGELOG](CHANGELOG.md) for more information.
-
-## Roadmap
-
-- [x] Generate background for hexa colors
-- [x] Update background on color updates
-- [ ] Generate background for rgb colors
-- [ ] Generate background for rgba colors
-- [ ] Generate background for hsl colors
-- [ ] Generate background for hsla colors
-- [ ] Generate background for Predefined/Cross-browser colors
-- [ ] Generate background for preprocessor variables
-- [ ] Generate background for css variables
 
 ## Contributing
 
