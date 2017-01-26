@@ -7,7 +7,7 @@ import {
 } from 'vscode';
 
 import ColorUtil from './color-util';
-import Color from './color'
+import Color from './color';
 
 class ColorDecoration {
   public color: Color;

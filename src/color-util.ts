@@ -1,4 +1,6 @@
-import { HEXA_COLOR } from './color-regex';
+import {
+  HEXA_COLOR
+} from './color-regex';
 import Color from './color';
 
 class ColorUtil {
