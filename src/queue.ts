@@ -16,13 +16,14 @@ class Queue {
   }
   private _next() {
     this._running = false;
-    if(shift) { 
-        this._running = true;
-        shift(()=> {
-          this._next();
-        }); 
     // get the first element off the queue
     let action = this._queue.shift();
+    if (action) {
+      this._running = true;
+      new Promise((reject, resolve) => action(resolve)).then(this._next)
+      // action(() => {
+      //   this._next();
+      // });
     }
   }
 }
