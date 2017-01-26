@@ -18,7 +18,9 @@ import {
   TextDocumentContentChangeEvent
 } from 'vscode';
 
-import { HEXA_COLOR } from './color-regex';
+import {
+  HEXA_COLOR
+} from './color-regex';
 import ColorUtil from './color-util';
 import ColorDecoration from './color-decoration';
 import Color from './color';
@@ -27,16 +29,17 @@ import Queue from './queue';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 
-function mapToArray(map: Map<number,any>) {
-  let it = map.keys()
+function mapToArray(map: Map < number, any > ) {
+  let it = map.keys();
   let tmp = it.next();
-  let array= [];
-  while(!tmp.done) {
+  let array = [];
+  while (!tmp.done) {
     array.push(tmp.value);
-    tmp= it.next();
+    tmp = it.next();
   }
   return array;
 };
+
 function generateTextDocumentContentChange(startLine: number, text: string): TextDocumentContentChangeEvent {
   return {
     rangeLength: 0,
@@ -44,6 +47,7 @@ function generateTextDocumentContentChange(startLine: number, text: string): Tex
     range: new Range(new Position(startLine, 0), new Position(startLine, 0))
   };
 }
+
 function mutEditedLIneForDeletion(editedLine: TextDocumentContentChangeEvent[]): TextDocumentContentChangeEvent[] {
 
   let newEditedLine: TextDocumentContentChangeEvent[] = [];
@@ -60,6 +64,7 @@ function mutEditedLIneForDeletion(editedLine: TextDocumentContentChangeEvent[]):
   });
   return newEditedLine.reverse();
 }
+
 function mutEditedLIne(editedLine: TextDocumentContentChangeEvent[]): TextDocumentContentChangeEvent[] {
   let newEditedLine: TextDocumentContentChangeEvent[] = [];
   let startLine = 0;
@@ -67,14 +72,14 @@ function mutEditedLIne(editedLine: TextDocumentContentChangeEvent[]): TextDocume
   editedLine.reverse();
   editedLine.forEach(line => {
     startLine = line.range.start.line + before;
-    if (line.text == "\n") {
+    if (line.text === "\n") {
       newEditedLine.push(line);
     } else {
       line.text.split(/\n/).forEach(text => {
         newEditedLine.push(generateTextDocumentContentChange(startLine, line.text));
         startLine++;
         before++;
-      })
+      });
       before--;
     }
   });
@@ -82,7 +87,10 @@ function mutEditedLIne(editedLine: TextDocumentContentChangeEvent[]): TextDocume
 }
 
 function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context, diffLine: number) {
-  let positions = mapToArray(context.deco).map(_ => Object({oldPosition: _, newPosition: _}));
+  let positions = mapToArray(context.deco).map(_ => Object({
+    oldPosition: _,
+    newPosition: _
+  }));
 
   if (diffLine < 0) {
     editedLine = handleLineRemoved(editedLine, positions);
@@ -91,10 +99,10 @@ function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context, d
   }
   positions = positions.filter(position => {
     if (position.newPosition === null) {
-      context.deco.get(position.oldPosition).forEach(decoration => decoration.dispose())
+      context.deco.get(position.oldPosition).forEach(decoration => decoration.dispose());
       return false;
     }
-    return true
+    return true;
   });
   let newDeco = new Map();
   positions.forEach(position => {
@@ -112,12 +120,12 @@ function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position)
   editedLine = mutEditedLIne(editedLine);
   editedLine.forEach((line) => {
     position.forEach(position => {
-      if(position.oldPosition > line.range.start.line) {
+      if (position.oldPosition > line.range.start.line) {
         position.newPosition = position.newPosition + 1;
       }
     });
   });
-  return editedLine
+  return editedLine;
 }
 
 function updatePositionsForDeletion(range, positions) {
@@ -126,7 +134,7 @@ function updatePositionsForDeletion(range, positions) {
     if (position.newPosition === null) {
       return;
     }
-    if(position.oldPosition >= range.start.line && position.oldPosition < (range.end.line + 1)) {
+    if (position.oldPosition >= range.start.line && position.oldPosition < (range.end.line + 1)) {
       position.newPosition = null;
       return;
     }
@@ -139,19 +147,20 @@ function updatePositionsForDeletion(range, positions) {
   });
   return positions;
 }
+
 function handleLineRemoved(editedLine: TextDocumentContentChangeEvent[], positions) {
   editedLine.reverse();
   editedLine.forEach((line) => {
     positions = updatePositionsForDeletion(line.range, positions);
   });
   editedLine.reverse();
-  
+
   return mutEditedLIneForDeletion(editedLine);
 }
 
-function updateDecorations(editedLine: TextDocumentContentChangeEvent[], context, cb:Function) {
+function updateDecorations(editedLine: TextDocumentContentChangeEvent[], context, cb: Function) {
   let diffLine = context.current_editor.document.lineCount - context.nbLine;
-  
+
   if (diffLine !== 0) {
     editedLine = handleLineDiff(editedLine, context, diffLine);
     context.nbLine = context.current_editor.document.lineCount;
@@ -160,14 +169,14 @@ function updateDecorations(editedLine: TextDocumentContentChangeEvent[], context
 }
 
 function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], context, cb: Function) {
-  editedLine.forEach((line:TextDocumentContentChangeEvent) => {
+  editedLine.forEach((line: TextDocumentContentChangeEvent) => {
     if (context.deco.has(line.range.start.line)) {
       context.deco.get(line.range.start.line).forEach(decoration => {
         decoration.dispose();
       });
     }
     context.deco.set(line.range.start.line, []);
-    
+
     let colors = ColorUtil.extractColor(context.current_editor.document.lineAt(line.range.start.line).text);
     let decorations: ColorDecoration[] = [];
     colors.forEach((color) => {
@@ -187,7 +196,7 @@ function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], 
   cb();
 }
 
-function initDecorations(context, cb:Function) {
+function initDecorations(context, cb) {
   if (!context.current_editor) {
     return;
   }
