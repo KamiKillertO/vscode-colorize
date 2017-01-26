@@ -21,12 +21,13 @@
     "preprocessor"
   ],
   "repository": {
-    "url": "https://github.com/KamiKillertO/vscode-colorize.git"
+    "type": "git",
+    "url": "https://github.com/kamikillerto/vscode-colorize.git"
   },
   "bugs": {
-    "url": "https://github.com/KamiKillertO/vscode-colorize/issues"
+    "url": "https://github.com/kamikillerto/vscode-colorize/issues"
   },
-  "homepage": "https://github.com/KamiKillertO/vscode-colorize",
+  "homepage": "https://github.com/kamikillerto/vscode-colorize/blob/master/README.MD",
   "galleryBanner": {
     "theme": "light"
   },
