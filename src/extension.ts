@@ -168,32 +168,22 @@ function updateDecorations(editedLine: TextDocumentContentChangeEvent[], context
   checkDecorationForUpdate(editedLine, context, cb);
 }
 
-function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], context, cb: Function) {
-  editedLine.forEach((line: TextDocumentContentChangeEvent) => {
-    if (context.deco.has(line.range.start.line)) {
-      context.deco.get(line.range.start.line).forEach(decoration => {
-        decoration.dispose();
-      });
-    }
-    context.deco.set(line.range.start.line, []);
-
-    let colors = ColorUtil.extractColor(context.current_editor.document.lineAt(line.range.start.line).text);
-    let decorations: ColorDecoration[] = [];
-    colors.forEach((color) => {
-      let startPos = new Position(line.range.start.line, color.positionInText);
-      let endPos = new Position(line.range.start.line, color.positionInText + color.value.length);
-
-      let range = new Range(startPos, endPos);
-      let decoration = new ColorDecoration(range, color);
-      if (context.deco.has(startPos.line)) {
-        context.deco.set(startPos.line, context.deco.get(startPos.line).concat([decoration]));
-      } else {
-        context.deco.set(startPos.line, [decoration]);
+function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], context, cb) {
+  Promise.all(
+    editedLine.map(({range}: TextDocumentContentChangeEvent) => {
+      if (context.deco.has(range.start.line)) {
+        context.deco.get(range.start.line).forEach(decoration => {
+          decoration.dispose();
+        });
       }
-      context.current_editor.setDecorations(decoration.decoration, [range]);
-    });
-  });
-  cb();
+      context.deco.set(range.start.line, []);
+
+      return ColorUtil.findColors(context.current_editor.document.lineAt(range.start.line).text)
+              .then(colors => generateDecorations(colors, range.start.line, context))
+              .then(decorateEditor);
+    })
+
+  ).then(cb);
 }
 
 function initDecorations(context, cb) {
@@ -202,34 +192,38 @@ function initDecorations(context, cb) {
   }
   context.nbLine = context.current_editor.document.lineCount;
 
-  let text = context.current_editor.document.getText(); //should read line by line instead
-  let colors = ColorUtil.extractColor(text);
-  let decorations = generateDecorations(colors, context);
-  updateEditorDecorationFromMap(context.deco, context.current_editor);
-  cb();
+  let text = context.current_editor.document.getText(); // should read line by line instead or not?
+  let n: number = context.current_editor.document.lineCount;
+
+  Promise.all(context.current_editor.document.getText().split(/\n/).map((text, index) => ColorUtil.findColors(text)
+                                            .then(colors => generateDecorations(colors, index, context))
+                                            .then(decorateEditor))).then(cb);
+
 }
 
-function generateDecorations(colors: Color[], context): ColorDecoration[] {
-  let decorations: ColorDecoration[] = [];
+function generateDecorations(colors: Color[], line, context) {
   colors.forEach((color) => {
-    let startPos = context.current_editor.document.positionAt(color.positionInText);
-    let endPos = context.current_editor.document.positionAt(color.positionInText + color.value.length);
+    let startPos = new Position(line, color.positionInText);
+    let endPos = new Position(line, color.positionInText + color.value.length);
     let range = new Range(startPos, endPos);
-    if (context.deco.has(startPos.line)) {
-      context.deco.set(startPos.line, context.deco.get(startPos.line).concat([new ColorDecoration(range, color)]));
+    if (context.deco.has(line)) {
+      context.deco.set(line, context.deco.get(line).concat([new ColorDecoration(range, color)]));
     } else {
-      context.deco.set(startPos.line, [new ColorDecoration(range, color)]);
+      context.deco.set(line, [new ColorDecoration(range, color)]);
     }
   });
-  return decorations;
+  return context;
 }
-function updateEditorDecorationFromMap(decorations:  Map < number, ColorDecoration[] >, editor: TextEditor ) {
-    let it = decorations.entries();
-    let tmp = it.next();
-    while(!tmp.done) {
-      tmp.value[1].forEach(decoration => editor.setDecorations(decoration.decoration, [decoration.textPosition]))
-      tmp= it.next();
-    }
+
+function decorateEditor(context) {
+  
+  let it = context.deco.entries();
+  let tmp = it.next();
+  while (!tmp.done) {
+    tmp.value[1].forEach(decoration => context.current_editor.setDecorations(decoration.decoration, [decoration.textPosition]));
+    tmp = it.next();
+  }
+  return;
 }
 
 export function activate(context: ExtensionContext) {
