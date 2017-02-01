@@ -35,7 +35,9 @@
     "onLanguage:css",
     "onLanguage:sass",
     "onLanguage:scss",
-    "onLanguage:less"
+    "onLanguage:less",
+    "onLanguage:pcss",
+    "onLanguage:sss"
   ],
   "main": "./out/src/extension",
   "contributes": {
