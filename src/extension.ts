@@ -29,7 +29,7 @@ import Queue from './queue';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 
-function mapToArray(map: Map < number, any > ) {
+function mapKeysToArray(map: Map < number, any > ) {
   let it = map.keys();
   let tmp = it.next();
   let array = [];
@@ -40,16 +40,15 @@ function mapToArray(map: Map < number, any > ) {
   return array;
 };
 
-function generateTextDocumentContentChange(startLine: number, text: string): TextDocumentContentChangeEvent {
+function generateTextDocumentContentChange(line: number, text: string): TextDocumentContentChangeEvent {
   return {
     rangeLength: 0,
     text: text,
-    range: new Range(new Position(startLine, 0), new Position(startLine, 0))
+    range: new Range(new Position(line, 0), new Position(line, 0))
   };
 }
 
 function mutEditedLIneForDeletion(editedLine: TextDocumentContentChangeEvent[]): TextDocumentContentChangeEvent[] {
-
   let newEditedLine: TextDocumentContentChangeEvent[] = [];
   let startLine = 0;
   let before = 0;
@@ -57,7 +56,7 @@ function mutEditedLIneForDeletion(editedLine: TextDocumentContentChangeEvent[]):
   editedLine.forEach(line => {
     startLine = line.range.start.line + before;
     for (let i = line.range.start.line; i <= line.range.end.line; i++) {
-      newEditedLine.push(generateTextDocumentContentChange(startLine, line.text));
+      newEditedLine.push(generateTextDocumentContentChange(i, line.text));
       before--;
     }
     before++;
@@ -75,9 +74,8 @@ function mutEditedLIne(editedLine: TextDocumentContentChangeEvent[]): TextDocume
     if (line.text === "\n") {
       newEditedLine.push(line);
     } else {
-      line.text.split(/\n/).forEach(text => {
-        newEditedLine.push(generateTextDocumentContentChange(startLine, line.text));
-        startLine++;
+      line.text.split(/\n/).map(text => {
+        newEditedLine.push(generateTextDocumentContentChange(startLine++, line.text));
         before++;
       });
       before--;
@@ -86,10 +84,40 @@ function mutEditedLIne(editedLine: TextDocumentContentChangeEvent[]): TextDocume
   return newEditedLine.reverse();
 }
 
+function updatePositionsForDeletion(range, positions) {
+  let rangeLength = range.end.line - range.start.line;
+  positions.forEach(position => {
+    if (position.newPosition === null) {
+      return;
+    }
+    if (position.oldPosition >= range.start.line && position.oldPosition < (range.end.line + 1)) {
+      position.newPosition = null;
+      return;
+    }
+    if (position.oldPosition >= range.end.line) {
+      position.newPosition = position.newPosition - rangeLength;
+    }
+    if (position.newPosition < 0) {
+      position.newPosition = 0;
+    }
+  });
+  return positions;
+}
+
+function handleLineRemoved(editedLine: TextDocumentContentChangeEvent[], positions) {
+  editedLine.reverse();
+  editedLine.forEach((line) => {
+    positions = updatePositionsForDeletion(line.range, positions);
+  });
+  editedLine.reverse();
+
+  return mutEditedLIneForDeletion(editedLine);
+}
+
 function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context, diffLine: number) {
-  let positions = mapToArray(context.deco).map(_ => Object({
-    oldPosition: _,
-    newPosition: _
+  let positions = mapKeysToArray(context.deco).map(position => Object({
+    oldPosition: position,
+    newPosition: position
   }));
 
   if (diffLine < 0) {
@@ -126,36 +154,6 @@ function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position)
     });
   });
   return editedLine;
-}
-
-function updatePositionsForDeletion(range, positions) {
-  let rangeLength = range.end.line - range.start.line;
-  positions.forEach(position => {
-    if (position.newPosition === null) {
-      return;
-    }
-    if (position.oldPosition >= range.start.line && position.oldPosition < (range.end.line + 1)) {
-      position.newPosition = null;
-      return;
-    }
-    if (position.oldPosition >= range.end.line) {
-      position.newPosition = position.newPosition - rangeLength;
-    }
-    if (position.newPosition < 0) {
-      position.newPosition = 0;
-    }
-  });
-  return positions;
-}
-
-function handleLineRemoved(editedLine: TextDocumentContentChangeEvent[], positions) {
-  editedLine.reverse();
-  editedLine.forEach((line) => {
-    positions = updatePositionsForDeletion(line.range, positions);
-  });
-  editedLine.reverse();
-
-  return mutEditedLIneForDeletion(editedLine);
 }
 
 function updateDecorations(editedLine: TextDocumentContentChangeEvent[], context, cb: Function) {
@@ -216,7 +214,6 @@ function generateDecorations(colors: Color[], line, context) {
 }
 
 function decorateEditor(context) {
-  
   let it = context.deco.entries();
   let tmp = it.next();
   while (!tmp.done) {
@@ -227,35 +224,35 @@ function decorateEditor(context) {
 }
 
 export function activate(context: ExtensionContext) {
-  let decorations : Map < string, Map < number, ColorDecoration[] > > = new Map();
+  let decorations: Map < string, Map < number, ColorDecoration[] > > = new Map();
   let extension = {
-    current_editor: null,
+    current_editor: window.activeTextEditor,
     nbLine: 0,
     deco: null
-  }
+  };
   let q = new Queue();
-  let editor = window.activeTextEditor;
 
-  if (editor) {
-    extension.current_editor = editor,
-    extension.deco = new Map();
-    decorations.set(editor.document.fileName, extension.deco);
-    q.push((cb)=> initDecorations(extension, cb))
+  if (extension.current_editor) {
+      extension.deco = new Map();
+    decorations.set(extension.current_editor.document.fileName, extension.deco);
+    q.push((cb) => {
+      initDecorations(extension, cb);
+    });
   }
   window.onDidChangeActiveTextEditor(newEditor => {
-    extension.current_editor = newEditor
+    extension.current_editor = newEditor;
     if (newEditor && !decorations.has(newEditor.document.fileName)) {
       extension.deco = new Map();
     } else {
       extension.deco = decorations.get(newEditor.document.fileName);
     }
-    return q.push((cb)=> initDecorations(extension, cb))
-    
+    return q.push((cb) => initDecorations(extension, cb));
+
   }, null, context.subscriptions);
 
   workspace.onDidChangeTextDocument((event: TextDocumentChangeEvent) => {
-    if (editor && event.document === editor.document) {
-      q.push((cb)=> updateDecorations(event.contentChanges, extension, cb))
+    if (extension.current_editor && event.document === extension.current_editor.document) {
+      q.push((cb) => updateDecorations(event.contentChanges, extension, cb));
     }
   }, null, context.subscriptions);
 }

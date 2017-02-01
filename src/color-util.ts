@@ -40,8 +40,7 @@ class ColorUtil {
 
   public static findColors(text): Promise < Color[] > {
     return Promise.all([
-      this._extractHexa(text),
-      this._extractRGB(text)
+      this._extractHexa(text)
     ]).then(colors => { // need to flat
       return flatten(colors);
     });
