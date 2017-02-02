@@ -31,5 +31,9 @@ class Color {
         return;
     }
   }
+
+  public toRGBString(): string {
+    return `rgb(${this.rgb.join(',')})`;
+  }
 }
 export default Color;
