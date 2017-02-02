@@ -21,9 +21,6 @@ class Queue {
     if (action) {
       this._running = true;
       new Promise((resolve, reject) => action(resolve)).then(this._next.bind(this));
-      // action(() => {
-      //   this._next();
-      // });
     }
   }
 }

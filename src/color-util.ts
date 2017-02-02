@@ -34,16 +34,6 @@ class ColorUtil {
     });
   }
 
-
-  public static match(text: string, model: string): boolean {
-    switch (model) {
-      case 'hexa':
-        return !!text.match(HEXA_COLOR);
-      default:
-        return false;
-    }
-  }
-
   private static _extractHexa(text: string): Promise < Color[] > {
     return new Promise((resolve, reject) => {
       let match = null;
