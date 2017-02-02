@@ -1,5 +1,6 @@
 import {
-  HEXA_COLOR
+  HEXA_COLOR,
+  RGB_COLOR
 } from './color-regex';
 import Color from './color';
 
@@ -40,8 +41,9 @@ class ColorUtil {
 
   public static findColors(text): Promise < Color[] > {
     return Promise.all([
-      this._extractHexa(text)
-    ]).then(colors => { // need to flat
+      this._extractHexa(text),
+      this._extractRGB(text)
+    ]).then(colors => {
       return flatten(colors);
     });
   }
@@ -67,5 +69,20 @@ class ColorUtil {
     });
   }
 
+  private static _extractRGB(text: string): Promise < Color[] > {
+    return new Promise((resolve, reject) => {
+      let match = null;
+      let colors: Color[] = [];
+      // Get rgb "like" colors
+      while ((match = RGB_COLOR.exec(text)) !== null) {
+        let rgba = match[1].replace(/rgb(a){0,1}\(/, '').replace(/\)/, '').split(/,/gi).map(c => parseFloat(c));
+        // Check if it's a valid rgb(a) color
+        if (rgba.slice(0, 3).every(c => c <= 255) && (rgba[4] || 1) <= 1) {
+          colors.push(new Color('rgb', match[0], match.index));
+        }
+      }
+      return resolve(colors);
+    });
+  }
 };
 export default ColorUtil;
