@@ -43,8 +43,8 @@ class ColorDecoration {
     let backgroundDecorationType = window.createTextEditorDecorationType({
       borderWidth: "1px",
       borderStyle: "solid",
-      borderColor: this.color.value,
-      backgroundColor: this.color.value,
+      borderColor: this.color.toRGBString(),
+      backgroundColor: this.color.toRGBString(),
       color: textColor
     });
     this.decoration = backgroundDecorationType;
