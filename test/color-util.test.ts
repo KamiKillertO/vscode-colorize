@@ -6,9 +6,18 @@ import ColorUtil from '../src/color-util';
 import Color from '../src/color';
 
 describe('Test utility fonction', () => {
-  it('Should return the rgb value of a color', () => {
-    assert.deepEqual(ColorUtil.getRGB(new Color('hexa', '#fff')), [255, 255, 255], 'Should return rgb values for CSS hexa shorthand color');
-    assert.deepEqual(ColorUtil.getRGB(new Color('hexa', '#ffffff')), [255, 255, 255], 'Should return rgb values for CSS hexa color');
+  it('Should not extract invalid colors from a text', (done) => {
+    ColorUtil.findColors('#ffg, rgb(323,123,123)').then(colors => {
+      assert.equal(0, colors.length, 'Should have found 0 colors');
+      done();
+    });
+  });
+  it('Should extract Colors from a text', (done) => {
+    ColorUtil.findColors('#fff, rgb(123,123,123), #dccdcd').then(colors => {
+      assert.equal(3, colors.length, 'Should have found 3 colors');
+      assert.deepEqual(['hexa', 'hexa', 'rgb'], colors.map(color => color.model));
+      done();
+    });
   });
   it('Should return the color luminance', () => {
     assert.equal(ColorUtil.luminance(new Color('hexa', '#fff')), 1, 'Should be "1" for #fff');
