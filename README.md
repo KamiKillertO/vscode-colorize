@@ -50,15 +50,6 @@ The background is generated/updated from the color.
 - Huge code refacto
 - Dramatically improvement colored background updates
 
-### 0.1.2 (2017.01.18)
-
-- Fix background update
-
-### 0.1.1 (2017.01.18)
-
-- README update
-- Update logo
-
 ### 0.1.0 (2017.01.17)
 
 - First Release
