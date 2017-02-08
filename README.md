@@ -30,7 +30,12 @@ The background is generated/updated from the color.
 
 ## Release Notes
 
-### Latest 0.3.0 (2017.02.04)
+### Latest 0.3.1 (2017.02.08)
+
+- Fix an issue where one space after rgb(a) colors was included in the colored background
+- Speed up colored background generation for long files
+
+### 0.3.0 (2017.02.04)
 
 - Add support for PostCSS
 - Generate background for RGB colors
