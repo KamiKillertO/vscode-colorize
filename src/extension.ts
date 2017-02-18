@@ -175,13 +175,11 @@ function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], 
         });
       }
       context.deco.set(range.start.line, []);
-
       return ColorUtil.findColors(context.current_editor.document.lineAt(range.start.line).text)
-              .then(colors => generateDecorations(colors, range.start.line, context))
-              .then(decorateEditor);
+              .then(colors => generateDecorations(colors, range.start.line, context));
     })
-
-  ).then(cb);
+  ).then(() => decorateEditor(context))
+   .then(cb);
 }
 
 function initDecorations(context, cb) {
@@ -192,10 +190,25 @@ function initDecorations(context, cb) {
 
   let text = context.current_editor.document.getText(); // should read line by line instead or not?
   let n: number = context.current_editor.document.lineCount;
+  Promise.all(context.current_editor.document.getText()
+                                  .split(/\n/)
+                                  .map((text, index) => Object({"text": text, "line": index}))
+                                  .filter(line => line.text !== "")
+                                  .map(line => ColorUtil.findColors(line.text)
+                                              .then(colors => generateDecorations(colors, line.line, context))))
+                                  .then(() => decorateEditor(context))
+                                  .then(cb);
 
-  Promise.all(context.current_editor.document.getText().split(/\n/).map((text, index) => ColorUtil.findColors(text)
-                                            .then(colors => generateDecorations(colors, index, context))
-                                            .then(decorateEditor))).then(cb);
+// Remove empty lines (faster?)
+  // Promise.all(context.current_editor.document.getText()
+  //                                           .split(/\n/)
+  //                                           .map((text, index) => Object({"text": text, "line": index}))
+  //                                           .filter(line => line.text !== "")
+  //                                           .splice(0, 300)
+  //                                           .map((text, index) => ColorUtil.findColors(text)
+  //                                             .then(colors => generateDecorations(colors, index, context)))
+  //                                           .then(() => decorateEditor(context)))
+  //                                           .then(cb);
 
 }
 
@@ -210,7 +223,7 @@ function generateDecorations(colors: Color[], line, context) {
       context.deco.set(line, [new ColorDecoration(range, color)]);
     }
   });
-  return context;
+  return context; // return colors instead?
 }
 
 function decorateEditor(context) {

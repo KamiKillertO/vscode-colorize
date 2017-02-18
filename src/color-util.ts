@@ -54,7 +54,7 @@ class ColorUtil {
         let rgba = match[1].replace(/rgb(a){0,1}\(/, '').replace(/\)/, '').split(/,/gi).map(c => parseFloat(c));
         // Check if it's a valid rgb(a) color
         if (rgba.slice(0, 3).every(c => c <= 255) && (rgba[4] || 1) <= 1) {
-          colors.push(new Color('rgb', match[0], match.index));
+          colors.push(new Color('rgb', match[1], match.index));
         }
       }
       return resolve(colors);
