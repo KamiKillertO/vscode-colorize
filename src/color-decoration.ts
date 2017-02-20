@@ -20,6 +20,7 @@ class ColorDecoration {
   }
 
   public dispose(): void {
+    this.color = null;
     this.decoration.dispose();
   }
 

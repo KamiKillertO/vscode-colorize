@@ -80,11 +80,14 @@ function generateTextDocumentContentChange(line: number, text: string): TextDocu
 //
 // 
 function mutEditedLIne(editedLine: TextDocumentContentChangeEvent[]): TextDocumentContentChangeEvent[] {
+
   let newEditedLine: TextDocumentContentChangeEvent[] = [];
   let startLine = 0;
   let before = 0;
   editedLine.reverse();
+  // debugger;
   editedLine.forEach(line => {
+    let a = line.text.match(/\n/g);
     startLine = line.range.start.line + before;
     line.text.split(/\n/).map((text, i, array) => {
       if (i === 0 && text === '' && array.length === 1) {
@@ -161,6 +164,7 @@ function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context: C
 }
 
 function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position) {
+  // debugger;
   editedLine = mutEditedLIne(editedLine);
   editedLine.forEach((line) => {
     position.forEach(position => {
@@ -287,4 +291,7 @@ export function activate(context: ExtensionContext) {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() {
+
+  // need to clean up everything
+}

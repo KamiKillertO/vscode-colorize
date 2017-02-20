@@ -3,7 +3,11 @@ import {
   RGB_COLOR
 } from './color-regex';
 import Color from './color';
+import browserColors from "./brower-colors";
 
+// debugger;
+
+const BROWSER_COLORS_REGEX = RegExp(`(${Object.keys(browserColors).map((color) => `(?:${color.toLowerCase()})`).join('|')})(?:$|,| |;|\n)`, 'gi');
 // Flatten Array
 // flatten(arr[[1,2,3],[4,5]]) -> arr[1,2,3,4,5]
 const flatten = arr => arr.reduce((a, b) => a.concat(Array.isArray(b) ? flatten(b) : b), []);
@@ -26,9 +30,11 @@ class ColorUtil {
   }
 
   public static findColors(text): Promise < Color[] > {
+    // debugger;
     return Promise.all([
       this._extractHexa(text),
-      this._extractRGB(text)
+      this._extractRGB(text),
+      this._extractBrowserColors(text)
     ]).then(colors => {
       return flatten(colors);
     });
@@ -60,5 +66,15 @@ class ColorUtil {
       return resolve(colors);
     });
   }
+  private static _extractBrowserColors(text: string): Promise < Color[] > {
+    return new Promise((resolve, reject) => {
+      let match = null;
+      let colors: Color[] = [];
+      while ((match = BROWSER_COLORS_REGEX.exec(text)) !== null) {
+        colors.push(new Color('browser', match[1], match.index, browserColors[match[1]].rgb));
+      }
+      return resolve(colors);
+    });
+  };
 };
 export default ColorUtil;
