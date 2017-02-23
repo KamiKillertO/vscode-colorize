@@ -18,6 +18,7 @@ import {
   TextDocumentContentChangeEvent
 } from 'vscode';
 
+import Color from './color';
 import ColorUtil from './color-util';
 import ColorDecoration from './color-decoration';
 import Queue from './queue';
