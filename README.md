@@ -2,10 +2,9 @@
 
 [![codebeat badge](https://codebeat.co/badges/aec222e1-64ae-4360-a849-d077040694ca)](https://codebeat.co/projects/github-com-kamikillerto-vscode-colorize) [![Build Status](https://travis-ci.org/KamiKillertO/vscode-colorize.svg?branch=master)](https://travis-ci.org/KamiKillertO/vscode-colorize) [![Build status](https://ci.appveyor.com/api/projects/status/errygb6n97kiq75a?svg=true)](https://ci.appveyor.com/project/KamiKillertO/vscode-colorize) [![Licence](https://img.shields.io/github/license/KamiKillertO/vscode_colorize.svg)](https://github.com/KamiKillertO/vscode_colorize) ![VS Code Marketplace](http://vsmarketplacebadge.apphb.com/version-short/kamikillerto.vscode-colorize.svg)
 
-Instantly visualize css colors in your css/sass/scss/less/pcss/sss files.
+Instantly visualize css colors in your css/sass/less/postcss/stylus/XML files.
 
-This extension scan your styles files looking for colors and generate a colored background for each of them.  
-The background is generated/updated from the color.
+This extension  your styles files looking for colors and generate a colored background (using the color) for each of them.
 
 ![](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/demo.gif)
 
@@ -29,6 +28,12 @@ The background is generated/updated from the color.
 - [ ] Generate background for css variables
 
 ## Release Notes
+
+### Latest 0.3.2 (2017.02.23)
+
+- Stylus support
+- XML support
+- Fix some background update issues
 
 ### Latest 0.3.1 (2017.02.08)
 
@@ -60,4 +65,4 @@ See [CHANGELOG](CHANGELOG.md) for more information.
 
 ## Contributing
 
-Bugs, feature requests and more, in [GitHub Issues](https://github.com/KamiKillertO/vscode-colorize/issues).
+Bugs, feature requests and more are welcome here [GitHub Issues](https://github.com/KamiKillertO/vscode-colorize/issues).
