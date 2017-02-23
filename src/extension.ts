@@ -18,6 +18,7 @@ import {
   TextDocumentContentChangeEvent
 } from 'vscode';
 
+import Color from './color';
 import ColorUtil from './color-util';
 import ColorDecoration from './color-decoration';
 import Queue from './queue';
@@ -279,7 +280,7 @@ export function activate(context: ExtensionContext) {
   }, null, context.subscriptions);
 
   workspace.onDidChangeTextDocument((event: TextDocumentChangeEvent) => {
-    if (extension.editor && event.document === extension.editor.document) {
+    if (extension.editor && event.document.fileName === extension.editor.document.fileName) {
       q.push((cb) => updateDecorations(event.contentChanges, extension, cb));
     }
   }, null, context.subscriptions);

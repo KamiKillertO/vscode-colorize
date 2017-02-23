@@ -16,6 +16,9 @@ describe("Test CSS hexa shorthand color Regex", () => {
   it('Regex should not care about the case', function () {
     assert.ok('#Abc'.match(HEXA_COLOR));
   });
+  it('Sould match inside a string', function() {
+    assert.ok('"#Abc"'.match(HEXA_COLOR));
+  });
   it('Should match with different characters at the end', function () {
     assert.ok('#Abc'.match(HEXA_COLOR));
     assert.ok('#Abc '.match(HEXA_COLOR));
@@ -42,6 +45,9 @@ describe("Test CSS hexa color Regex", () => {
   it('Regex should not care about the case', function () {
     assert.ok('#Abc012'.match(HEXA_COLOR));
   });
+  it('Sould match inside a string', function() {
+    assert.ok('"#ffffff"'.match(HEXA_COLOR));
+  });
   it('Should match with different characters at the end', function () {
     assert.ok('#ffffff '.match(HEXA_COLOR));
     assert.ok('#ffffff,'.match(HEXA_COLOR));
@@ -62,6 +68,10 @@ describe("Test rgb(a) color Regex", () => {
     assert.ok('rgba(123,123,123, 0)'.match(RGB_COLOR));
     assert.ok('rgba(123,123,123, 0.3)'.match(RGB_COLOR));
     assert.ok('rgba(123,123,123, 1)'.match(RGB_COLOR));
+  });
+  it('Sould match inside a string', function() {
+    assert.ok('"rgba(123,123,123, 1)"'.match(RGB_COLOR));
+    assert.ok('"rgb(123,123,123)"'.match(RGB_COLOR));
   });
 
   it('Should match with different characters at the end', function () {
