@@ -11,25 +11,20 @@ import Color from './color';
 
 class ColorDecoration {
   public color: Color;
-  public textPosition: Range;
   public decoration: TextEditorDecorationType;
   public disposed: boolean = false;
 
-  public constructor(textPosition: Range, color: Color) {
-    this.textPosition = textPosition;
+  public constructor(color: Color) {
     this.color = color;
     this._generateDecorator();
   }
 
-  private _updateDecoration(editor) {
-    this.decoration.dispose();
-    this.decoration = this._generateDecorator();
-    editor.setDecorations(this.decoration, [{
-      range: this.textPosition
-    }]);
-  }
   public dispose(): void {
     this.decoration.dispose();
+  }
+
+  public generateRange(line: number) {
+    return new Range(new Position(line, this.color.positionInText), new Position(line, this.color.positionInText + this.color.value.length));
   }
 
   private _generateDecorator(): TextEditorDecorationType {
