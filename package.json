@@ -39,7 +39,8 @@
     "onLanguage:pcss",
     "onLanguage:sss",
     "onLanguage:stylus",
-    "onLanguage:styl"
+    "onLanguage:styl",
+    "onLanguage:xml"
   ],
   "main": "./out/src/extension",
   "contributes": {
