@@ -280,7 +280,7 @@ export function activate(context: ExtensionContext) {
   }, null, context.subscriptions);
 
   workspace.onDidChangeTextDocument((event: TextDocumentChangeEvent) => {
-    if (extension.editor && event.document === extension.editor.document) {
+    if (extension.editor && event.document.fileName === extension.editor.document.fileName) {
       q.push((cb) => updateDecorations(event.contentChanges, extension, cb));
     }
   }, null, context.subscriptions);
