@@ -32,15 +32,7 @@
     "theme": "light"
   },
   "activationEvents": [
-    "onLanguage:css",
-    "onLanguage:sass",
-    "onLanguage:scss",
-    "onLanguage:less",
-    "onLanguage:pcss",
-    "onLanguage:sss",
-    "onLanguage:stylus",
-    "onLanguage:styl",
-    "onLanguage:xml"
+    "*"
   ],
   "main": "./out/src/extension",
   "contributes": {},
