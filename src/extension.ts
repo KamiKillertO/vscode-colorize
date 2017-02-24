@@ -23,11 +23,43 @@ import ColorUtil from './color-util';
 import ColorDecoration from './color-decoration';
 import Queue from './queue';
 
+const SUPPORTED_FILE_EXTENSIONS: RegExp[] = [
+    /\.sass$/,
+    /\.scss$/,
+    /\.less$/,
+    /\.pcss$/,
+    /\.sss$/,
+    /\.stylus$/,
+    /\.styl$/,
+    /\.svg$/,
+    /\.xml$/
+];
+const SUPPORTED_LANGUAGEID: string[] = [
+    "css",
+    "sass",
+    "scss",
+    "less",
+    "pcss",
+    "sss",
+    "stylus",
+    "xml",
+    "svg"
+]; // move in https://code.visualstudio.com/docs/extensionAPI/extension-points#_contributesconfiguration?
+
 interface ColorizeContext {
   editor: TextEditor;
   nbLine: number;
   deco: Map < number, ColorDecoration[] >;
 }
+
+let extension: ColorizeContext = {
+  editor: window.activeTextEditor,
+  nbLine: 0,
+  deco: null
+};
+let filesDecorations: Map < string, Map < number, ColorDecoration[] > > = new Map();
+
+const q = new Queue();
 
 // Return all map's keys in an array
 function mapKeysToArray(map: Map < number, any > ) {
@@ -75,9 +107,6 @@ function generateTextDocumentContentChange(line: number, text: string): TextDocu
 //  text: '',
 //  range: {start:{line:4,/*...*/}, end:{line:4,/*...*/}}
 // }]
-//
-//
-//
 // 
 function mutEditedLIne(editedLine: TextDocumentContentChangeEvent[]): TextDocumentContentChangeEvent[] {
   let newEditedLine: TextDocumentContentChangeEvent[] = [];
@@ -210,7 +239,6 @@ function initDecorations(context: ColorizeContext, cb) {
   if (!context.editor) {
     return;
   }
-  context.nbLine = context.editor.document.lineCount;
 
   let text = context.editor.document.getText();
   let n: number = context.editor.document.lineCount;
@@ -252,38 +280,45 @@ function decorateEditor(context: ColorizeContext) {
   return;
 }
 
-export function activate(context: ExtensionContext) {
-  let decorations: Map < string, Map < number, ColorDecoration[] > > = new Map();
-  let extension: ColorizeContext = {
-    editor: window.activeTextEditor,
-    nbLine: 0,
-    deco: null
-  };
-  let q = new Queue();
+function isLanguageSupported(languageId): boolean {
+  return SUPPORTED_LANGUAGEID.indexOf(languageId) !== -1;
+}
 
-  if (extension.editor) {
-    extension.deco = new Map();
-    decorations.set(extension.editor.document.fileName, extension.deco);
-    q.push((cb) => {
-      initDecorations(extension, cb);
-    });
-  }
-  window.onDidChangeActiveTextEditor(newEditor => {
-    extension.editor = newEditor;
-    if (newEditor && !decorations.has(newEditor.document.fileName)) {
-      extension.deco = new Map();
-    } else {
-      extension.deco = decorations.get(newEditor.document.fileName);
+function isFileExtenstionSupported(languageId): boolean {
+  return SUPPORTED_LANGUAGEID.indexOf(languageId) !== -1;
+}
+
+
+function checkIfColorizeSupportFile(editor: TextEditor) {
+  if (editor) {
+    debugger;
+    if (isLanguageSupported(editor.document.languageId) || isFileExtenstionSupported(editor.document.fileName)) {
+      extension.editor = editor;
+      if (filesDecorations.has(editor.document.fileName)) {
+        extension.deco = filesDecorations.get(editor.document.fileName);
+        extension.nbLine = editor.document.lineCount;
+      } else {
+        extension.deco = new Map();
+        filesDecorations.set(extension.editor.document.fileName, extension.deco);
+        extension.nbLine = editor.document.lineCount;
+        q.push((cb) => {
+          initDecorations(extension, cb);
+        });
+      }
     }
-    return q.push((cb) => initDecorations(extension, cb));
+  }
+};
 
-  }, null, context.subscriptions);
+export function activate(context: ExtensionContext) {
+
+  window.onDidChangeActiveTextEditor(editor => checkIfColorizeSupportFile(editor), null, context.subscriptions);
 
   workspace.onDidChangeTextDocument((event: TextDocumentChangeEvent) => {
     if (extension.editor && event.document.fileName === extension.editor.document.fileName) {
       q.push((cb) => updateDecorations(event.contentChanges, extension, cb));
     }
   }, null, context.subscriptions);
+  checkIfColorizeSupportFile(window.activeTextEditor);
 }
 
 // this method is called when your extension is deactivated
