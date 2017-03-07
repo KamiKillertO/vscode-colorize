@@ -7,7 +7,6 @@ platform:
   - x64
 
 install:
-  - mkdir .vscode-test
   - ps: Install-Product node 6
   - yarn
 
