@@ -35,7 +35,44 @@
     "*"
   ],
   "main": "./out/src/extension",
-  "contributes": {},
+  "contributes": {
+    "configuration": {
+      "title": "Colorize extension (reboot after any changes required)",
+       "properties": {
+        
+        "colorize.languages": {
+          "default": [
+            "css",
+            "sass",
+            "scss",
+            "less",
+            "pcss",
+            "sss",
+            "stylus",
+            "xml",
+            "svg"
+          ],
+          "title": "Colorize files with these languages",
+          "type": "array"
+        },
+        "colorize.files_extensions": {
+          "default": [
+            ".sass",
+            ".scss",
+            ".less",
+            ".pcss",
+            ".sss",
+            ".stylus",
+            ".styl",
+            ".svg",
+            ".xml"
+          ],
+          "title": "Colorize files with these extensions",
+          "type": "array"
+        }
+      }
+    }
+  },
   "scripts": {
     "vscode:prepublish": "tsc -p ./",
     "compile": "tsc -watch -p ./",

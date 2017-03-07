@@ -23,28 +23,10 @@ import ColorUtil from './color-util';
 import ColorDecoration from './color-decoration';
 import Queue from './queue';
 
-const SUPPORTED_FILE_EXTENSIONS: RegExp[] = [
-    /\.sass$/,
-    /\.scss$/,
-    /\.less$/,
-    /\.pcss$/,
-    /\.sss$/,
-    /\.stylus$/,
-    /\.styl$/,
-    /\.svg$/,
-    /\.xml$/
-];
-const SUPPORTED_LANGUAGEID: string[] = [
-    "css",
-    "sass",
-    "scss",
-    "less",
-    "pcss",
-    "sss",
-    "stylus",
-    "xml",
-    "svg"
-]; // move in https://code.visualstudio.com/docs/extensionAPI/extension-points#_contributesconfiguration?
+let config = {
+  languages: null,
+  filesExtensions: null
+};
 
 interface ColorizeContext {
   editor: TextEditor;
@@ -281,17 +263,16 @@ function decorateEditor(context: ColorizeContext) {
 }
 
 function isLanguageSupported(languageId): boolean {
-  return SUPPORTED_LANGUAGEID.indexOf(languageId) !== -1;
+  return config.languages.indexOf(languageId) !== -1;
 }
 
-function isFileExtenstionSupported(languageId): boolean {
-  return SUPPORTED_LANGUAGEID.indexOf(languageId) !== -1;
+function isFileExtenstionSupported(fileName): boolean {
+  return config.filesExtensions.find(ext => ext.test(fileName));
 }
 
 
 function checkIfColorizeSupportFile(editor: TextEditor) {
   if (editor) {
-    debugger;
     if (isLanguageSupported(editor.document.languageId) || isFileExtenstionSupported(editor.document.fileName)) {
       extension.editor = editor;
       if (filesDecorations.has(editor.document.fileName)) {
@@ -310,6 +291,9 @@ function checkIfColorizeSupportFile(editor: TextEditor) {
 };
 
 export function activate(context: ExtensionContext) {
+  const configuration = workspace.getConfiguration('colorize');
+  config.languages = configuration.languages;
+  config.filesExtensions = configuration.files_extensions.map(ext => RegExp(`\\${ext}$`));
 
   window.onDidChangeActiveTextEditor(editor => checkIfColorizeSupportFile(editor), null, context.subscriptions);
 
