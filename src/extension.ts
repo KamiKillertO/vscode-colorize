@@ -292,11 +292,10 @@ function checkIfColorizeSupportFile(editor: TextEditor) {
 
 export function activate(context: ExtensionContext) {
   const configuration = workspace.getConfiguration('colorize');
-  config.languages = configuration.languages;
-  config.filesExtensions = configuration.files_extensions.map(ext => RegExp(`\\${ext}$`));
+  config.languages = configuration.get('languages', []);
+  config.filesExtensions = configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`));
 
   window.onDidChangeActiveTextEditor(editor => checkIfColorizeSupportFile(editor), null, context.subscriptions);
-
   workspace.onDidChangeTextDocument((event: TextDocumentChangeEvent) => {
     if (extension.editor && event.document.fileName === extension.editor.document.fileName) {
       q.push((cb) => updateDecorations(event.contentChanges, extension, cb));
