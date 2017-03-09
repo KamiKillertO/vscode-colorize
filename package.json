@@ -56,17 +56,7 @@
           "type": "array"
         },
         "colorize.files_extensions": {
-          "default": [
-            ".sass",
-            ".scss",
-            ".less",
-            ".pcss",
-            ".sss",
-            ".stylus",
-            ".styl",
-            ".svg",
-            ".xml"
-          ],
+          "default": [],
           "title": "Colorize files with these extensions",
           "type": "array"
         }
