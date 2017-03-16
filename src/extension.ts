@@ -278,6 +278,7 @@ function checkIfColorizeSupportFile(editor: TextEditor) {
       if (filesDecorations.has(editor.document.fileName)) {
         extension.deco = filesDecorations.get(editor.document.fileName);
         extension.nbLine = editor.document.lineCount;
+        q.push((cb) => updateDecorations([], extension, cb));
       } else {
         extension.deco = new Map();
         filesDecorations.set(extension.editor.document.fileName, extension.deco);
