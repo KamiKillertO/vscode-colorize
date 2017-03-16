@@ -270,24 +270,27 @@ function isFileExtenstionSupported(fileName): boolean {
   return config.filesExtensions.find(ext => ext.test(fileName));
 }
 
+function isSupported(document: TextDocument){
+  return isLanguageSupported(document.languageId) || isFileExtenstionSupported(document.fileName);
+}
 
-function checkIfColorizeSupportFile(editor: TextEditor) {
-  if (editor) {
-    if (isLanguageSupported(editor.document.languageId) || isFileExtenstionSupported(editor.document.fileName)) {
-      extension.editor = editor;
-      if (filesDecorations.has(editor.document.fileName)) {
-        extension.deco = filesDecorations.get(editor.document.fileName);
-        extension.nbLine = editor.document.lineCount;
-        q.push((cb) => updateDecorations([], extension, cb));
-      } else {
-        extension.deco = new Map();
-        filesDecorations.set(extension.editor.document.fileName, extension.deco);
-        extension.nbLine = editor.document.lineCount;
-        q.push((cb) => {
-          initDecorations(extension, cb);
-        });
-      }
-    }
+function colorize(editor: TextEditor, cb) {
+   if (!editor) {
+    return;
+  }
+  if (!isSupported(editor.document)) {
+    return;
+  }
+  extension.editor = editor;
+  if (filesDecorations.has(editor.document.fileName)) {
+    extension.deco = filesDecorations.get(editor.document.fileName);
+    extension.nbLine = editor.document.lineCount;
+    updateDecorations([], extension, cb);
+  } else {
+    extension.deco = new Map();
+    filesDecorations.set(extension.editor.document.fileName, extension.deco);
+    extension.nbLine = editor.document.lineCount;
+    initDecorations(extension, cb);
   }
 };
 
@@ -296,13 +299,16 @@ export function activate(context: ExtensionContext) {
   config.languages = configuration.get('languages', []);
   config.filesExtensions = configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`));
 
-  window.onDidChangeActiveTextEditor(editor => checkIfColorizeSupportFile(editor), null, context.subscriptions);
+  window.onDidChangeActiveTextEditor(editor => q.push(cb => colorize(editor, cb)), null, context.subscriptions);
   workspace.onDidChangeTextDocument((event: TextDocumentChangeEvent) => {
     if (extension.editor && event.document.fileName === extension.editor.document.fileName) {
       q.push((cb) => updateDecorations(event.contentChanges, extension, cb));
     }
   }, null, context.subscriptions);
-  checkIfColorizeSupportFile(window.activeTextEditor);
+
+  window.visibleTextEditors.forEach(editor => {
+    q.push(cb => colorize(editor, cb));
+  });
 }
 
 // this method is called when your extension is deactivated
