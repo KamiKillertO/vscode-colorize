@@ -53,12 +53,18 @@
             "svg"
           ],
           "title": "Colorize files with these languages",
-          "type": "array"
+          "type": "array",
+          "description": "Languages that should be colorized"
         },
         "colorize.files_extensions": {
           "default": [],
           "title": "Colorize files with these extensions",
-          "type": "array"
+          "type": "array",
+          "pattern": {
+            "regexp": "/\\.\\w+/g"
+          },
+          "description": "Specified files extension that should be colorized",
+          "$schema": "/\\.\\w+/g"
         }
       }
     }
