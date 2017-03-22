@@ -13,9 +13,6 @@ const ext = vscode.extensions.getExtension("kamikillerto.vscode-colorize");
 let fixtureSourcePath = path.join(__dirname, '..', '..', 'fixtures');
 
 describe("Extension", () => {
-  it("is not activated initially", () => {
-    assert.equal(ext.isActive, false);
-  });
   // it("is activated successfully upon opening a css file", done => {
   //   vscode.workspace.openTextDocument(`${fixtureSourcePath}/styles.sass`)
   //     .then(() => {

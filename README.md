@@ -15,6 +15,49 @@ This extension  your styles files looking for colors and generate a colored back
 -  🆕 Generate colored background for rgba hexa color
 - Update the background when the color is updated
 
+## Options
+
+The following Visual Studio Code settings are available for the Colorize extension.
+These can be set in user preferences `(cmd+,)` or workspace settings `(.vscode/settings.json)`.
+
+```json
+{
+    "colorize.languages": [
+            "css",
+            "sass",
+            "scss",
+            "less",
+            "pcss",
+            "sss",
+            "stylus",
+            "xml",
+            "svg"
+    ],
+    "colorize.files_extensions": []
+}
+````
+
+### colorize.languages _ARRAY_
+
+Modified this option to add or remove support for a [language](https://code.visualstudio.com/docs/languages/overview).
+
+For example if you want to add `javascript`:
+
+```json
+  "colorize.languages": [
+            "javascript",
+            "css",
+            "sass",
+            "scss",
+            "less",
+            "pcss",
+            "sss",
+            "stylus",
+            "xml",
+            "svg"
+    ]
+```
+
 ## Roadmap
 
 - [x] Generate background for hexa colors
@@ -46,14 +89,9 @@ This extension  your styles files looking for colors and generate a colored back
 - Generate background for RGB colors
 - Generate background for RGBa colors
 
-### 0.2.1 (2017.01.26)
-
-- Fix some background update issues
-
 ### 0.2.0 (2017.01.25)
 
-- Huge code refacto
-- Dramatically improvement colored background updates
+- Improvement colored background updates
 
 ### 0.1.0 (2017.01.17)
 

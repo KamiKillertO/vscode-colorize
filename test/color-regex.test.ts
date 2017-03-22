@@ -25,6 +25,7 @@ describe("Test CSS hexa shorthand color Regex", () => {
     assert.ok('#Abc,'.match(HEXA_COLOR));
     assert.ok('#Abc;'.match(HEXA_COLOR));
     assert.ok('#Abc\n'.match(HEXA_COLOR));
+    assert.ok('#Abc)\n'.match(HEXA_COLOR));
   });
   it('Should not match', function () {
     assert.notOk('#AbG'.match(HEXA_COLOR));
@@ -53,6 +54,7 @@ describe("Test CSS hexa color Regex", () => {
     assert.ok('#ffffff,'.match(HEXA_COLOR));
     assert.ok('#ffffff;'.match(HEXA_COLOR));
     assert.ok('#ffffff\n'.match(HEXA_COLOR));
+    assert.ok('#ffffff)'.match(HEXA_COLOR));
   });
   it('Should not match', function () {
     assert.notOk('#fffffg'.match(HEXA_COLOR));

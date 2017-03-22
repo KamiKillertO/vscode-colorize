@@ -23,11 +23,25 @@ import ColorUtil from './color-util';
 import ColorDecoration from './color-decoration';
 import Queue from './queue';
 
+let config = {
+  languages: null,
+  filesExtensions: null
+};
+
 interface ColorizeContext {
   editor: TextEditor;
   nbLine: number;
   deco: Map < number, ColorDecoration[] >;
 }
+
+let extension: ColorizeContext = {
+  editor: window.activeTextEditor,
+  nbLine: 0,
+  deco: null
+};
+let filesDecorations: Map < string, Map < number, ColorDecoration[] > > = new Map();
+
+const q = new Queue();
 
 // Return all map's keys in an array
 function mapKeysToArray(map: Map < number, any > ) {
@@ -75,9 +89,6 @@ function generateTextDocumentContentChange(line: number, text: string): TextDocu
 //  text: '',
 //  range: {start:{line:4,/*...*/}, end:{line:4,/*...*/}}
 // }]
-//
-//
-//
 // 
 function mutEditedLIne(editedLine: TextDocumentContentChangeEvent[]): TextDocumentContentChangeEvent[] {
 
@@ -214,7 +225,6 @@ function initDecorations(context: ColorizeContext, cb) {
   if (!context.editor) {
     return;
   }
-  context.nbLine = context.editor.document.lineCount;
 
   let text = context.editor.document.getText();
   let n: number = context.editor.document.lineCount;
@@ -256,38 +266,53 @@ function decorateEditor(context: ColorizeContext) {
   return;
 }
 
-export function activate(context: ExtensionContext) {
-  let decorations: Map < string, Map < number, ColorDecoration[] > > = new Map();
-  let extension: ColorizeContext = {
-    editor: window.activeTextEditor,
-    nbLine: 0,
-    deco: null
-  };
-  let q = new Queue();
+function isLanguageSupported(languageId): boolean {
+  return config.languages.indexOf(languageId) !== -1;
+}
 
-  if (extension.editor) {
-    extension.deco = new Map();
-    decorations.set(extension.editor.document.fileName, extension.deco);
-    q.push((cb) => {
-      initDecorations(extension, cb);
-    });
+function isFileExtenstionSupported(fileName): boolean {
+  return config.filesExtensions.find(ext => ext.test(fileName));
+}
+
+function isSupported(document: TextDocument){
+  return isLanguageSupported(document.languageId) || isFileExtenstionSupported(document.fileName);
+}
+
+function colorize(editor: TextEditor, cb) {
+   if (!editor) {
+    return;
   }
-  window.onDidChangeActiveTextEditor(newEditor => {
-    extension.editor = newEditor;
-    if (newEditor && !decorations.has(newEditor.document.fileName)) {
-      extension.deco = new Map();
-    } else {
-      extension.deco = decorations.get(newEditor.document.fileName);
-    }
-    return q.push((cb) => initDecorations(extension, cb));
+  if (!isSupported(editor.document)) {
+    return;
+  }
+  extension.editor = editor;
+  if (filesDecorations.has(editor.document.fileName)) {
+    extension.deco = filesDecorations.get(editor.document.fileName);
+    extension.nbLine = editor.document.lineCount;
+    updateDecorations([], extension, cb);
+  } else {
+    extension.deco = new Map();
+    filesDecorations.set(extension.editor.document.fileName, extension.deco);
+    extension.nbLine = editor.document.lineCount;
+    initDecorations(extension, cb);
+  }
+};
 
-  }, null, context.subscriptions);
+export function activate(context: ExtensionContext) {
+  const configuration = workspace.getConfiguration('colorize');
+  config.languages = configuration.get('languages', []);
+  config.filesExtensions = configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`));
 
+  window.onDidChangeActiveTextEditor(editor => q.push(cb => colorize(editor, cb)), null, context.subscriptions);
   workspace.onDidChangeTextDocument((event: TextDocumentChangeEvent) => {
     if (extension.editor && event.document.fileName === extension.editor.document.fileName) {
       q.push((cb) => updateDecorations(event.contentChanges, extension, cb));
     }
   }, null, context.subscriptions);
+
+  window.visibleTextEditors.forEach(editor => {
+    q.push(cb => colorize(editor, cb));
+  });
 }
 
 // this method is called when your extension is deactivated

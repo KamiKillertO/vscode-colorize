@@ -17,9 +17,10 @@ before_install:
       sh -e /etc/init.d/xvfb start;
       sleep 3;
     fi
+  - curl -o- -L https://yarnpkg.com/install.sh | bash
+  - export PATH=$HOME/.yarn/bin:$PATH
 
 install:
-  - npm install -g yarn
   - yarn
   - yarn run vscode:prepublish
 
