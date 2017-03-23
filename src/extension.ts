@@ -18,10 +18,11 @@ import {
   TextDocumentContentChangeEvent
 } from 'vscode';
 
-import Color from './color';
+import Color from './util/color';
 import ColorUtil from './color-util';
 import ColorDecoration from './color-decoration';
 import Queue from './queue';
+import ColorExtractor from './util/extractors/color-extractor';
 
 let config = {
   languages: null,
@@ -223,7 +224,7 @@ function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], 
 
 function initDecorations(context: ColorizeContext, cb) {
   if (!context.editor) {
-    return;
+    return cb();
   }
 
   let text = context.editor.document.getText();
@@ -274,16 +275,16 @@ function isFileExtenstionSupported(fileName): boolean {
   return config.filesExtensions.find(ext => ext.test(fileName));
 }
 
-function isSupported(document: TextDocument){
+function isSupported(document: TextDocument) {
   return isLanguageSupported(document.languageId) || isFileExtenstionSupported(document.fileName);
 }
 
 function colorize(editor: TextEditor, cb) {
    if (!editor) {
-    return;
+    return cb();
   }
   if (!isSupported(editor.document)) {
-    return;
+    return cb();
   }
   extension.editor = editor;
   if (filesDecorations.has(editor.document.fileName)) {
@@ -320,3 +321,14 @@ export function deactivate() {
 
   // need to clean up everything
 }
+
+
+
+
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+///////////////////                                   ///////////////////
+/////////////////// generate decorations one by one ? ///////////////////
+///////////////////                                   ///////////////////
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////

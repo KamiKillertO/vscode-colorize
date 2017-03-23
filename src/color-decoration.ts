@@ -7,7 +7,7 @@ import {
 } from 'vscode';
 
 import ColorUtil from './color-util';
-import Color from './color';
+import Color from './util/color';
 
 class ColorDecoration {
   public color: Color;
@@ -39,8 +39,8 @@ class ColorDecoration {
     let backgroundDecorationType = window.createTextEditorDecorationType({
       borderWidth: "1px",
       borderStyle: "solid",
-      borderColor: this.color.toRGBString(),
-      backgroundColor: this.color.toRGBString(),
+      borderColor: this.color.toRgbString(),
+      backgroundColor: this.color.toRgbString(),
       color: textColor
     });
     this.decoration = backgroundDecorationType;

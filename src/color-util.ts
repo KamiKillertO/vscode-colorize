@@ -1,16 +1,22 @@
-import {
-  HEXA_COLOR,
-  RGB_COLOR
-} from './color-regex';
-import Color from './color';
-import browserColors from "./brower-colors";
+// import {
+//   HEXA_COLOR,
+//   RGB_COLOR
+// } from './color-regex';
+import Color from './util/color';
+// import HexaColor from './util/hexa-color';
+// import RgbColor from './util/rgb-color';
+// import BrowserColor from './util/browser-color';
+// import { COLORS } from "./util/browser-color";
+import './util/extractors/hexa-extractor';
+import './util/extractors/rgb-extractor';
+import ColorExtractor from './util/extractors/color-extractor';
 
-// debugger;
 
-const BROWSER_COLORS_REGEX = RegExp(`(${Object.keys(browserColors).map((color) => `(?:${color.toLowerCase()})`).join('|')})(?:$|,| |;|\n)`, 'gi');
+// const BROWSER_COLORS_REGEX = RegExp(`(${Object.keys(COLORS).map((color) => `(?:${color.toLowerCase()})`).join('|')})(?:$|,| |;|\n)`, 'gi');
+
 // Flatten Array
 // flatten(arr[[1,2,3],[4,5]]) -> arr[1,2,3,4,5]
-const flatten = arr => arr.reduce((a, b) => a.concat(Array.isArray(b) ? flatten(b) : b), []);
+// const flatten = arr => arr.reduce((a, b) => a.concat(Array.isArray(b) ? flatten(b) : b), []);
 
 class ColorUtil {
 
@@ -30,51 +36,53 @@ class ColorUtil {
   }
 
   public static findColors(text): Promise < Color[] > {
+    return ColorExtractor.extract(text);
     // debugger;
-    return Promise.all([
-      this._extractHexa(text),
-      this._extractRGB(text),
-      this._extractBrowserColors(text)
-    ]).then(colors => {
-      return flatten(colors);
-    });
+    // return Promise.all([
+    //   this._extractHexa(text),
+    //   this._extractRGB(text),
+    //   this._extractBrowserColors(text)
+    // ]).then(colors => {
+    //   return flatten(colors);
+    // });
   }
 
-  private static _extractHexa(text: string): Promise < Color[] > {
-    return new Promise((resolve, reject) => {
-      let match = null;
-      let colors: Color[] = [];
-      while ((match = HEXA_COLOR.exec(text)) !== null) {
-        colors.push(new Color('hexa', match[1], match.index));
-      }
-      return resolve(colors);
-    });
-  }
+  // private static _extractHexa(text: string): Promise < Color[] > {
+  //   return new Promise((resolve, reject) => {
+  //     let match = null;
+  //     let colors: Color[] = [];
 
-  private static _extractRGB(text: string): Promise < Color[] > {
-    return new Promise((resolve, reject) => {
-      let match = null;
-      let colors: Color[] = [];
-      // Get rgb "like" colors
-      while ((match = RGB_COLOR.exec(text)) !== null) {
-        let rgba = match[1].replace(/rgb(a){0,1}\(/, '').replace(/\)/, '').split(/,/gi).map(c => parseFloat(c));
-        // Check if it's a valid rgb(a) color
-        if (rgba.slice(0, 3).every(c => c <= 255) && (rgba[4] || 1) <= 1) {
-          colors.push(new Color('rgb', match[1], match.index));
-        }
-      }
-      return resolve(colors);
-    });
-  }
-  private static _extractBrowserColors(text: string): Promise < Color[] > {
-    return new Promise((resolve, reject) => {
-      let match = null;
-      let colors: Color[] = [];
-      while ((match = BROWSER_COLORS_REGEX.exec(text)) !== null) {
-        colors.push(new Color('browser', match[1], match.index, browserColors[match[1]].rgb));
-      }
-      return resolve(colors);
-    });
-  };
+  //     while ((match = HEXA_COLOR.exec(text)) !== null) {
+  //       // colors.push(new HexaColor(match[1], match.index));
+  //     }
+  //     return resolve(colors);
+  //   });
+  // }
+
+  // private static _extractRGB(text: string): Promise < Color[] > {
+  //   return new Promise((resolve, reject) => {
+  //     let match = null;
+  //     let colors: Color[] = [];
+  //     // Get rgb "like" colors
+  //     while ((match = RGB_COLOR.exec(text)) !== null) {
+  //       let rgba = match[1].replace(/rgb(a){0,1}\(/, '').replace(/\)/, '').split(/,/gi).map(c => parseFloat(c));
+  //       // Check if it's a valid rgb(a) color
+  //       if (rgba.slice(0, 3).every(c => c <= 255) && (rgba[4] || 1) <= 1) {
+  //         // colors.push(new RgbColor(match[1], match.index));
+  //       }
+  //     }
+  //     return resolve(colors);
+  //   });
+  // }
+  // private static _extractBrowserColors(text: string): Promise < Color[] > {
+  //   return new Promise((resolve, reject) => {
+  //     let match = null;
+  //     let colors: Color[] = [];
+  //     while ((match = BROWSER_COLORS_REGEX.exec(text)) !== null) {
+  //       colors.push(new BrowserColor(match[1], match.index));
+  //     }
+  //     return resolve(colors);
+  //   });
+  // };
 };
 export default ColorUtil;
