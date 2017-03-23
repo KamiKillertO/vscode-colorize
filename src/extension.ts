@@ -219,7 +219,7 @@ function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], 
 
 function initDecorations(context: ColorizeContext, cb) {
   if (!context.editor) {
-    return;
+    return cb();
   }
 
   let text = context.editor.document.getText();
@@ -276,10 +276,10 @@ function isSupported(document: TextDocument){
 
 function colorize(editor: TextEditor, cb) {
    if (!editor) {
-    return;
+    return cb();
   }
   if (!isSupported(editor.document)) {
-    return;
+    return cb();
   }
   extension.editor = editor;
   if (filesDecorations.has(editor.document.fileName)) {
