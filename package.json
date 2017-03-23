@@ -32,33 +32,60 @@
     "theme": "light"
   },
   "activationEvents": [
-    "onLanguage:css",
-    "onLanguage:sass",
-    "onLanguage:scss",
-    "onLanguage:less",
-    "onLanguage:pcss",
-    "onLanguage:sss",
-    "onLanguage:stylus",
-    "onLanguage:styl",
-    "onLanguage:xml"
+    "*"
   ],
   "main": "./out/src/extension",
-  "contributes": {},
+  "contributes": {
+    "configuration": {
+      "title": "Colorize extension (reboot after any changes required)",
+      "properties": {
+
+        "colorize.languages": {
+          "default": [
+            "css",
+            "sass",
+            "scss",
+            "less",
+            "pcss",
+            "sss",
+            "stylus",
+            "xml",
+            "svg"
+          ],
+          "title": "Colorize files with these languages",
+          "type": "array",
+          "description": "Languages that should be colorized"
+        },
+        "colorize.files_extensions": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "default": "toto",
+          "title": "Colorize files with these extensions",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "\\.\\w+$",
+            "description": "You should enter a valid file extension"
+          },
+          "description": "Specified files extension that should be colorized"
+        }
+      }
+    }
+  },
   "scripts": {
     "vscode:prepublish": "tsc -p ./",
     "compile": "tsc -watch -p ./",
     "postinstall": "node ./node_modules/vscode/bin/install",
-    "lint": "node ./node_modules/tslint/lib/tslint-cli.js -c tslint.json --project tsconfig.json", 
+    "lint": "node ./node_modules/tslint/lib/tslint-cli.js -c tslint.json --project tsconfig.json",
     "test": "node ./node_modules/vscode/bin/test"
   },
   "devDependencies": {
     "@types/chai": "3.4.35",
-    "@types/mocha": "2.2.39",
-    "@types/node": "7.0.8",
+    "@types/mocha": "2.2.40",
+    "@types/node": "7.0.10",
     "chai": "3.5.0",
     "mocha": "3.2.0",
     "tslint": "4.3.1",
     "typescript": "2.2.1",
-    "vscode": "1.0.5"
+    "vscode": "1.0.6"
   }
 }
