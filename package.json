@@ -81,7 +81,7 @@
   "devDependencies": {
     "@types/chai": "3.4.35",
     "@types/mocha": "2.2.40",
-    "@types/node": "7.0.7",
+    "@types/node": "7.0.10",
     "chai": "3.5.0",
     "mocha": "3.2.0",
     "tslint": "4.3.1",
