@@ -59,6 +59,18 @@ For example if you want to add `javascript`:
     ]
 ```
 
+### colorize.files_extensions _ARRAY_
+
+Modified this option to activate colorize for files with the matching extension.
+
+For example if you want to colorize `.diff` files:
+
+```json
+  "colorize.languages": [
+            ".diff"
+    ]
+```
+
 ## Roadmap
 
 - [x] Generate background for hexa colors
