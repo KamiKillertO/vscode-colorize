@@ -58,7 +58,7 @@
         },
         "colorize.files_extensions": {
           "$schema": "http://json-schema.org/draft-04/schema#",
-          "default": "toto",
+          "default": [],
           "title": "Colorize files with these extensions",
           "type": "array",
           "items": {
