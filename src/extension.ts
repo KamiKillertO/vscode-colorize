@@ -18,10 +18,11 @@ import {
   TextDocumentContentChangeEvent
 } from 'vscode';
 
-import Color from './color';
+import Color from './util/color';
 import ColorUtil from './color-util';
 import ColorDecoration from './color-decoration';
 import Queue from './queue';
+import ColorExtractor from './util/extractors/color-extractor';
 
 let config = {
   languages: null,
@@ -91,11 +92,14 @@ function generateTextDocumentContentChange(line: number, text: string): TextDocu
 // }]
 // 
 function mutEditedLIne(editedLine: TextDocumentContentChangeEvent[]): TextDocumentContentChangeEvent[] {
+
   let newEditedLine: TextDocumentContentChangeEvent[] = [];
   let startLine = 0;
   let before = 0;
   editedLine.reverse();
+  // debugger;
   editedLine.forEach(line => {
+    let a = line.text.match(/\n/g);
     startLine = line.range.start.line + before;
     line.text.split(/\n/).map((text, i, array) => {
       if (i === 0 && text === '' && array.length === 1) {
@@ -172,6 +176,7 @@ function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context: C
 }
 
 function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position) {
+  // debugger;
   editedLine = mutEditedLIne(editedLine);
   editedLine.forEach((line) => {
     position.forEach(position => {
@@ -270,7 +275,7 @@ function isFileExtenstionSupported(fileName): boolean {
   return config.filesExtensions.find(ext => ext.test(fileName));
 }
 
-function isSupported(document: TextDocument){
+function isSupported(document: TextDocument) {
   return isLanguageSupported(document.languageId) || isFileExtenstionSupported(document.fileName);
 }
 
@@ -312,4 +317,18 @@ export function activate(context: ExtensionContext) {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() {
+
+  // need to clean up everything
+}
+
+
+
+
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+///////////////////                                   ///////////////////
+/////////////////// generate decorations one by one ? ///////////////////
+///////////////////                                   ///////////////////
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
