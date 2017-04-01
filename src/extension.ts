@@ -294,7 +294,7 @@ function isSupported(document: TextDocument) {
 }
 
 function colorize(editor: TextEditor, cb) {
-   if (!editor) {
+  if (!editor) {
     return cb();
   }
   if (!isSupported(editor.document)) {
@@ -304,7 +304,8 @@ function colorize(editor: TextEditor, cb) {
   if (filesDecorations.has(editor.document.fileName)) {
     extension.deco = filesDecorations.get(editor.document.fileName);
     extension.nbLine = editor.document.lineCount;
-    updateDecorations([], extension, cb);
+    decorateEditor(extension.editor, extension.deco);
+    cb();
   } else {
     extension.deco = new Map();
     filesDecorations.set(extension.editor.document.fileName, extension.deco);
@@ -319,8 +320,6 @@ export function activate(context: ExtensionContext) {
   config.filesExtensions = configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`));
 
   window.onDidChangeActiveTextEditor(editor => {
-    console.log(editor.document);
-
     window.visibleTextEditors.filter(e => e !== editor).forEach(e => {
       q.push(cb => colorize(e, cb));
     });
