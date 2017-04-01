@@ -200,6 +200,7 @@ function updateDecorations(editedLine: TextDocumentContentChangeEvent[], context
 }
 
 function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, cb) {
+  let m = new Map();
   Promise.all(
       editedLine.map(({
         range
@@ -213,12 +214,25 @@ function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], 
         // lineAt raise an exception if line does not exist
         try { // not really good 
           return ColorUtil.findColors(context.editor.document.lineAt(range.start.line).text)
-            .then(colors => generateDecorations(colors, range.start.line, context));
+            .then(colors => generateDecorations(colors, range.start.line, m))
         } catch (e) { // use promise catch instead?
-          return context;
+          return context.deco;
         }
       })
-    ).then(() => decorateEditor(context))
+    ).then(() => {
+      decorateEditor(context.editor, m);
+      let it = m.entries();
+      let tmp = it.next();
+      while (!tmp.done) {
+        let line = tmp.value[0];
+        if (context.deco.has(line)) {
+          context.deco.set(line, context.deco.get(line).concat(m.get(line)));
+        } else {
+          context.deco.set(line, m.get(line));
+        }
+        tmp = it.next();
+      }
+    })
     .then(cb);
 }
 
@@ -236,32 +250,32 @@ function initDecorations(context: ColorizeContext, cb) {
         "line": index
       }))
       .map(line => ColorUtil.findColors(line.text)
-        .then(colors => generateDecorations(colors, line.line, context))))
-    .then(() => decorateEditor(context))
+        .then(colors => generateDecorations(colors, line.line, context.deco))))
+    .then(() => decorateEditor(context.editor, context.deco))
     .then(cb);
 }
 
-function generateDecorations(colors: Color[], line, context: ColorizeContext) {
+function generateDecorations(colors: Color[], line: number, decorations: Map<number, ColorDecoration[]>) {
   colors.forEach((color) => {
     let startPos = new Position(line, color.positionInText);
     let endPos = new Position(line, color.positionInText + color.value.length);
     let range = new Range(startPos, endPos);
-    if (context.deco.has(line)) {
-      context.deco.set(line, context.deco.get(line).concat([new ColorDecoration( /*range, */ color)]));
+    if (decorations.has(line)) {
+      decorations.set(line, decorations.get(line).concat([new ColorDecoration( /*range, */ color)]));
     } else {
-      context.deco.set(line, [new ColorDecoration( /*range, */ color)]);
+      decorations.set(line, [new ColorDecoration( /*range, */ color)]);
     }
   });
-  return context; // return decoration instead?
+  return decorations; // return decoration instead?
 }
 
-function decorateEditor(context: ColorizeContext) {
-  let it = context.deco.entries();
+function decorateEditor(editor: TextEditor, decorations: Map<number, ColorDecoration[]>) {
+  let it = decorations.entries();
   let tmp = it.next();
   while (!tmp.done) {
     let line = tmp.value[0];
     // tmp.value[1].forEach(decoration => context.current_editor.setDecorations(decoration.decoration, [decoration.textPosition]));
-    tmp.value[1].forEach(decoration => context.editor.setDecorations(decoration.decoration, [decoration.generateRange(line)]));
+    tmp.value[1].forEach(decoration => editor.setDecorations(decoration.decoration, [decoration.generateRange(line)]));
     tmp = it.next();
   }
   return;
@@ -304,7 +318,14 @@ export function activate(context: ExtensionContext) {
   config.languages = configuration.get('languages', []);
   config.filesExtensions = configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`));
 
-  window.onDidChangeActiveTextEditor(editor => q.push(cb => colorize(editor, cb)), null, context.subscriptions);
+  window.onDidChangeActiveTextEditor(editor => {
+    console.log(editor.document);
+
+    window.visibleTextEditors.filter(e => e !== editor).forEach(e => {
+      q.push(cb => colorize(e, cb));
+    });
+    q.push(cb => colorize(editor, cb));
+  }, null, context.subscriptions);
   workspace.onDidChangeTextDocument((event: TextDocumentChangeEvent) => {
     if (extension.editor && event.document.fileName === extension.editor.document.fileName) {
       q.push((cb) => updateDecorations(event.contentChanges, extension, cb));
