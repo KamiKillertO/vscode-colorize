@@ -9,6 +9,7 @@ import Color from './util/color';
 // import { COLORS } from "./util/browser-color";
 import './util/extractors/hexa-extractor';
 import './util/extractors/rgb-extractor';
+import './util/extractors/browser-extractor';
 import ColorExtractor from './util/extractors/color-extractor';
 
 

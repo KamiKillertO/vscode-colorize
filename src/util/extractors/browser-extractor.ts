@@ -1,4 +1,27 @@
-export default Object({
+import Color from './../color';
+import ColorExtractor, { IColorExtractor } from './color-extractor';
+
+// class BrowerColor implements Color {
+
+//   public value: string;
+//   public rgb: number[];
+//   public alpha: number;
+//   public positionInText: number;
+
+//   public constructor(value: string, positionInText: number = 0, rgb = null, alpha = 1) {
+//     this.value = value;
+//     this.positionInText = positionInText;
+//     this.alpha = alpha;
+//     this.rgb = COLORS[value].rgb;
+//   }
+
+//   public toRgbString(): string {
+//     return `rgb(${this.rgb.join(',')})`;
+//   }
+// }
+// export default BrowerColor;
+
+export const COLORS = Object({
     "aliceblue": {
       "value": "#F0F8FF",
       "rgb": [240, 248, 255],
@@ -740,3 +763,30 @@ export default Object({
       "luminace": 1
     }
 });
+
+export const REGEXP = (() => RegExp(`(${Object.keys(COLORS).map((color) => `(?:${color.toLowerCase()})`).join('|')})(?:$|,| |;|\\)|\n)`, 'gi'))();
+
+class BrowsersColorExtractor implements IColorExtractor {
+  public name: string = "BROWSERS_COLORS_EXTRACTOR";
+
+  private extractRGBValue(value): number[] {
+    let rgb: any = /#(.+)/gi.exec(value);
+    if (rgb[1].length === 3) {
+      return rgb[1].split('').map(_ => parseInt(_ + _, 16));
+    }
+    rgb = rgb[1].split('').map(_ => parseInt(_, 16));
+    return [16 * rgb[0] + rgb[1], 16 * rgb[2] + rgb[3], 16 * rgb[4] + rgb[5]];
+  }
+  public extractColors(text: string) {
+    return new Promise((resolve, reject) => {
+      let match = null;
+      let colors: Color[] = [];
+      while ((match = REGEXP.exec(text)) !== null) {
+        colors.push(new Color(match[1], match.index, 1, COLORS[match[1]].rgb));
+      }
+      return resolve(colors);
+    });
+  }
+}
+ColorExtractor.registerExtractor(new BrowsersColorExtractor());
+export default BrowsersColorExtractor;
