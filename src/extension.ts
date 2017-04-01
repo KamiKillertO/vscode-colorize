@@ -18,16 +18,31 @@ import {
   TextDocumentContentChangeEvent
 } from 'vscode';
 
-import Color from './color';
+import Color from './util/color';
 import ColorUtil from './color-util';
 import ColorDecoration from './color-decoration';
 import Queue from './queue';
+import ColorExtractor from './util/extractors/color-extractor';
+
+let config = {
+  languages: null,
+  filesExtensions: null
+};
 
 interface ColorizeContext {
   editor: TextEditor;
   nbLine: number;
   deco: Map < number, ColorDecoration[] >;
 }
+
+let extension: ColorizeContext = {
+  editor: window.activeTextEditor,
+  nbLine: 0,
+  deco: null
+};
+let filesDecorations: Map < string, Map < number, ColorDecoration[] > > = new Map();
+
+const q = new Queue();
 
 // Return all map's keys in an array
 function mapKeysToArray(map: Map < number, any > ) {
@@ -75,16 +90,16 @@ function generateTextDocumentContentChange(line: number, text: string): TextDocu
 //  text: '',
 //  range: {start:{line:4,/*...*/}, end:{line:4,/*...*/}}
 // }]
-//
-//
-//
 // 
 function mutEditedLIne(editedLine: TextDocumentContentChangeEvent[]): TextDocumentContentChangeEvent[] {
+
   let newEditedLine: TextDocumentContentChangeEvent[] = [];
   let startLine = 0;
   let before = 0;
   editedLine.reverse();
+  // debugger;
   editedLine.forEach(line => {
+    let a = line.text.match(/\n/g);
     startLine = line.range.start.line + before;
     line.text.split(/\n/).map((text, i, array) => {
       if (i === 0 && text === '' && array.length === 1) {
@@ -161,6 +176,7 @@ function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context: C
 }
 
 function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position) {
+  // debugger;
   editedLine = mutEditedLIne(editedLine);
   editedLine.forEach((line) => {
     position.forEach(position => {
@@ -184,6 +200,7 @@ function updateDecorations(editedLine: TextDocumentContentChangeEvent[], context
 }
 
 function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, cb) {
+  let m = new Map();
   Promise.all(
       editedLine.map(({
         range
@@ -197,20 +214,32 @@ function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], 
         // lineAt raise an exception if line does not exist
         try { // not really good 
           return ColorUtil.findColors(context.editor.document.lineAt(range.start.line).text)
-            .then(colors => generateDecorations(colors, range.start.line, context));
+            .then(colors => generateDecorations(colors, range.start.line, m))
         } catch (e) { // use promise catch instead?
-          return context;
+          return context.deco;
         }
       })
-    ).then(() => decorateEditor(context))
+    ).then(() => {
+      decorateEditor(context.editor, m);
+      let it = m.entries();
+      let tmp = it.next();
+      while (!tmp.done) {
+        let line = tmp.value[0];
+        if (context.deco.has(line)) {
+          context.deco.set(line, context.deco.get(line).concat(m.get(line)));
+        } else {
+          context.deco.set(line, m.get(line));
+        }
+        tmp = it.next();
+      }
+    })
     .then(cb);
 }
 
 function initDecorations(context: ColorizeContext, cb) {
   if (!context.editor) {
-    return;
+    return cb();
   }
-  context.nbLine = context.editor.document.lineCount;
 
   let text = context.editor.document.getText();
   let n: number = context.editor.document.lineCount;
@@ -221,70 +250,105 @@ function initDecorations(context: ColorizeContext, cb) {
         "line": index
       }))
       .map(line => ColorUtil.findColors(line.text)
-        .then(colors => generateDecorations(colors, line.line, context))))
-    .then(() => decorateEditor(context))
+        .then(colors => generateDecorations(colors, line.line, context.deco))))
+    .then(() => decorateEditor(context.editor, context.deco))
     .then(cb);
 }
 
-function generateDecorations(colors: Color[], line, context: ColorizeContext) {
+function generateDecorations(colors: Color[], line: number, decorations: Map<number, ColorDecoration[]>) {
   colors.forEach((color) => {
     let startPos = new Position(line, color.positionInText);
     let endPos = new Position(line, color.positionInText + color.value.length);
     let range = new Range(startPos, endPos);
-    if (context.deco.has(line)) {
-      context.deco.set(line, context.deco.get(line).concat([new ColorDecoration( /*range, */ color)]));
+    if (decorations.has(line)) {
+      decorations.set(line, decorations.get(line).concat([new ColorDecoration( /*range, */ color)]));
     } else {
-      context.deco.set(line, [new ColorDecoration( /*range, */ color)]);
+      decorations.set(line, [new ColorDecoration( /*range, */ color)]);
     }
   });
-  return context; // return decoration instead?
+  return decorations; // return decoration instead?
 }
 
-function decorateEditor(context: ColorizeContext) {
-  let it = context.deco.entries();
+function decorateEditor(editor: TextEditor, decorations: Map<number, ColorDecoration[]>) {
+  let it = decorations.entries();
   let tmp = it.next();
   while (!tmp.done) {
     let line = tmp.value[0];
     // tmp.value[1].forEach(decoration => context.current_editor.setDecorations(decoration.decoration, [decoration.textPosition]));
-    tmp.value[1].forEach(decoration => context.editor.setDecorations(decoration.decoration, [decoration.generateRange(line)]));
+    tmp.value[1].forEach(decoration => editor.setDecorations(decoration.decoration, [decoration.generateRange(line)]));
     tmp = it.next();
   }
   return;
 }
 
-export function activate(context: ExtensionContext) {
-  let decorations: Map < string, Map < number, ColorDecoration[] > > = new Map();
-  let extension: ColorizeContext = {
-    editor: window.activeTextEditor,
-    nbLine: 0,
-    deco: null
-  };
-  let q = new Queue();
+function isLanguageSupported(languageId): boolean {
+  return config.languages.indexOf(languageId) !== -1;
+}
 
-  if (extension.editor) {
-    extension.deco = new Map();
-    decorations.set(extension.editor.document.fileName, extension.deco);
-    q.push((cb) => {
-      initDecorations(extension, cb);
-    });
+function isFileExtenstionSupported(fileName): boolean {
+  return config.filesExtensions.find(ext => ext.test(fileName));
+}
+
+function isSupported(document: TextDocument) {
+  return isLanguageSupported(document.languageId) || isFileExtenstionSupported(document.fileName);
+}
+
+function colorize(editor: TextEditor, cb) {
+  if (!editor) {
+    return cb();
   }
-  window.onDidChangeActiveTextEditor(newEditor => {
-    extension.editor = newEditor;
-    if (newEditor && !decorations.has(newEditor.document.fileName)) {
-      extension.deco = new Map();
-    } else {
-      extension.deco = decorations.get(newEditor.document.fileName);
-    }
-    return q.push((cb) => initDecorations(extension, cb));
+  if (!isSupported(editor.document)) {
+    return cb();
+  }
+  extension.editor = editor;
+  if (filesDecorations.has(editor.document.fileName)) {
+    extension.deco = filesDecorations.get(editor.document.fileName);
+    extension.nbLine = editor.document.lineCount;
+    decorateEditor(extension.editor, extension.deco);
+    cb();
+  } else {
+    extension.deco = new Map();
+    filesDecorations.set(extension.editor.document.fileName, extension.deco);
+    extension.nbLine = editor.document.lineCount;
+    initDecorations(extension, cb);
+  }
+};
 
+export function activate(context: ExtensionContext) {
+  const configuration = workspace.getConfiguration('colorize');
+  config.languages = configuration.get('languages', []);
+  config.filesExtensions = configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`));
+
+  window.onDidChangeActiveTextEditor(editor => {
+    window.visibleTextEditors.filter(e => e !== editor).forEach(e => {
+      q.push(cb => colorize(e, cb));
+    });
+    q.push(cb => colorize(editor, cb));
   }, null, context.subscriptions);
-
   workspace.onDidChangeTextDocument((event: TextDocumentChangeEvent) => {
     if (extension.editor && event.document.fileName === extension.editor.document.fileName) {
       q.push((cb) => updateDecorations(event.contentChanges, extension, cb));
     }
   }, null, context.subscriptions);
+
+  window.visibleTextEditors.forEach(editor => {
+    q.push(cb => colorize(editor, cb));
+  });
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() {
+
+  // need to clean up everything
+}
+
+
+
+
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+///////////////////                                   ///////////////////
+/////////////////// generate decorations one by one ? ///////////////////
+///////////////////                                   ///////////////////
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
