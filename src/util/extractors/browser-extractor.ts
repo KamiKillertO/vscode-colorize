@@ -62,7 +62,7 @@ export const COLORS = Object({
       "rgb": [0, 0, 0],
       "luminace": 1
     },
-    "blanchedAlmond": {
+    "blanchedalmond": {
       "value": "#FFEBCD",
       "rgb": [255, 235, 205],
       "luminace": 1
@@ -72,7 +72,7 @@ export const COLORS = Object({
       "rgb": [0, 0, 255],
       "luminace": 1
     },
-    "blueViolet": {
+    "blueviolet": {
       "value": "#8A2BE2",
       "rgb": [138, 43, 226],
       "luminace": 1
@@ -157,7 +157,7 @@ export const COLORS = Object({
       "rgb": [0, 100, 0],
       "luminace": 1
     },
-    "darkKhaki": {
+    "darkkhaki": {
       "value": "#BDB76B",
       "rgb": [189, 183, 107],
       "luminace": 1
@@ -167,7 +167,7 @@ export const COLORS = Object({
       "rgb": [139, 0, 139],
       "luminace": 1
     },
-    "darkOlivegreen": {
+    "darkolivegreen": {
       "value": "#556B2F",
       "rgb": [85, 107, 47],
       "luminace": 1
@@ -212,12 +212,12 @@ export const COLORS = Object({
       "rgb": [47, 79, 79],
       "luminace": 1
     },
-    "darkTurquoise": {
+    "darkturquoise": {
       "value": "#00CED1",
       "rgb": [0, 206, 209],
       "luminace": 1
     },
-    "darkViolet": {
+    "darkviolet": {
       "value": "#9400D3",
       "rgb": [148, 0, 211],
       "luminace": 1
@@ -247,7 +247,7 @@ export const COLORS = Object({
       "rgb": [30, 144, 255],
       "luminace": 1
     },
-    "fireBrick": {
+    "firebrick": {
       "value": "#B22222",
       "rgb": [178, 34, 34],
       "luminace": 1
@@ -487,17 +487,17 @@ export const COLORS = Object({
       "rgb": [123, 104, 238],
       "luminace": 1
     },
-    "mediumSpringgreen": {
+    "mediumspringgreen": {
       "value": "#00FA9A",
       "rgb": [0, 250, 154],
       "luminace": 1
     },
-    "mediumTurquoise": {
+    "mediumturquoise": {
       "value": "#48D1CC",
       "rgb": [72, 209, 204],
       "luminace": 1
     },
-    "mediumVioletred": {
+    "mediumvioletred": {
       "value": "#C71585",
       "rgb": [199, 21, 133],
       "luminace": 1
@@ -507,12 +507,12 @@ export const COLORS = Object({
       "rgb": [25, 25, 112],
       "luminace": 1
     },
-    "mintCream": {
+    "mintcream": {
       "value": "#F5FFFA",
       "rgb": [245, 255, 250],
       "luminace": 1
     },
-    "mistyRose": {
+    "mistyrose": {
       "value": "#FFE4E1",
       "rgb": [255, 228, 225],
       "luminace": 1
@@ -532,7 +532,7 @@ export const COLORS = Object({
       "rgb": [0, 0, 128],
       "luminace": 1
     },
-    "oldLace": {
+    "oldlace": {
       "value": "#FDF5E6",
       "rgb": [253, 245, 230],
       "luminace": 1
@@ -542,7 +542,7 @@ export const COLORS = Object({
       "rgb": [128, 128, 0],
       "luminace": 1
     },
-    "oliveDrab": {
+    "olivedrab": {
       "value": "#6B8E23",
       "rgb": [107, 142, 35],
       "luminace": 1
@@ -572,22 +572,22 @@ export const COLORS = Object({
       "rgb": [152, 251, 152],
       "luminace": 1
     },
-    "paleTurquoise": {
+    "paleturquoise": {
       "value": "#AFEEEE",
       "rgb": [175, 238, 238],
       "luminace": 1
     },
-    "paleVioletred": {
+    "palevioletred": {
       "value": "#DB7093",
       "rgb": [219, 112, 147],
       "luminace": 1
     },
-    "papayaWhip": {
+    "papayawhip": {
       "value": "#FFEFD5",
       "rgb": [255, 239, 213],
       "luminace": 1
     },
-    "peachPuff": {
+    "peachpuff": {
       "value": "#FFDAB9",
       "rgb": [255, 218, 185],
       "luminace": 1
@@ -657,7 +657,7 @@ export const COLORS = Object({
       "rgb": [46, 139, 87],
       "luminace": 1
     },
-    "seaShell": {
+    "seashell": {
       "value": "#FFF5EE",
       "rgb": [255, 245, 238],
       "luminace": 1
