@@ -764,7 +764,7 @@ export const COLORS = Object({
     }
 });
 
-export const REGEXP = (() => RegExp(`(${Object.keys(COLORS).map((color) => `(?:${color.toLowerCase()})`).join('|')})(?:$|,| |;|\\)|\n)`, 'gi'))();
+export const REGEXP = (() => RegExp(`(?:,| |\\(|:)(${Object.keys(COLORS).map((color) => `(?:${color.toLowerCase()})`).join('|')})(?:$|,| |;|\\)|\\n)`, 'i'))();
 
 class BrowsersColorExtractor implements IColorExtractor {
   public name: string = "BROWSERS_COLORS_EXTRACTOR";
@@ -781,8 +781,12 @@ class BrowsersColorExtractor implements IColorExtractor {
     return new Promise((resolve, reject) => {
       let match = null;
       let colors: Color[] = [];
-      while ((match = REGEXP.exec(text)) !== null) {
-        colors.push(new Color(match[1], match.index, 1, COLORS[match[1]].rgb));
+      let position = 0;
+      while ((match = text.match(REGEXP)) !== null) {
+        position += match.index + 1;
+        colors.push(new Color(match[1], position, 1, COLORS[match[1]].rgb));
+        text = text.slice(match.index + 1 + match[1].length);
+        position += match[1].length;
       }
       return resolve(colors);
     });
