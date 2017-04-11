@@ -1,3 +1,16 @@
+## 0.4.0
+
+### Changed
+
+- Colors extractions refacto
+- Support for split view (fix #20)
+- Colorize all colors in gradient statement (fix #11)
+
+### Added
+
+- Cross browser colors extraction (#12)
+- Add settings options to easily add new languages support (fix #13)
+
 ## 0.3.2
 
 - Add stylus and XML support
@@ -16,8 +29,6 @@
 - Add new activationEvents (pcss and sss)
 - Add rgb(a) color extraction
 - Add rgb and luminance properties in color.ts
-
-## 0.2.1
 
 ## 0.2.0
 
