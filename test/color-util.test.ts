@@ -13,8 +13,8 @@ describe('Test utility fonction', () => {
     });
   });
   it('Should extract Colors from a text', (done) => {
-    ColorUtil.findColors('#fff, rgb(123,123,123), #dccdcd, linear-gradient(to bottom right, #fff, #ccc)').then(colors => {
-      assert.equal(5, colors.length, 'Should have found 5 colors');
+    ColorUtil.findColors('#fff, rgb(123,123,123), #dccdcd, linear-gradient(to bottom right, #fff, #ccc), white').then(colors => {
+      assert.equal(6, colors.length, 'Should have found 5 colors');
       done();
     });
   });
