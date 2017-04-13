@@ -20,7 +20,7 @@ class Queue {
     let action = this._queue.shift();
     if (action) {
       this._running = true;
-      new Promise((resolve, reject) => action(resolve)).then(this._next.bind(this));
+      action(this._next.bind(this));
     }
   }
 }

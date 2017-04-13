@@ -1,3 +1,8 @@
+## 0.4.1
+
+- Fix an issue where browsers colors inside a word were colorized (#26)
+- Remove the use of `Promise` in `queue.ts` to fix an error of background generation/update caused by a 1s timeout
+
 ## 0.4.0
 
 ### Changed

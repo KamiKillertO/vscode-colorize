@@ -86,36 +86,31 @@ For example if you want to colorize `.diff` files:
 - [ ] Generate background for preprocessor variables
 - [ ] Generate background for css variables
 
-## Release Notes
+## Release
 
-### Latest 0.4.0 (2017.04.01)
+### Latest 0.4.1 (2017.04.13)
+
+- Fix background generation/update timeout issue
+- Fix an issue where `grey` was colored in a word (works also with white...)
+
+### 0.4.0 (2017.04.01)
 
 - Generate background for cross browsers colors (white, black...)
 - Add settings to easily add support for new languages
-- Fix several issues and improve performance 
-
-### Latest 0.3.2 (2017.02.23)
-
-- Stylus support
-- XML support
-- Fix some background update issues
-
-### 0.3.1 (2017.02.08)
-
-- Fix an issue where one space after rgb(a) colors was included in the colored background
-- Speed up colored background generation for long files
+- Fix several issues and improve performance
 
 ### 0.3.0 (2017.02.04)
 
 - Add support for PostCSS
-- Generate background for RGB colors
-- Generate background for RGBa colors
+- Generate background for RGB/RGBa colors
+- Stylus/XML support
+- Speed up colored background generation for long files
 
-### 0.2.0 (2017.01.25)
+### 0.2.x (2017.01.25)
 
 - Improvement colored background updates
 
-### 0.1.0 (2017.01.17)
+### 0.1.x (2017.01.17)
 
 - First Release
 - Add support for css hexa colors
