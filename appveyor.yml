@@ -18,6 +18,7 @@ test_script:
   - yarn --version
   - npm run vscode:prepublish
   - npm test --silent
+  - yarn lint
 #  - .\scripts\test.bat
 #  - .\scripts\test-integration.bat
 

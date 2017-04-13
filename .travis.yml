@@ -22,6 +22,7 @@ before_install:
 
 install:
   - yarn
+  - yarn lint
   - yarn run vscode:prepublish
 
 script:
