@@ -305,14 +305,13 @@ function colorize(editor: TextEditor, cb) {
     extension.deco = filesDecorations.get(editor.document.fileName);
     extension.nbLine = editor.document.lineCount;
     decorateEditor(extension.editor, extension.deco);
-    cb();
-  } else {
-    extension.deco = new Map();
-    filesDecorations.set(extension.editor.document.fileName, extension.deco);
-    extension.nbLine = editor.document.lineCount;
-    initDecorations(extension, cb);
+    return cb();
   }
-};
+  extension.deco = new Map();
+  filesDecorations.set(extension.editor.document.fileName, extension.deco);
+  extension.nbLine = editor.document.lineCount;
+  return initDecorations(extension, cb);
+}
 
 export function activate(context: ExtensionContext) {
   const configuration = workspace.getConfiguration('colorize');
