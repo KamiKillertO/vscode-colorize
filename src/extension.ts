@@ -338,7 +338,12 @@ export function activate(context: ExtensionContext) {
 
 // this method is called when your extension is deactivated
 export function deactivate() {
-
+  extension.nbLine = null;
+  extension.editor = null;
+  extension.deco.clear();
+  extension.deco = null;
+  filesDecorations.clear();
+  filesDecorations = null;
   // need to clean up everything
 }
 
