@@ -2,7 +2,7 @@ import { assert } from 'chai';
 
 import { REGEXP } from '../../src/util/extractors/hexa-extractor';
 // Defines a Mocha test suite to group tests of similar kind together
-describe("Test CSS hexa shorthand color Regex", () => {
+describe('Test CSS hexa shorthand color Regex', () => {
   it('Should match color with only integer', function () {
     assert.ok('#000'.match(REGEXP));
   });
@@ -32,7 +32,7 @@ describe("Test CSS hexa shorthand color Regex", () => {
     assert.notOk('#Ab'.match(REGEXP));
   });
 });
-describe("Test CSS hexa color Regex", () => {
+describe('Test CSS hexa color Regex', () => {
   it('Should match color with only integer', function () {
     assert.ok('#000000'.match(REGEXP));
   });

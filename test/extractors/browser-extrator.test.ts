@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { REGEXP } from '../../src/util/extractors/browser-extractor';
 
 // Defines a Mocha test suite to group tests of similar kind together
-describe("Test browser predefined color Regex", () => {
+describe('Test browser predefined color Regex', () => {
 
   it('white should match', function () {
     assert.ok(' white'.match(REGEXP));
@@ -12,7 +12,7 @@ describe("Test browser predefined color Regex", () => {
     assert.ok(':white'.match(REGEXP));
   });
   it('Should not match inside a string', function() {
-    assert.notOk('"white"'.match(REGEXP));
+    assert.notOk('"white""'.match(REGEXP));
   });
   it('Should not match without a valid char before', function() {
     assert.notOk('awhite'.match(REGEXP));

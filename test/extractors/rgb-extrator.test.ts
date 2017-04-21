@@ -2,7 +2,7 @@ import { assert } from 'chai';
 
 import { REGEXP } from '../../src/util/extractors/rgb-extractor';
 
-describe("Test rgb(a) color Regex", () => {
+describe('Test rgb(a) color Regex', () => {
   it('Should match a simple rgb color', function () {
     assert.ok('rgb(123,123,123)'.match(REGEXP));
   });
