@@ -54,7 +54,7 @@ function mapKeysToArray(map: Map < number, any > ) {
     tmp = it.next();
   }
   return array;
-};
+}
 
 // Generate a TextDocumentContentChangeEvent like object for one line
 function generateTextDocumentContentChange(line: number, text: string): TextDocumentContentChangeEvent {
@@ -64,9 +64,8 @@ function generateTextDocumentContentChange(line: number, text: string): TextDocu
     range: new Range(new Position(line, 0), new Position(line, text.length))
   };
 }
-
 // Split the TextDocumentContentChangeEvent into multiple line if the added text contain multiple lines
-// example : 
+// example :
 //  let editedLine = [{
 //  rangeLength: 0,
 //  text: 'a\nb\nc\n',
@@ -90,7 +89,7 @@ function generateTextDocumentContentChange(line: number, text: string): TextDocu
 //  text: '',
 //  range: {start:{line:4,/*...*/}, end:{line:4,/*...*/}}
 // }]
-// 
+//
 function mutEditedLIne(editedLine: TextDocumentContentChangeEvent[]): TextDocumentContentChangeEvent[] {
 
   let newEditedLine: TextDocumentContentChangeEvent[] = [];
@@ -212,9 +211,9 @@ function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], 
         }
         context.deco.set(range.start.line, []);
         // lineAt raise an exception if line does not exist
-        try { // not really good 
+        try { // not really good
           return ColorUtil.findColors(context.editor.document.lineAt(range.start.line).text)
-            .then(colors => generateDecorations(colors, range.start.line, m))
+            .then(colors => generateDecorations(colors, range.start.line, m));
         } catch (e) { // use promise catch instead?
           return context.deco;
         }
@@ -246,8 +245,8 @@ function initDecorations(context: ColorizeContext, cb) {
   Promise.all(context.editor.document.getText()
       .split(/\n/)
       .map((text, index) => Object({
-        "text": text,
-        "line": index
+        'text': text,
+        'line': index
       }))
       .map(line => ColorUtil.findColors(line.text)
         .then(colors => generateDecorations(colors, line.line, context.deco))))

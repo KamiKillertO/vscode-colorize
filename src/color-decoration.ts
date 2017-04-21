@@ -37,8 +37,8 @@ class ColorDecoration {
       textColor = '#000';
     }
     let backgroundDecorationType = window.createTextEditorDecorationType({
-      borderWidth: "1px",
-      borderStyle: "solid",
+      borderWidth: '1px',
+      borderStyle: 'solid',
       borderColor: this.color.toRgbString(),
       backgroundColor: this.color.toRgbString(),
       color: textColor

@@ -3,7 +3,7 @@ import Color from './../color';
 export interface IColorExtractor {
   name: string;
   extractColors(text: string): Promise < Color[] >;
-};
+}
 
 const flatten = arr => arr.reduce((a, b) => a.concat(Array.isArray(b) ? flatten(b) : b), []);
 

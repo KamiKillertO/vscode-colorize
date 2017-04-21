@@ -6,7 +6,7 @@ import Color from './util/color';
 // import HexaColor from './util/hexa-color';
 // import RgbColor from './util/rgb-color';
 // import BrowserColor from './util/browser-color';
-// import { COLORS } from "./util/browser-color";
+// import { COLORS } from './util/browser-color';
 import './util/extractors/hexa-extractor';
 import './util/extractors/rgb-extractor';
 import './util/extractors/browser-extractor';
@@ -64,7 +64,7 @@ class ColorUtil {
   //   return new Promise((resolve, reject) => {
   //     let match = null;
   //     let colors: Color[] = [];
-  //     // Get rgb "like" colors
+  //     // Get rgb 'like' colors
   //     while ((match = RGB_COLOR.exec(text)) !== null) {
   //       let rgba = match[1].replace(/rgb(a){0,1}\(/, '').replace(/\)/, '').split(/,/gi).map(c => parseFloat(c));
   //       // Check if it's a valid rgb(a) color
@@ -85,5 +85,5 @@ class ColorUtil {
   //     return resolve(colors);
   //   });
   // };
-};
+}
 export default ColorUtil;
