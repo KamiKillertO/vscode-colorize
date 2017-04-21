@@ -1,7 +1,7 @@
 import Color from './../color';
 import ColorExtractor, { IColorExtractor } from './color-extractor';
 
-// class BrowerColor implements Color {
+// class BrowserColor implements Color {
 
 //   public value: string;
 //   public rgb: number[];
@@ -19,7 +19,7 @@ import ColorExtractor, { IColorExtractor } from './color-extractor';
 //     return `rgb(${this.rgb.join(',')})`;
 //   }
 // }
-// export default BrowerColor;
+// export default BrowserColor;
 
 export const COLORS = Object({
     'aliceblue': {
@@ -764,7 +764,7 @@ export const COLORS = Object({
     }
 });
 
-export const REGEXP = (() => RegExp(`(?:,| |\\(|:)(${Object.keys(COLORS).map((color) => `(?:${color.toLowerCase()})`).join('|')})(?:$|,| |;|\\)|\\n)`, 'i'))();
+export const REGEXP = (() => RegExp(`(?:,| |\\(|:)(${Object.keys(COLORS).map((color) => `(?:${color.toLowerCase()})`).join('|')})(?:$|,| |;|\\)|\\r|\\n)`, 'i'))();
 
 class BrowsersColorExtractor implements IColorExtractor {
   public name: string = 'BROWSERS_COLORS_EXTRACTOR';
