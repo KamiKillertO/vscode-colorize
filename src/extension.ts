@@ -54,7 +54,7 @@ function mapKeysToArray(map: Map < number, any > ) {
     tmp = it.next();
   }
   return array;
-};
+}
 
 // Generate a TextDocumentContentChangeEvent like object for one line
 function generateTextDocumentContentChange(line: number, text: string): TextDocumentContentChangeEvent {
@@ -89,7 +89,7 @@ function generateTextDocumentContentChange(line: number, text: string): TextDocu
 //  text: '',
 //  range: {start:{line:4,/*...*/}, end:{line:4,/*...*/}}
 // }]
-// 
+//
 function mutEditedLIne(editedLine: TextDocumentContentChangeEvent[]): TextDocumentContentChangeEvent[] {
 
   let newEditedLine: TextDocumentContentChangeEvent[] = [];
@@ -211,7 +211,7 @@ function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], 
         }
         context.deco.set(range.start.line, []);
         // lineAt raise an exception if line does not exist
-        try { // not really good 
+        try { // not really good
           return ColorUtil.findColors(context.editor.document.lineAt(range.start.line).text)
             .then(colors => generateDecorations(colors, range.start.line, m));
         } catch (e) { // use promise catch instead?

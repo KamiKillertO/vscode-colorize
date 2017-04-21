@@ -85,5 +85,5 @@ class ColorUtil {
   //     return resolve(colors);
   //   });
   // };
-};
+}
 export default ColorUtil;
