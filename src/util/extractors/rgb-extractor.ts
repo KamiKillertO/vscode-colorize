@@ -2,7 +2,7 @@ import { IColorExtractor } from './color-extractor';
 import ColorExtractor from './color-extractor';
 import Color from './../color';
 
-export const REGEXP = /((?:rgb\((?:\d{1,3}\s*,\s*){2}\d{1,3}\))|(?:rgba\((?:\d{1,3}\s*,\s*){3}[0-1](?:\.\d+){0,1}\)))(?:$|"|'|,| |;|\)|\n)/gi;
+export const REGEXP = /((?:rgb\((?:\d{1,3}\s*,\s*){2}\d{1,3}\))|(?:rgba\((?:\d{1,3}\s*,\s*){3}(?:[0-1]|1\.0|[0](?:\.\d+){0,1}|(?:\.\d+))\)))(?:$|"|'|,| |;|\)|\n)/gi;
 
 class RgbExtractor implements IColorExtractor {
   public name: string = "RGB_EXTRACTOR";
