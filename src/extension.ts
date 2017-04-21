@@ -40,7 +40,8 @@ let extension: ColorizeContext = {
   nbLine: 0,
   deco: null
 };
-let filesDecorations: Map < string, Map < number, ColorDecoration[] > > = new Map();
+let dirtyFilesDecorations: Map < string, Map < number, ColorDecoration[] > > = new Map();
+let savedFilesDecorations: Map < string, Map < number, ColorDecoration[] > > = new Map();
 
 const q = new Queue();
 
@@ -155,6 +156,9 @@ function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context: C
   positions = positions.filter(position => {
     if (position.newPosition === null) {
       context.deco.get(position.oldPosition).forEach(decoration => decoration.dispose());
+      return false;
+    }
+    if (position.newPosition === 0 && extension.editor.document.lineCount === 1 && extension.editor.document.lineAt(0).text === '') {
       return false;
     }
     if (Math.abs(position.oldPosition - position.newPosition) > Math.abs(diffLine)) {
@@ -284,12 +288,12 @@ function isLanguageSupported(languageId): boolean {
   return config.languages.indexOf(languageId) !== -1;
 }
 
-function isFileExtenstionSupported(fileName): boolean {
+function isFileExtensionSupported(fileName): boolean {
   return config.filesExtensions.find(ext => ext.test(fileName));
 }
 
 function isSupported(document: TextDocument) {
-  return isLanguageSupported(document.languageId) || isFileExtenstionSupported(document.fileName);
+  return isLanguageSupported(document.languageId) || isFileExtensionSupported(document.fileName);
 }
 
 function colorize(editor: TextEditor, cb) {
@@ -300,24 +304,62 @@ function colorize(editor: TextEditor, cb) {
     return cb();
   }
   extension.editor = editor;
-  if (filesDecorations.has(editor.document.fileName)) {
-    extension.deco = filesDecorations.get(editor.document.fileName);
+  if (!editor.document.isDirty && savedFilesDecorations.has(editor.document.fileName)) {
+    extension.deco = savedFilesDecorations.get(editor.document.fileName);
+    extension.nbLine = editor.document.lineCount;
+    decorateEditor(extension.editor, extension.deco);
+    return cb();
+  }
+  if (dirtyFilesDecorations.has(editor.document.fileName)) {
+    extension.deco = dirtyFilesDecorations.get(editor.document.fileName);
     extension.nbLine = editor.document.lineCount;
     decorateEditor(extension.editor, extension.deco);
     return cb();
   }
   extension.deco = new Map();
-  filesDecorations.set(extension.editor.document.fileName, extension.deco);
+  dirtyFilesDecorations.set(extension.editor.document.fileName, extension.deco);
   extension.nbLine = editor.document.lineCount;
   return initDecorations(extension, cb);
 }
 
+function saveDirtyDecoration(fileName: string, decorations: Map<number, ColorDecoration[]>) {
+  return dirtyFilesDecorations.set(fileName, decorations);
+}
+
+
+function savedSavedDecorations(fileName: string, decorations: Map<number, ColorDecoration[]>) {
+  return savedFilesDecorations.set(fileName, decorations);
+}
 export function activate(context: ExtensionContext) {
   const configuration = workspace.getConfiguration('colorize');
   config.languages = configuration.get('languages', []);
   config.filesExtensions = configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`));
 
+  workspace.onDidCloseTextDocument(document => {
+    q.push((cb) => {
+      if (extension.editor && extension.editor.document.fileName === document.fileName) {
+        document.isDirty ? saveDirtyDecoration(document.fileName, extension.deco) : savedSavedDecorations(document.fileName, extension.deco);
+        return cb();
+      }
+      console.error('closed document is not the current file');
+      return cb();
+    });
+  }, null, context.subscriptions);
+
+  workspace.onDidSaveTextDocument(document => {
+    q.push((cb) => {
+      if (extension.editor.document.fileName === document.fileName) {
+        savedSavedDecorations(document.fileName, extension.deco);
+        return cb();
+      }
+      console.error('saved document is not the current file');
+      return cb();
+    });
+  }, null, context.subscriptions);
   window.onDidChangeActiveTextEditor(editor => {
+    if (extension.editor) {
+      saveDirtyDecoration(extension.editor.document.fileName, extension.deco);
+    }
     window.visibleTextEditors.filter(e => e !== editor).forEach(e => {
       q.push(cb => colorize(e, cb));
     });
@@ -340,8 +382,10 @@ export function deactivate() {
   extension.editor = null;
   extension.deco.clear();
   extension.deco = null;
-  filesDecorations.clear();
-  filesDecorations = null;
+  dirtyFilesDecorations.clear();
+  dirtyFilesDecorations = null;
+  savedFilesDecorations.clear();
+  savedFilesDecorations = null;
   // need to clean up everything
 }
 
