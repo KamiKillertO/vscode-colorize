@@ -10,11 +10,11 @@ class ColorUtil {
    * The luminance value is between 0 and 1
    * - 1 means that the color is light
    * - 0 means that the color is dark
-   * 
+   *
    * @static
-   * @param {Color} color 
+   * @param {Color} color
    * @returns {number}
-   * 
+   *
    * @memberOf ColorUtil
    */
   public static luminance(color: Color): number {
@@ -33,11 +33,11 @@ class ColorUtil {
   }
   /**
    * Extract all colors from a text
-   * 
+   *
    * @static
-   * @param {any} text 
-   * @returns {Promise < Color[] >} 
-   * 
+   * @param {any} text
+   * @returns {Promise < Color[] >}
+   *
    * @memberOf ColorUtil
    */
   public static findColors(text): Promise < Color[] > {

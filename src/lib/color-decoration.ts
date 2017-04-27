@@ -12,7 +12,7 @@ import Color from './color';
 class ColorDecoration {
   /**
    * The color used to generate the TextEditorDecorationType
-   * 
+   *
    * @type {Color}
    * @public
    * @memberOf ColorDecoration
@@ -20,7 +20,7 @@ class ColorDecoration {
   public color: Color;
   /**
    * Keep track of the TextEditorDecorationType status
-   * 
+   *
    * @type {boolean}
    * @public
    * @memberOf ColorDecoration
@@ -29,7 +29,7 @@ class ColorDecoration {
   private _decoration: TextEditorDecorationType;
   /**
    * The TextEditorDecorationType associated to the color
-   * 
+   *
    * @type {TextEditorDecorationType}
    * @memberOf ColorDecoration
    */
@@ -50,7 +50,7 @@ class ColorDecoration {
   /**
    * Disposed the TextEditorDecorationType
    * (destroy the colored background)
-   * 
+   *
    * @public
    * @memberOf ColorDecoration
    */
@@ -61,10 +61,10 @@ class ColorDecoration {
   }
   /**
    * Generate the decoration Range (start and end position in line)
-   * 
-   * @param {number} line 
-   * @returns {Range} 
-   * 
+   *
+   * @param {number} line
+   * @returns {Range}
+   *
    * @memberOf ColorDecoration
    */
   public generateRange(line: number): Range {
