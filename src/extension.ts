@@ -279,7 +279,6 @@ function decorateEditor(editor: TextEditor, decorations: Map<number, ColorDecora
     tmp.value[1].forEach(decoration => editor.setDecorations(decoration.decoration, [decoration.generateRange(line)]));
     tmp = it.next();
   }
-  
   return;
 }
 function isLanguageSupported(languageId): boolean {
@@ -332,13 +331,11 @@ function saveDecorations(document: TextDocument, deco: Map<number, ColorDecorati
 }
 
 function _saveDirtyDecoration(fileName: string, decorations: Map<number, ColorDecoration[]>) {
-  
   return dirtyFilesDecorations.set(fileName, decorations);
 }
 
 
 function _saveSavedDecorations(fileName: string, decorations: Map<number, ColorDecoration[]>) {
-  
   return savedFilesDecorations.set(fileName, decorations);
 }
 
