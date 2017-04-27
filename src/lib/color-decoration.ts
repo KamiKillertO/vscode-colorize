@@ -7,13 +7,32 @@ import {
 } from 'vscode';
 
 import ColorUtil from './color-util';
-import Color from './util/color';
+import Color from './color';
 
 class ColorDecoration {
+  /**
+   * The color used to generate the TextEditorDecorationType
+   * 
+   * @type {Color}
+   * @public
+   * @memberOf ColorDecoration
+   */
   public color: Color;
-  private _decoration: TextEditorDecorationType;
+  /**
+   * Keep track of the TextEditorDecorationType status
+   * 
+   * @type {boolean}
+   * @public
+   * @memberOf ColorDecoration
+   */
   public disposed: boolean = false;
-
+  private _decoration: TextEditorDecorationType;
+  /**
+   * The TextEditorDecorationType associated to the color
+   * 
+   * @type {TextEditorDecorationType}
+   * @memberOf ColorDecoration
+   */
   get decoration(): TextEditorDecorationType {
     if (this.disposed) {
       this.disposed = false;
@@ -28,20 +47,35 @@ class ColorDecoration {
     this.color = color;
     this._generateDecorator();
   }
-
+  /**
+   * Disposed the TextEditorDecorationType
+   * (destroy the colored background)
+   * 
+   * @public
+   * @memberOf ColorDecoration
+   */
   public dispose(): void {
     // this.color = null;
     this.decoration.dispose();
     this.disposed = true;
   }
-
-  public generateRange(line: number) {
+  /**
+   * Generate the decoration Range (start and end position in line)
+   * 
+   * @param {number} line 
+   * @returns {Range} 
+   * 
+   * @memberOf ColorDecoration
+   */
+  public generateRange(line: number): Range {
     return new Range(new Position(line, this.color.positionInText), new Position(line, this.color.positionInText + this.color.value.length));
   }
 
   private _generateDecorator() {
     let textColor = null;
     let luminance = ColorUtil.luminance(this.color);
+    console.log(this.color.value);
+    console.log(luminance);
     if (luminance < 0.7) {
       textColor = '#fff';
     } else {

@@ -2,8 +2,8 @@ import {
   assert
 } from 'chai';
 
-import ColorUtil from '../src/color-util';
-import Color from '../src/util/color';
+import ColorUtil from '../src/lib/color-util';
+import Color from '../src/lib/color';
 
 describe('Test utility fonction', () => {
   it('Should not extract invalid colors from a text', (done) => {

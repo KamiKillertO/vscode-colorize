@@ -18,11 +18,11 @@ import {
   TextDocumentContentChangeEvent
 } from 'vscode';
 
-import Color from './util/color';
-import ColorUtil from './color-util';
-import ColorDecoration from './color-decoration';
-import Queue from './queue';
-import ColorExtractor from './util/extractors/color-extractor';
+import Color from './lib/color';
+import ColorUtil from './lib/color-util';
+import ColorDecoration from './lib/color-decoration';
+import Queue from './lib/queue';
+import ColorExtractor from './lib/extractors/color-extractor';
 
 let config = {
   languages: null,
