@@ -11,24 +11,35 @@ import Color from './util/color';
 
 class ColorDecoration {
   public color: Color;
-  public decoration: TextEditorDecorationType;
+  private _decoration: TextEditorDecorationType;
   public disposed: boolean = false;
 
+  get decoration(): TextEditorDecorationType {
+    if (this.disposed) {
+      this.disposed = false;
+      this._generateDecorator();
+    }
+    return this._decoration;
+  }
+  set decoration(deco: TextEditorDecorationType) {
+    this._decoration = deco;
+  }
   public constructor(color: Color) {
     this.color = color;
     this._generateDecorator();
   }
 
   public dispose(): void {
-    this.color = null;
+    // this.color = null;
     this.decoration.dispose();
+    this.disposed = true;
   }
 
   public generateRange(line: number) {
     return new Range(new Position(line, this.color.positionInText), new Position(line, this.color.positionInText + this.color.value.length));
   }
 
-  private _generateDecorator(): TextEditorDecorationType {
+  private _generateDecorator() {
     let textColor = null;
     let luminance = ColorUtil.luminance(this.color);
     if (luminance < 0.7) {
@@ -44,7 +55,6 @@ class ColorDecoration {
       color: textColor
     });
     this.decoration = backgroundDecorationType;
-    return backgroundDecorationType;
   }
 }
 export default ColorDecoration;
