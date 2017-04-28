@@ -1,6 +1,22 @@
+## 0.4.2
+
+### Fixed
+
+- Fix #28, now `.x` is a valid alpha value
+
+### Changed
+
+- Add `\r` as a valid end for a color
+- Save files decorations in two map one for dirty files and one for saved files, fix issues with opening/reopening files
+
 ## 0.4.1
 
+### Fixed
+
 - Fix an issue where browsers colors inside a word were colorized (#26)
+
+### Changed
+
 - Remove the use of `Promise` in `queue.ts` to fix an error of background generation/update caused by a 1s timeout
 
 ## 0.4.0
