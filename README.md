@@ -88,7 +88,13 @@ For example if you want to colorize `.diff` files:
 
 ## Release
 
-### Latest 0.4.1 (2017.04.13)
+### Latest 0.4.2 (2017.04.27)
+
+- You can now use `.1` instead of `0.1` in your rbga colors
+- No more issue with files using `\r` as end of lines
+- Open/reopen your save/unsaved files is now longer a problem (no more weird generated background)
+
+### 0.4.1 (2017.04.13)
 
 - Fix background generation/update timeout issue
 - Fix an issue where `grey` was colored in a word (works also with white...)

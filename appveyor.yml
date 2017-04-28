@@ -16,8 +16,9 @@ cache:
 test_script:
   - node --version
   - yarn --version
-  - npm run vscode:prepublish
-  - npm test --silent
+  - yarn lint
+  - yarn vscode:prepublish
+  - yarn test --silent
 #  - .\scripts\test.bat
 #  - .\scripts\test-integration.bat
 
