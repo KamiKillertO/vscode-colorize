@@ -15,11 +15,11 @@ class HSLColorExtractor implements IColorExtractor {
    * @param {number} s
    * @param {number} l
    * @param {number} [a=1]
-   * @returns
+   * @returns {number[]} The colors converted in rgba
    *
    * @memberof HSLColorExtractor
    */
-  private convertToRGBA(h: number, s: number, l: number, a: number = 1) {
+  private convertToRGBA(h: number, s: number, l: number, a: number = 1): number[] {
     let r: number, g: number, b: number;
     if (s === 0) {
       r = g = b = Math.round((l / 100) * 255);
@@ -45,7 +45,17 @@ class HSLColorExtractor implements IColorExtractor {
 
     return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255), a];
   }
-
+  /**
+   * Select and execute the proper formula to get the r,g,b values
+   *
+   * @private
+   * @param {number} tmp_1
+   * @param {number} tmp_2
+   * @param {number} value
+   * @returns {number}
+   *
+   * @memberof HSLColorExtractor
+   */
   private executeProperFormula(tmp_1: number, tmp_2: number, value: number): number {
     if (6 * value < 1) {
       return tmp_2 + (tmp_1 - tmp_2) * 6 * value;
