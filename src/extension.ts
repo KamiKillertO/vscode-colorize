@@ -360,7 +360,7 @@ export function activate(context: ExtensionContext) {
     // need to be checked
     // open color.sass, delete all, close without saving and reopen
     q.push((cb) => {
-      if (extension.editor.document.fileName === document.fileName) {
+      if (extension.editor && extension.editor.document.fileName === document.fileName) {
         saveDecorations(document, extension.deco);
         return cb();
       }

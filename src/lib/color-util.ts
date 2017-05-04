@@ -2,6 +2,7 @@ import Color from './color';
 import './extractors/hexa-extractor';
 import './extractors/rgb-extractor';
 import './extractors/browser-extractor';
+import './extractors/hsl-extractor';
 import ColorExtractor from './extractors/color-extractor';
 
 class ColorUtil {
