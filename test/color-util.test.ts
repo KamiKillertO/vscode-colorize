@@ -2,8 +2,8 @@ import {
   assert
 } from 'chai';
 
-import ColorUtil from '../src/color-util';
-import Color from '../src/util/color';
+import ColorUtil from '../src/lib/color-util';
+import Color from '../src/lib/color';
 
 describe('Test utility fonction', () => {
   it('Should not extract invalid colors from a text', (done) => {
@@ -13,8 +13,8 @@ describe('Test utility fonction', () => {
     });
   });
   it('Should extract Colors from a text', (done) => {
-    ColorUtil.findColors('#fff, rgb(123,123,123), #dccdcd, linear-gradient(to bottom right, #fff, #ccc), white').then(colors => {
-      assert.equal(6, colors.length, 'Should have found 5 colors');
+    ColorUtil.findColors('#fff, rgb(123,123,123), #dccdcd, linear-gradient(to bottom right, #fff, #ccc), white, hsl(123,10%,1%)').then(colors => {
+      assert.equal(7, colors.length, 'Should have found 7 colors');
       done();
     });
   });

@@ -18,11 +18,11 @@ import {
   TextDocumentContentChangeEvent
 } from 'vscode';
 
-import Color from './util/color';
-import ColorUtil from './color-util';
-import ColorDecoration from './color-decoration';
-import Queue from './queue';
-import ColorExtractor from './util/extractors/color-extractor';
+import Color from './lib/color';
+import ColorUtil from './lib/color-util';
+import ColorDecoration from './lib/color-decoration';
+import Queue from './lib/queue';
+import ColorExtractor from './lib/extractors/color-extractor';
 
 let config = {
   languages: null,
@@ -40,7 +40,8 @@ let extension: ColorizeContext = {
   nbLine: 0,
   deco: null
 };
-let filesDecorations: Map < string, Map < number, ColorDecoration[] > > = new Map();
+let dirtyFilesDecorations: Map < string, Map < number, ColorDecoration[] > > = new Map();
+let savedFilesDecorations: Map < string, Map < number, ColorDecoration[] > > = new Map();
 
 const q = new Queue();
 
@@ -91,12 +92,10 @@ function generateTextDocumentContentChange(line: number, text: string): TextDocu
 // }]
 //
 function mutEditedLIne(editedLine: TextDocumentContentChangeEvent[]): TextDocumentContentChangeEvent[] {
-
   let newEditedLine: TextDocumentContentChangeEvent[] = [];
   let startLine = 0;
   let before = 0;
   editedLine.reverse();
-  // debugger;
   editedLine.forEach(line => {
     let a = line.text.match(/\n/g);
     startLine = line.range.start.line + before;
@@ -157,12 +156,16 @@ function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context: C
       context.deco.get(position.oldPosition).forEach(decoration => decoration.dispose());
       return false;
     }
+    if (position.newPosition === 0 && extension.editor.document.lineCount === 1 && extension.editor.document.lineAt(0).text === '') {
+      context.deco.get(position.oldPosition).forEach(decoration => decoration.dispose());
+      return false;
+    }
     if (Math.abs(position.oldPosition - position.newPosition) > Math.abs(diffLine)) {
       position.newPosition = position.oldPosition + diffLine;
     }
     return true;
   });
-  let newDeco = new Map();
+    let newDeco = new Map();
   positions.forEach(position => {
     if (newDeco.has(position.newPosition)) {
       newDeco.set(position.newPosition, newDeco.get(position.newPosition).concat(context.deco.get(position.oldPosition)));
@@ -189,7 +192,7 @@ function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position)
 }
 
 function updateDecorations(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, cb: Function) {
-  let diffLine = context.editor.document.lineCount - context.nbLine;
+    let diffLine = context.editor.document.lineCount - context.nbLine;
   let positions;
   if (diffLine !== 0) {
     editedLine = handleLineDiff(editedLine, context, diffLine);
@@ -236,7 +239,7 @@ function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], 
 }
 
 function initDecorations(context: ColorizeContext, cb) {
-  if (!context.editor) {
+    if (!context.editor) {
     return cb();
   }
 
@@ -273,51 +276,101 @@ function decorateEditor(editor: TextEditor, decorations: Map<number, ColorDecora
   let tmp = it.next();
   while (!tmp.done) {
     let line = tmp.value[0];
-    // tmp.value[1].forEach(decoration => context.current_editor.setDecorations(decoration.decoration, [decoration.textPosition]));
     tmp.value[1].forEach(decoration => editor.setDecorations(decoration.decoration, [decoration.generateRange(line)]));
     tmp = it.next();
   }
   return;
 }
-
 function isLanguageSupported(languageId): boolean {
   return config.languages.indexOf(languageId) !== -1;
 }
 
-function isFileExtenstionSupported(fileName): boolean {
+function isFileExtensionSupported(fileName): boolean {
   return config.filesExtensions.find(ext => ext.test(fileName));
 }
 
 function isSupported(document: TextDocument) {
-  return isLanguageSupported(document.languageId) || isFileExtenstionSupported(document.fileName);
+  return isLanguageSupported(document.languageId) || isFileExtensionSupported(document.fileName);
 }
 
 function colorize(editor: TextEditor, cb) {
-  if (!editor) {
+      if (!editor) {
     return cb();
   }
   if (!isSupported(editor.document)) {
     return cb();
   }
   extension.editor = editor;
-  if (filesDecorations.has(editor.document.fileName)) {
-    extension.deco = filesDecorations.get(editor.document.fileName);
+  const deco = getDecorations(editor);
+  if (deco) {
+    extension.deco = deco;
     extension.nbLine = editor.document.lineCount;
     decorateEditor(extension.editor, extension.deco);
     return cb();
   }
   extension.deco = new Map();
-  filesDecorations.set(extension.editor.document.fileName, extension.deco);
   extension.nbLine = editor.document.lineCount;
-  return initDecorations(extension, cb);
+  return initDecorations(extension, () => {
+    saveDecorations(extension.editor.document, extension.deco);
+    return cb();
+  });
 }
 
+function getDecorations(editor: TextEditor): Map<number, ColorDecoration[]> | null  {
+  if (!editor.document.isDirty && savedFilesDecorations.has(editor.document.fileName)) {
+    return savedFilesDecorations.get(editor.document.fileName);
+  }
+  if (dirtyFilesDecorations.has(editor.document.fileName)) {
+    return dirtyFilesDecorations.get(editor.document.fileName);
+  }
+  return null;
+}
+
+function saveDecorations(document: TextDocument, deco: Map<number, ColorDecoration[]>) {
+  document.isDirty ? _saveDirtyDecoration(document.fileName, deco) : _saveSavedDecorations(document.fileName, deco);
+}
+
+function _saveDirtyDecoration(fileName: string, decorations: Map<number, ColorDecoration[]>) {
+  return dirtyFilesDecorations.set(fileName, decorations);
+}
+
+
+function _saveSavedDecorations(fileName: string, decorations: Map<number, ColorDecoration[]>) {
+  return savedFilesDecorations.set(fileName, decorations);
+}
+
+
 export function activate(context: ExtensionContext) {
-  const configuration = workspace.getConfiguration('colorize');
+    const configuration = workspace.getConfiguration('colorize');
   config.languages = configuration.get('languages', []);
   config.filesExtensions = configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`));
 
+  workspace.onDidCloseTextDocument(document => {
+        q.push((cb) => {
+      if (extension.editor && extension.editor.document.fileName === document.fileName) {
+        saveDecorations(document, extension.deco);
+        return cb();
+      }
+      return cb();
+    });
+  }, null, context.subscriptions);
+
+  workspace.onDidSaveTextDocument(document => {
+    // add last saved deco for a document
+    // need to be checked
+    // open color.sass, delete all, close without saving and reopen
+    q.push((cb) => {
+      if (extension.editor && extension.editor.document.fileName === document.fileName) {
+        saveDecorations(document, extension.deco);
+        return cb();
+      }
+      return cb();
+    });
+  }, null, context.subscriptions);
   window.onDidChangeActiveTextEditor(editor => {
+    if (extension.editor) {
+      saveDecorations(extension.editor.document, extension.deco);
+    }
     window.visibleTextEditors.filter(e => e !== editor).forEach(e => {
       q.push(cb => colorize(e, cb));
     });
@@ -325,6 +378,7 @@ export function activate(context: ExtensionContext) {
   }, null, context.subscriptions);
   workspace.onDidChangeTextDocument((event: TextDocumentChangeEvent) => {
     if (extension.editor && event.document.fileName === extension.editor.document.fileName) {
+      extension.editor = window.activeTextEditor;
       q.push((cb) => updateDecorations(event.contentChanges, extension, cb));
     }
   }, null, context.subscriptions);
@@ -336,12 +390,14 @@ export function activate(context: ExtensionContext) {
 
 // this method is called when your extension is deactivated
 export function deactivate() {
-  extension.nbLine = null;
+    extension.nbLine = null;
   extension.editor = null;
   extension.deco.clear();
   extension.deco = null;
-  filesDecorations.clear();
-  filesDecorations = null;
+  dirtyFilesDecorations.clear();
+  dirtyFilesDecorations = null;
+  savedFilesDecorations.clear();
+  savedFilesDecorations = null;
   // need to clean up everything
 }
 

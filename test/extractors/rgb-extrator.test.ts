@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { REGEXP } from '../../src/util/extractors/rgb-extractor';
+import { REGEXP } from '../../src/lib/extractors/rgb-extractor';
 
 describe('Test rgb(a) color Regex', () => {
   it('Should match a simple rgb color', function () {
@@ -16,7 +16,7 @@ describe('Test rgb(a) color Regex', () => {
   it('Should not match', function () {
     assert.notOk('rgba(123,123,123, 1.1)'.match(REGEXP));
   });
-  it('Sould match inside a string', function() {
+  it('Should match inside a string', function() {
     assert.ok('"rgba(123,123,123, 1)"'.match(REGEXP));
     assert.ok('"rgb(123,123,123)"'.match(REGEXP));
   });
