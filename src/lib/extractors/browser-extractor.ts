@@ -1,26 +1,6 @@
 import Color from './../color';
 import ColorExtractor, { IColorExtractor } from './color-extractor';
 
-// class BrowserColor implements Color {
-
-//   public value: string;
-//   public rgb: number[];
-//   public alpha: number;
-//   public positionInText: number;
-
-//   public constructor(value: string, positionInText: number = 0, rgb = null, alpha = 1) {
-//     this.value = value;
-//     this.positionInText = positionInText;
-//     this.alpha = alpha;
-//     this.rgb = COLORS[value].rgb;
-//   }
-
-//   public toRgbString(): string {
-//     return `rgb(${this.rgb.join(',')})`;
-//   }
-// }
-// export default BrowserColor;
-
 export const COLORS = Object({
     'aliceblue': {
       'value': '#F0F8FF',
