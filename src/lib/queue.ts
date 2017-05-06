@@ -5,11 +5,11 @@ class Queue {
   private _queue: Function[] = [];
   /**
    * Add a action inside the queue.
-   * The action should take a callback as first parameter and call it 
+   * The action should take a callback as first parameter and call it
    * when his work is done in order to start the next action
-   * 
-   * @param {Function} f 
-   * @returns 
+   *
+   * @param {Function} f
+   * @returns
    * @memberOf Queue
    */
   public push(f: Function) {
