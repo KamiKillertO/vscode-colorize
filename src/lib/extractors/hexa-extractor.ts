@@ -1,10 +1,10 @@
 import Color from './../color';
 import ColorExtractor, { IColorExtractor } from './color-extractor';
 
-export const REGEXP = /(#[\da-f]{3}|#[\da-f]{6})(?:$|"|'|,| |;|\)|\n)/gi;
+export const REGEXP = /(#[\da-f]{3}|#[\da-f]{6})(?:$|"|'|,| |;|\)|\r|\n)/gi;
 
 class HexaColorExtractor implements IColorExtractor {
-  public name: string = "HEXA_EXTRACTOR";
+  public name: string = 'HEXA_EXTRACTOR';
 
   private extractRGBValue(value): number[] {
     let rgb: any = /#(.+)/gi.exec(value);
