@@ -45,7 +45,7 @@
             "sass",
             "scss",
             "less",
-            "pcss",
+            "postcss",
             "sss",
             "stylus",
             "xml",
