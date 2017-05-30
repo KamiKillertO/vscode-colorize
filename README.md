@@ -10,8 +10,10 @@ This extension  your styles files looking for colors and generate a colored back
 
 ## Features
 
-- 🆕 Generate colored background for hsl colors
-- 🆕 Generate colored background for hsla colors
+- 🆕 Generate colored background for css variables
+- 🆕 Generate colored background for preprocessor variables
+- Generate colored background for hsl colors
+- Generate colored background for hsla colors
 - Generate colored background for cross browsers colors
 - Generate colored background for css hexa color
 - Generate colored background for rgb color
