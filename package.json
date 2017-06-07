@@ -81,7 +81,7 @@
     "@types/chai": "3.4.35",
     "@types/mocha": "2.2.40",
     "@types/node": "7.0.13",
-    "chai": "3.5.0",
+    "chai": "4.0.2",
     "mocha": "3.3.0",
     "tslint": "5.4.3",
     "typescript": "2.3.4",
