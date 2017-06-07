@@ -15,7 +15,10 @@ import {
   TextLine,
   Position,
   TextDocumentChangeEvent,
-  TextDocumentContentChangeEvent
+  TextDocumentContentChangeEvent,
+  TextEditorSelectionChangeEvent,
+  TextEditorSelectionChangeKind,
+  Selection
 } from 'vscode';
 
 import Color from './lib/color';
@@ -33,12 +36,14 @@ interface ColorizeContext {
   editor: TextEditor;
   nbLine: number;
   deco: Map < number, ColorDecoration[] >;
+  currentSelection: number;
 }
 
 let extension: ColorizeContext = {
   editor: window.activeTextEditor,
   nbLine: 0,
-  deco: null
+  deco: null,
+  currentSelection: null
 };
 let dirtyFilesDecorations: Map < string, Map < number, ColorDecoration[] > > = new Map();
 let savedFilesDecorations: Map < string, Map < number, ColorDecoration[] > > = new Map();
@@ -192,7 +197,7 @@ function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position)
 }
 
 function updateDecorations(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, cb: Function) {
-    let diffLine = context.editor.document.lineCount - context.nbLine;
+  let diffLine = context.editor.document.lineCount - context.nbLine;
   let positions;
   if (diffLine !== 0) {
     editedLine = handleLineDiff(editedLine, context, diffLine);
@@ -222,7 +227,7 @@ function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], 
         }
       })
     ).then(() => {
-      decorateEditor(context.editor, m);
+      decorateEditor(context);
       let it = m.entries();
       let tmp = it.next();
       while (!tmp.done) {
@@ -253,33 +258,38 @@ function initDecorations(context: ColorizeContext, cb) {
       }))
       .map(line => ColorUtil.findColors(line.text)
         .then(colors => generateDecorations(colors, line.line, context.deco))))
-    .then(() => decorateEditor(context.editor, context.deco))
+    .then(() => decorateEditor(context))
     .then(cb);
 }
-
+// Mut context ><
 function generateDecorations(colors: Color[], line: number, decorations: Map<number, ColorDecoration[]>) {
   colors.forEach((color) => {
     let startPos = new Position(line, color.positionInText);
     let endPos = new Position(line, color.positionInText + color.value.length);
-    let range = new Range(startPos, endPos);
     if (decorations.has(line)) {
-      decorations.set(line, decorations.get(line).concat([new ColorDecoration( /*range, */ color)]));
+      decorations.set(line, decorations.get(line).concat([new ColorDecoration(color)]));
     } else {
-      decorations.set(line, [new ColorDecoration( /*range, */ color)]);
+      decorations.set(line, [new ColorDecoration(color)]);
     }
   });
-  return decorations; // return decoration instead?
+  return decorations;
 }
-
-function decorateEditor(editor: TextEditor, decorations: Map<number, ColorDecoration[]>) {
-  let it = decorations.entries();
+// Run through all decoration to generate editor's decorations
+function decorateEditor(context: ColorizeContext) {
+  let it = context.deco.entries();
   let tmp = it.next();
   while (!tmp.done) {
     let line = tmp.value[0];
-    tmp.value[1].forEach(decoration => editor.setDecorations(decoration.decoration, [decoration.generateRange(line)]));
+    if (line !== context.currentSelection) {
+      decorateLine(context.editor, tmp.value[1], line);
+    }
     tmp = it.next();
   }
   return;
+}
+// Decorate editor's decorations for one line
+function decorateLine(editor: TextEditor, decorations: ColorDecoration[], line: number) {
+  decorations.forEach(decoration => editor.setDecorations(decoration.decoration, [decoration.generateRange(line)]));
 }
 function isLanguageSupported(languageId): boolean {
   return config.languages.indexOf(languageId) !== -1;
@@ -294,18 +304,19 @@ function isSupported(document: TextDocument) {
 }
 
 function colorize(editor: TextEditor, cb) {
-      if (!editor) {
+  if (!editor) {
     return cb();
   }
   if (!isSupported(editor.document)) {
     return cb();
   }
   extension.editor = editor;
+  extension.currentSelection = null;
   const deco = getDecorations(editor);
   if (deco) {
     extension.deco = deco;
     extension.nbLine = editor.document.lineCount;
-    decorateEditor(extension.editor, extension.deco);
+    decorateEditor(extension);
     return cb();
   }
   extension.deco = new Map();
@@ -334,19 +345,41 @@ function _saveDirtyDecoration(fileName: string, decorations: Map<number, ColorDe
   return dirtyFilesDecorations.set(fileName, decorations);
 }
 
-
 function _saveSavedDecorations(fileName: string, decorations: Map<number, ColorDecoration[]>) {
   return savedFilesDecorations.set(fileName, decorations);
 }
 
+function handleTextSelectionChange(event: TextEditorSelectionChangeEvent) {
+  if (event.textEditor !== extension.editor) {
+    return;
+  }
+  if (event.kind === TextEditorSelectionChangeKind.Mouse || event.kind === TextEditorSelectionChangeKind.Keyboard ) {
+    q.push(cb => {
+      if (extension.currentSelection !== null && extension.deco.get(extension.currentSelection) !== null) {
+        decorateLine(extension.editor, extension.deco.get(extension.currentSelection), extension.currentSelection);
+      }
+      extension.currentSelection =  null;
+      event.selections.forEach((selection: Selection) => {
+        let decorations = extension.deco.get(selection.active.line);
+        if (decorations) {
+          extension.currentSelection = selection.active.line;
+          decorations.forEach(_ => _.dispose());
+        }
+      });
+      return cb();
+    });
+  }
+}
 
 export function activate(context: ExtensionContext) {
-    const configuration = workspace.getConfiguration('colorize');
+  const configuration = workspace.getConfiguration('colorize');
   config.languages = configuration.get('languages', []);
   config.filesExtensions = configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`));
 
+    window.onDidChangeTextEditorSelection(handleTextSelectionChange, null, context.subscriptions);
+
   workspace.onDidCloseTextDocument(document => {
-        q.push((cb) => {
+    q.push((cb) => {
       if (extension.editor && extension.editor.document.fileName === document.fileName) {
         saveDecorations(document, extension.deco);
         return cb();
@@ -356,9 +389,6 @@ export function activate(context: ExtensionContext) {
   }, null, context.subscriptions);
 
   workspace.onDidSaveTextDocument(document => {
-    // add last saved deco for a document
-    // need to be checked
-    // open color.sass, delete all, close without saving and reopen
     q.push((cb) => {
       if (extension.editor && extension.editor.document.fileName === document.fileName) {
         saveDecorations(document, extension.deco);
@@ -367,8 +397,9 @@ export function activate(context: ExtensionContext) {
       return cb();
     });
   }, null, context.subscriptions);
+
   window.onDidChangeActiveTextEditor(editor => {
-    if (extension.editor) {
+    if (extension.editor !== null) {
       saveDecorations(extension.editor.document, extension.deco);
     }
     window.visibleTextEditors.filter(e => e !== editor).forEach(e => {
@@ -376,6 +407,7 @@ export function activate(context: ExtensionContext) {
     });
     q.push(cb => colorize(editor, cb));
   }, null, context.subscriptions);
+
   workspace.onDidChangeTextDocument((event: TextDocumentChangeEvent) => {
     if (extension.editor && event.document.fileName === extension.editor.document.fileName) {
       extension.editor = window.activeTextEditor;
@@ -390,7 +422,7 @@ export function activate(context: ExtensionContext) {
 
 // this method is called when your extension is deactivated
 export function deactivate() {
-    extension.nbLine = null;
+  extension.nbLine = null;
   extension.editor = null;
   extension.deco.clear();
   extension.deco = null;
@@ -398,16 +430,4 @@ export function deactivate() {
   dirtyFilesDecorations = null;
   savedFilesDecorations.clear();
   savedFilesDecorations = null;
-  // need to clean up everything
 }
-
-
-
-
-/////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////
-///////////////////                                   ///////////////////
-/////////////////// generate decorations one by one ? ///////////////////
-///////////////////                                   ///////////////////
-/////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////
