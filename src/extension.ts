@@ -294,7 +294,7 @@ function isSupported(document: TextDocument) {
 }
 
 function colorize(editor: TextEditor, cb) {
-      if (!editor) {
+  if (!editor) {
     return cb();
   }
   if (!isSupported(editor.document)) {
@@ -390,7 +390,7 @@ export function activate(context: ExtensionContext) {
 
 // this method is called when your extension is deactivated
 export function deactivate() {
-    extension.nbLine = null;
+  extension.nbLine = null;
   extension.editor = null;
   extension.deco.clear();
   extension.deco = null;
@@ -400,14 +400,3 @@ export function deactivate() {
   savedFilesDecorations = null;
   // need to clean up everything
 }
-
-
-
-
-/////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////
-///////////////////                                   ///////////////////
-/////////////////// generate decorations one by one ? ///////////////////
-///////////////////                                   ///////////////////
-/////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////
