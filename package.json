@@ -67,7 +67,7 @@
           },
           "description": "Specified files extension that should be colorized"
         },
-        "colorize.hide_decorations": {
+        "colorize.hide_current_line_decorations": {
           "title": "Hide current line decorations",
           "default": true,
           "type": "boolean",
