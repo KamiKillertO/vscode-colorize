@@ -376,7 +376,9 @@ export function activate(context: ExtensionContext) {
   config.languages = configuration.get('languages', []);
   config.filesExtensions = configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`));
 
+  if (configuration.get('hide_decorations') === true) {
     window.onDidChangeTextEditorSelection(handleTextSelectionChange, null, context.subscriptions);
+  }
 
   workspace.onDidCloseTextDocument(document => {
     q.push((cb) => {
