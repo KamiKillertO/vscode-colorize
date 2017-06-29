@@ -78,7 +78,7 @@ For example if you want to colorize `.diff` files:
 
 ### colorize.hide_current_line_decorations _BOOLEAN_
 
-By default decorations for the current line are not generated. Set this setting to false to deactivate this behavior.
+By default decorations for the current line are hidden. Set this setting to false to deactivate this behavior.
 
 ## Roadmap
 
