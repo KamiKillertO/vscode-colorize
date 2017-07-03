@@ -14,7 +14,7 @@ class HexaColorExtractor implements IColorExtractor {
     rgb = rgb[1].split('').map(_ => parseInt(_, 16));
     return [16 * rgb[0] + rgb[1], 16 * rgb[2] + rgb[3], 16 * rgb[4] + rgb[5]];
   }
-  public extractColors(text: string) {
+  public extractColors(text: string): Promise < Color[] > {
     return new Promise((resolve, reject) => {
       let match = null;
       let colors: Color[] = [];
