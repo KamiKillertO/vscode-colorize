@@ -2,6 +2,10 @@ environment:
   ELECTRON_RUN_AS_NODE: 1
   VSCODE_BUILD_VERBOSE: true
 
+# Temporary, remove after vscode 1.14.x release
+environment:
+  CODE_VERSION: 1.12.2
+
 platform:
   - x86
   - x64
