@@ -369,7 +369,7 @@ function handleTextSelectionChange(event: TextEditorSelectionChangeEvent) {
       });
       return cb();
     });
-//   }
+  }
 }
 
 export function activate(context: ExtensionContext) {
