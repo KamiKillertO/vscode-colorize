@@ -17,7 +17,7 @@ import {
   TextDocumentChangeEvent,
   TextDocumentContentChangeEvent,
   TextEditorSelectionChangeEvent,
-  TextEditorSelectionChangeKind,
+  // TextEditorSelectionChangeKind,
   Selection
 } from 'vscode';
 
@@ -183,7 +183,6 @@ function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context: C
 }
 
 function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position) {
-  // debugger;
   editedLine = mutEditedLIne(editedLine);
   editedLine.forEach((line) => {
     position.forEach(position => {
@@ -353,9 +352,11 @@ function handleTextSelectionChange(event: TextEditorSelectionChangeEvent) {
   if (event.textEditor !== extension.editor) {
     return;
   }
-  if (event.kind === TextEditorSelectionChangeKind.Mouse || event.kind === TextEditorSelectionChangeKind.Keyboard ) {
+  // if (event.kind !== TextEditorSelectionChangeKind.Mouse || event.kind === TextEditorSelectionChangeKind.Keyboard ) { // 'command' kind is fired when click occur inside a selected zone
+  // vscode issue?
+  if (event.kind !== undefined ) {
     q.push(cb => {
-      if (extension.currentSelection !== null && extension.deco.get(extension.currentSelection) !== null) {
+      if (extension.currentSelection !== null && extension.deco.get(extension.currentSelection) !== undefined) {
         decorateLine(extension.editor, extension.deco.get(extension.currentSelection), extension.currentSelection);
       }
       extension.currentSelection =  null;
@@ -368,7 +369,7 @@ function handleTextSelectionChange(event: TextEditorSelectionChangeEvent) {
       });
       return cb();
     });
-  }
+//   }
 }
 
 export function activate(context: ExtensionContext) {
