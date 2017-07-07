@@ -66,6 +66,12 @@
             "description": "You should enter a valid file extension"
           },
           "description": "Specified files extension that should be colorized"
+        },
+        "colorize.hide_current_line_decorations": {
+          "title": "Hide current line decorations",
+          "default": true,
+          "type": "boolean",
+          "description": "Hide decorations for the current line. Set to `false` to turn it off"
         }
       }
     }
@@ -83,7 +89,7 @@
     "@types/node": "7.0.13",
     "chai": "4.0.2",
     "mocha": "3.3.0",
-    "tslint": "5.4.3",
+    "tslint": "5.5.0",
     "typescript": "2.3.4",
     "vscode": "1.1.1"
   }
