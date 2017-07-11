@@ -1,3 +1,9 @@
+## 0.5.1
+
+### Fixed
+
+- fix a typo error that prevent postcss files to be colorized by default
+
 ## 0.5.0
 
 ### Added

@@ -25,7 +25,6 @@ This extension  your styles files looking for colors and generate a colored back
 The following Visual Studio Code settings are available for the Colorize extension.
 These can be set in user preferences `(cmd+,)` or workspace settings `(.vscode/settings.json)`.
 
-
 ```json
 {
     "colorize.languages": [
@@ -39,11 +38,12 @@ These can be set in user preferences `(cmd+,)` or workspace settings `(.vscode/s
             "xml",
             "svg"
     ],
-    "colorize.files_extensions": []
+    "colorize.files_extensions": [],
+    "colorire.hide_current_line_decorations": true
 }
 ```
 
-⚠️ Reload needed after changes ️️️️⚠️
+⚠️ Changes to any of this settings will require a VSCode restart ️️️️⚠️
 
 ### colorize.languages _ARRAY_
 
@@ -77,6 +77,10 @@ For example if you want to colorize `.diff` files:
             ".diff"
     ]
 ```
+
+### colorize.hide_current_line_decorations _BOOLEAN_
+
+By default decorations for the current line are hidden. Set this setting to false to deactivate this behavior.
 
 ## Roadmap
 
