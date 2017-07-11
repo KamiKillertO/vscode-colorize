@@ -15,7 +15,9 @@ import {
   TextLine,
   Position,
   TextDocumentChangeEvent,
-  TextDocumentContentChangeEvent
+  TextDocumentContentChangeEvent,
+  StatusBarAlignment,
+  Uri
 } from 'vscode';
 
 import Color from './lib/color';
@@ -310,10 +312,17 @@ function colorize(editor: TextEditor, cb) {
   }
   extension.deco = new Map();
   extension.nbLine = editor.document.lineCount;
-  return initDecorations(extension, () => {
+
+  // q.push((cb) => seekForColorVariables(extension, cb));
+  seekForColorVariables(extension, cb);
+  return q.push((cb) => initDecorations(extension, () => {
     saveDecorations(extension.editor.document, extension.deco);
     return cb();
-  });
+  }));
+  // return initDecorations(extension, () => {
+  //   saveDecorations(extension.editor.document, extension.deco);
+  //   return cb();
+  // });
 }
 
 function getDecorations(editor: TextEditor): Map<number, ColorDecoration[]> | null  {
@@ -324,6 +333,43 @@ function getDecorations(editor: TextEditor): Map<number, ColorDecoration[]> | nu
     return dirtyFilesDecorations.get(editor.document.fileName);
   }
   return null;
+}
+
+function seekForColorVariables(context: ColorizeContext, cb) {
+  if (!context.editor) {
+    return cb();
+  }
+
+  const statusBar = window.createStatusBarItem(StatusBarAlignment.Right);
+
+  statusBar.text = 'Fetching files...';
+  statusBar.show();
+  q.push((cb) => {
+    console.time('Start variables extraction');
+    console.time('Start files search');
+    // not so bad
+    workspace.findFiles('{**/*.css,**/*.sass,**/*.scss,**/*.less,**/*.pcss,**/*.sss,**/*.stylus,**/*.styl}', '{**/.git,**/.svn,**/.hg,**/CVS,**/.DS_Store,**/.git,**/node_modules,**/bower_components}').then((files) => {
+    // faster but if no src? (use config?)
+    // workspace.findFiles('{**/src/**/*.css,**/*.sass,**/*.scss,**/*.less,**/*.pcss,**/*.sss,**/*.stylus,**/*.styl}', '{**/.git,**/.svn,**/.hg,**/CVS,**/.DS_Store,**/.git,**/node_modules,**/bower_components}').then((files) => {
+      console.timeEnd('Start files search');
+      statusBar.text = `Found ${files.length} files`;
+      console.time('Open documents');
+      Promise.all(
+        files.map((f: Uri) => workspace.openTextDocument(f.path).then(d => d.getText()))
+      ).then(res => {
+        console.timeEnd('Open documents');
+        console.time('Find color variables');
+        return ColorUtil.findColorVariables(res.join(' '));
+      })
+      .then(vars  => {
+        statusBar.text = `Found ${vars.size} variables`;
+        console.timeEnd('Find color variables');
+        console.timeEnd('Start variables extraction');
+        return cb();
+      });
+    }, (reason) => cb());
+  });
+  return cb();
 }
 
 function saveDecorations(document: TextDocument, deco: Map<number, ColorDecoration[]>) {
