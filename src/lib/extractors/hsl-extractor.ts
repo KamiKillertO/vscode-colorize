@@ -3,6 +3,7 @@ import ColorExtractor, { IColorExtractor } from './color-extractor';
 
 
 export const REGEXP = /((?:hsl\(\d*\s*,\s*\d{1,3}%\s*,\s*\d{1,3}%\))|(?:hsla\(\d*\s*,\s*(?:\d{1,3}%\s*,\s*){2}(?:[0-1]|1\.0|[0](?:\.\d+){0,1}|(?:\.\d+))\)))(?:$|"|'|,| |;|\)|\r|\n)/gi;
+export const REGEXP_ONE = /^((?:hsl\(\d*\s*,\s*\d{1,3}%\s*,\s*\d{1,3}%\))|(?:hsla\(\d*\s*,\s*(?:\d{1,3}%\s*,\s*){2}(?:[0-1]|1\.0|[0](?:\.\d+){0,1}|(?:\.\d+))\)))(?:$|"|'|,| |;|\)|\r|\n)/i;
 
 class HSLColorExtractor implements IColorExtractor {
   public name: string = 'HSL_EXTRACTOR';
@@ -83,6 +84,17 @@ class HSLColorExtractor implements IColorExtractor {
       }
       return resolve(colors);
     });
+  }
+  public extractColor(text: string): Color {
+    let match: RegExpMatchArray = text.match(REGEXP_ONE);
+    if (match) {
+      let [h, s, l, a]: number[] = match[1].replace(/hsl(a){0,1}\(/, '').replace(/\)/, '').replace(/%/g, '').split(/,/gi).map(c => parseFloat(c));
+      if (s <= 100 && l <= 100) {
+        let [r, g, b] = this.convertToRGBA(h, s, l, a);
+        return new Color(match[1], match.index, 1, [r, g, b]);
+      }
+    }
+    return null;
   }
 }
 ColorExtractor.registerExtractor(new HSLColorExtractor());

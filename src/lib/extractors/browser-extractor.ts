@@ -745,6 +745,9 @@ export const COLORS = Object({
 });
 
 export const REGEXP = (() => RegExp(`(?:,| |\\(|:)(${Object.keys(COLORS).map((color) => `(?:${color.toLowerCase()})`).join('|')})(?:$|,| |;|\\)|\\r|\\n)`, 'i'))();
+// export const REGEXP_ONE = (() => RegExp(`^(?:,| |\\(|:)(${Object.keys(COLORS).map((color) => `(?:${color.toLowerCase()})`).join('|')})(?:$|,| |;|\\)|\\r|\\n)`, 'i'))();
+// Checking for beginning beginning allow to catch stylus var value
+export const REGEXP_ONE = (() => RegExp(`^(?:^|,|\s|\\(|:)(${Object.keys(COLORS).map((color) => `(?:${color.toLowerCase()})`).join('|')})(?:$|,| |;|\\)|\\r|\\n)`, 'i'))();
 
 class BrowsersColorExtractor implements IColorExtractor {
   public name: string = 'BROWSERS_COLORS_EXTRACTOR';
@@ -770,6 +773,14 @@ class BrowsersColorExtractor implements IColorExtractor {
       }
       return resolve(colors);
     });
+  }
+
+  public extractColor(text: string): Color {
+    let match = text.match(REGEXP_ONE);
+    if (match) {
+      return new Color(match[1], match.index, 1, COLORS[match[1]].rgb);
+    }
+    return null;
   }
 }
 ColorExtractor.registerExtractor(new BrowsersColorExtractor());

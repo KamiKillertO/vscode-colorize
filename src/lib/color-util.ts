@@ -4,6 +4,7 @@ import './extractors/rgb-extractor';
 import './extractors/browser-extractor';
 import './extractors/hsl-extractor';
 import ColorExtractor from './extractors/color-extractor';
+import VariablesExtractor from './extractors/variables-extractor';
 
 class ColorUtil {
   /**
@@ -43,6 +44,10 @@ class ColorUtil {
    */
   public static findColors(text): Promise < Color[] > {
     return ColorExtractor.extract(text);
+  }
+
+  public static findColorVariables(text): Promise <Set<String>> {
+    return VariablesExtractor.extractDeclarations(text);
   }
 }
 export default ColorUtil;
