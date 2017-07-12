@@ -444,7 +444,7 @@ export function activate(context: ExtensionContext) {
     }
   }, null, context.subscriptions);
 
-  if (configuration.get('activate_variables_beta') === true) {
+  if (configuration.get('activate_variables_support_beta') === true) {
     q.push(cb => seekForColorVariables(cb));
   }
 

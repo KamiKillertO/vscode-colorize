@@ -73,7 +73,7 @@
           "type": "boolean",
           "description": "Hide decorations for the current line. Set to `false` to turn it off"
         },
-        "colorize.activate_variables_beta": {
+        "colorize.activate_variables_support_beta": {
           "title": "Activate the variables support (beta)",
           "default": false,
           "type": "boolean",
