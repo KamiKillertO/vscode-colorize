@@ -323,16 +323,10 @@ function colorize(editor: TextEditor, cb) {
   extension.deco = new Map();
   extension.nbLine = editor.document.lineCount;
 
-  // q.push((cb) => seekForColorVariables(extension, cb));
-  seekForColorVariables(extension, cb);
-  return q.push((cb) => initDecorations(extension, () => {
+  return initDecorations(extension, () => {
     saveDecorations(extension.editor.document, extension.deco);
     return cb();
-  }));
-  // return initDecorations(extension, () => {
-  //   saveDecorations(extension.editor.document, extension.deco);
-  //   return cb();
-  // });
+  });
 }
 
 function getDecorations(editor: TextEditor): Map<number, ColorDecoration[]> | null  {
@@ -345,10 +339,7 @@ function getDecorations(editor: TextEditor): Map<number, ColorDecoration[]> | nu
   return null;
 }
 
-function seekForColorVariables(context: ColorizeContext, cb) {
-  if (!context.editor) {
-    return cb();
-  }
+function seekForColorVariables(cb) {
 
   const statusBar = window.createStatusBarItem(StatusBarAlignment.Right);
 
@@ -463,6 +454,10 @@ export function activate(context: ExtensionContext) {
       q.push((cb) => updateDecorations(event.contentChanges, extension, cb));
     }
   }, null, context.subscriptions);
+
+  if (configuration.get('activate_variables_beta') === true) {
+    q.push(cb => seekForColorVariables(cb));
+  }
 
   window.visibleTextEditors.forEach(editor => {
     q.push(cb => colorize(editor, cb));

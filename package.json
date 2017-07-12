@@ -72,6 +72,12 @@
           "default": true,
           "type": "boolean",
           "description": "Hide decorations for the current line. Set to `false` to turn it off"
+        },
+        "colorize.activate_variables_beta": {
+          "title": "Activate the variables support (beta)",
+          "default": false,
+          "type": "boolean",
+          "description": "Activate the variables extractions/decorations feature (beta)"
         }
       }
     }
