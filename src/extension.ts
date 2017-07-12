@@ -227,8 +227,8 @@ function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], 
           return context.deco;
         }
       })
-    ).then(() => {
-      decorateEditor(context);
+    ).then((decorations) => {
+      decorateEditor(m, context.editor, context.currentSelection);
       let it = m.entries();
       let tmp = it.next();
       while (!tmp.done) {
@@ -259,7 +259,7 @@ function initDecorations(context: ColorizeContext, cb) {
       }))
       .map(line => ColorUtil.findColors(line.text)
         .then(colors => generateDecorations(colors, line.line, context.deco))))
-    .then(() => decorateEditor(context))
+    .then(() => decorateEditor(context.deco, context.editor, context.currentSelection))
     .then(cb);
 }
 // Mut context ><
@@ -276,13 +276,13 @@ function generateDecorations(colors: Color[], line: number, decorations: Map<num
   return decorations;
 }
 // Run through all decoration to generate editor's decorations
-function decorateEditor(context: ColorizeContext) {
-  let it = context.deco.entries();
+function decorateEditor(decorations: Map<number, ColorDecoration[]>, editor: TextEditor, currentSelection: number) {
+  let it = decorations.entries();
   let tmp = it.next();
   while (!tmp.done) {
     let line = tmp.value[0];
-    if (line !== context.currentSelection) {
-      decorateLine(context.editor, tmp.value[1], line);
+    if (line !== currentSelection) {
+      decorateLine(editor, tmp.value[1], line);
     }
     tmp = it.next();
   }
@@ -317,7 +317,7 @@ function colorize(editor: TextEditor, cb) {
   if (deco) {
     extension.deco = deco;
     extension.nbLine = editor.document.lineCount;
-    decorateEditor(extension);
+    decorateEditor(extension.deco, extension.editor, extension.currentSelection);
     return cb();
   }
   extension.deco = new Map();
@@ -448,7 +448,7 @@ export function activate(context: ExtensionContext) {
   }, null, context.subscriptions);
 
   window.onDidChangeActiveTextEditor(editor => {
-    if (extension.editor !== null) {
+    if (extension.editor !== undefined && extension.editor !== null) {
       saveDecorations(extension.editor.document, extension.deco);
     }
     window.visibleTextEditors.filter(e => e !== editor).forEach(e => {
