@@ -409,6 +409,16 @@ function handleTextSelectionChange(event: TextEditorSelectionChangeEvent) {
   }
 }
 
+function handleCloseOpen(document) {
+  q.push((cb) => {
+    if (extension.editor && extension.editor.document.fileName === document.fileName) {
+      saveDecorations(document, extension.deco);
+      return cb();
+    }
+    return cb();
+  });
+}
+
 export function activate(context: ExtensionContext) {
   const configuration = workspace.getConfiguration('colorize');
   config.languages = configuration.get('languages', []);
@@ -418,25 +428,9 @@ export function activate(context: ExtensionContext) {
     window.onDidChangeTextEditorSelection(handleTextSelectionChange, null, context.subscriptions);
   }
 
-  workspace.onDidCloseTextDocument(document => {
-    q.push((cb) => {
-      if (extension.editor && extension.editor.document.fileName === document.fileName) {
-        saveDecorations(document, extension.deco);
-        return cb();
-      }
-      return cb();
-    });
-  }, null, context.subscriptions);
+  workspace.onDidCloseTextDocument(handleCloseOpen, null, context.subscriptions);
 
-  workspace.onDidSaveTextDocument(document => {
-    q.push((cb) => {
-      if (extension.editor && extension.editor.document.fileName === document.fileName) {
-        saveDecorations(document, extension.deco);
-        return cb();
-      }
-      return cb();
-    });
-  }, null, context.subscriptions);
+  workspace.onDidSaveTextDocument(handleCloseOpen, null, context.subscriptions);
 
   window.onDidChangeActiveTextEditor(editor => {
     if (extension.editor !== undefined && extension.editor !== null) {
