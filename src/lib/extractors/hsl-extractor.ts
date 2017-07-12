@@ -118,4 +118,4 @@ class HSLColorExtractor implements IColorExtractor {
 }
 ColorExtractor.registerExtractor(new HSLColorExtractor());
 
- export default HSLColorExtractor;
+export default HSLColorExtractor;

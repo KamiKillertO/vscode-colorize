@@ -345,32 +345,27 @@ function seekForColorVariables(cb) {
 
   statusBar.text = 'Fetching files...';
   statusBar.show();
-  q.push((cb) => {
-    console.time('Start variables extraction');
-    console.time('Start files search');
-    // not so bad
-    workspace.findFiles('{**/*.css,**/*.sass,**/*.scss,**/*.less,**/*.pcss,**/*.sss,**/*.stylus,**/*.styl}', '{**/.git,**/.svn,**/.hg,**/CVS,**/.DS_Store,**/.git,**/node_modules,**/bower_components}').then((files) => {
-    // faster but if no src? (use config?)
-    // workspace.findFiles('{**/src/**/*.css,**/*.sass,**/*.scss,**/*.less,**/*.pcss,**/*.sss,**/*.stylus,**/*.styl}', '{**/.git,**/.svn,**/.hg,**/CVS,**/.DS_Store,**/.git,**/node_modules,**/bower_components}').then((files) => {
-      console.timeEnd('Start files search');
-      statusBar.text = `Found ${files.length} files`;
-      console.time('Open documents');
-      Promise.all(
-        files.map((f: Uri) => workspace.openTextDocument(f.path).then(d => d.getText()))
-      ).then(res => {
-        console.timeEnd('Open documents');
-        console.time('Find color variables');
-        return ColorUtil.findColorVariables(res.join(' '));
-      })
-      .then(vars  => {
-        statusBar.text = `Found ${vars.size} variables`;
-        console.timeEnd('Find color variables');
-        console.timeEnd('Start variables extraction');
-        return cb();
-      });
-    }, (reason) => cb());
-  });
-  return cb();
+  console.time('Start variables extraction');
+  console.time('Start files search');
+  // not so bad
+  workspace.findFiles('{**/*.css,**/*.sass,**/*.scss,**/*.less,**/*.pcss,**/*.sss,**/*.stylus,**/*.styl}', '{**/.git,**/.svn,**/.hg,**/CVS,**/.DS_Store,**/.git,**/node_modules,**/bower_components}').then((files) => {
+    console.timeEnd('Start files search');
+    statusBar.text = `Found ${files.length} files`;
+    console.time('Open documents');
+    Promise.all(
+      files.map((f: Uri) => workspace.openTextDocument(f.path).then(d => d.getText()))
+    ).then(res => {
+      console.timeEnd('Open documents');
+      console.time('Find color variables');
+      return ColorUtil.findColorVariables(res.join(' '));
+    })
+    .then(vars  => {
+      statusBar.text = `Found ${vars.size} variables`;
+      console.timeEnd('Find color variables');
+      console.timeEnd('Start variables extraction');
+      return cb();
+    });
+  }, (reason) => cb());
 }
 
 function saveDecorations(document: TextDocument, deco: Map<number, ColorDecoration[]>) {
