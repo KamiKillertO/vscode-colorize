@@ -48,21 +48,4 @@ class HexaColorExtractor implements IColorExtractor {
 }
 ColorExtractor.registerExtractor(new HexaColorExtractor());
 
-  // public value: string;
-  // public rgb: number[];
-  // public alpha: number;
-  // public positionInText: number;
-
-  // public constructor(value: string, positionInText: number = 0) {
-  //   this.value = value;
-  //   this.positionInText = positionInText;
-  //   this.alpha = 1;
-  //   this.rgb = this._extractRGBValue();
-  // }
-
-  // public toRgbString(): string {
-  //   return `rgb(${this.rgb.join(',')})`;
-  // }
-
-// }
- export default HexaColorExtractor;
+export default HexaColorExtractor;
