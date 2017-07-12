@@ -17,8 +17,10 @@ import {
   TextDocumentChangeEvent,
   TextDocumentContentChangeEvent,
   TextEditorSelectionChangeEvent,
-  TextEditorSelectionChangeKind,
-  Selection
+  // TextEditorSelectionChangeKind,
+  Selection,
+  StatusBarAlignment,
+  Uri
 } from 'vscode';
 
 import Color from './lib/color';
@@ -183,7 +185,6 @@ function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context: C
 }
 
 function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position) {
-  // debugger;
   editedLine = mutEditedLIne(editedLine);
   editedLine.forEach((line) => {
     position.forEach(position => {
@@ -226,8 +227,8 @@ function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], 
           return context.deco;
         }
       })
-    ).then(() => {
-      decorateEditor(context);
+    ).then((decorations) => {
+      decorateEditor(m, context.editor, context.currentSelection);
       let it = m.entries();
       let tmp = it.next();
       while (!tmp.done) {
@@ -258,7 +259,7 @@ function initDecorations(context: ColorizeContext, cb) {
       }))
       .map(line => ColorUtil.findColors(line.text)
         .then(colors => generateDecorations(colors, line.line, context.deco))))
-    .then(() => decorateEditor(context))
+    .then(() => decorateEditor(context.deco, context.editor, context.currentSelection))
     .then(cb);
 }
 // Mut context ><
@@ -275,13 +276,13 @@ function generateDecorations(colors: Color[], line: number, decorations: Map<num
   return decorations;
 }
 // Run through all decoration to generate editor's decorations
-function decorateEditor(context: ColorizeContext) {
-  let it = context.deco.entries();
+function decorateEditor(decorations: Map<number, ColorDecoration[]>, editor: TextEditor, currentSelection: number) {
+  let it = decorations.entries();
   let tmp = it.next();
   while (!tmp.done) {
     let line = tmp.value[0];
-    if (line !== context.currentSelection) {
-      decorateLine(context.editor, tmp.value[1], line);
+    if (line !== currentSelection) {
+      decorateLine(editor, tmp.value[1], line);
     }
     tmp = it.next();
   }
@@ -316,11 +317,12 @@ function colorize(editor: TextEditor, cb) {
   if (deco) {
     extension.deco = deco;
     extension.nbLine = editor.document.lineCount;
-    decorateEditor(extension);
+    decorateEditor(extension.deco, extension.editor, extension.currentSelection);
     return cb();
   }
   extension.deco = new Map();
   extension.nbLine = editor.document.lineCount;
+
   return initDecorations(extension, () => {
     saveDecorations(extension.editor.document, extension.deco);
     return cb();
@@ -335,6 +337,35 @@ function getDecorations(editor: TextEditor): Map<number, ColorDecoration[]> | nu
     return dirtyFilesDecorations.get(editor.document.fileName);
   }
   return null;
+}
+
+function seekForColorVariables(cb) {
+
+  const statusBar = window.createStatusBarItem(StatusBarAlignment.Right);
+
+  statusBar.text = 'Fetching files...';
+  statusBar.show();
+  console.time('Start variables extraction');
+  console.time('Start files search');
+  // not so bad
+  workspace.findFiles('{**/*.css,**/*.sass,**/*.scss,**/*.less,**/*.pcss,**/*.sss,**/*.stylus,**/*.styl}', '{**/.git,**/.svn,**/.hg,**/CVS,**/.DS_Store,**/.git,**/node_modules,**/bower_components}').then((files) => {
+    console.timeEnd('Start files search');
+    statusBar.text = `Found ${files.length} files`;
+    console.time('Open documents');
+    Promise.all(
+      files.map((f: Uri) => workspace.openTextDocument(f.path).then(d => d.getText()))
+    ).then(res => {
+      console.timeEnd('Open documents');
+      console.time('Find color variables');
+      return ColorUtil.findColorVariables(res.join(' '));
+    })
+    .then(vars  => {
+      statusBar.text = `Found ${vars.size} variables`;
+      console.timeEnd('Find color variables');
+      console.timeEnd('Start variables extraction');
+      return cb();
+    });
+  }, (reason) => cb());
 }
 
 function saveDecorations(document: TextDocument, deco: Map<number, ColorDecoration[]>) {
@@ -353,9 +384,11 @@ function handleTextSelectionChange(event: TextEditorSelectionChangeEvent) {
   if (event.textEditor !== extension.editor) {
     return;
   }
-  if (event.kind === TextEditorSelectionChangeKind.Mouse || event.kind === TextEditorSelectionChangeKind.Keyboard ) {
+  // if (event.kind !== TextEditorSelectionChangeKind.Mouse || event.kind === TextEditorSelectionChangeKind.Keyboard ) { // 'command' kind is fired when click occur inside a selected zone
+  // vscode issue?
+  if (event.kind !== undefined ) {
     q.push(cb => {
-      if (extension.currentSelection !== null && extension.deco.get(extension.currentSelection) !== null) {
+      if (extension.currentSelection !== null && extension.deco.get(extension.currentSelection) !== undefined) {
         decorateLine(extension.editor, extension.deco.get(extension.currentSelection), extension.currentSelection);
       }
       extension.currentSelection =  null;
@@ -371,6 +404,16 @@ function handleTextSelectionChange(event: TextEditorSelectionChangeEvent) {
   }
 }
 
+function handleCloseOpen(document) {
+  q.push((cb) => {
+    if (extension.editor && extension.editor.document.fileName === document.fileName) {
+      saveDecorations(document, extension.deco);
+      return cb();
+    }
+    return cb();
+  });
+}
+
 export function activate(context: ExtensionContext) {
   const configuration = workspace.getConfiguration('colorize');
   config.languages = configuration.get('languages', []);
@@ -380,28 +423,12 @@ export function activate(context: ExtensionContext) {
     window.onDidChangeTextEditorSelection(handleTextSelectionChange, null, context.subscriptions);
   }
 
-  workspace.onDidCloseTextDocument(document => {
-    q.push((cb) => {
-      if (extension.editor && extension.editor.document.fileName === document.fileName) {
-        saveDecorations(document, extension.deco);
-        return cb();
-      }
-      return cb();
-    });
-  }, null, context.subscriptions);
+  workspace.onDidCloseTextDocument(handleCloseOpen, null, context.subscriptions);
 
-  workspace.onDidSaveTextDocument(document => {
-    q.push((cb) => {
-      if (extension.editor && extension.editor.document.fileName === document.fileName) {
-        saveDecorations(document, extension.deco);
-        return cb();
-      }
-      return cb();
-    });
-  }, null, context.subscriptions);
+  workspace.onDidSaveTextDocument(handleCloseOpen, null, context.subscriptions);
 
   window.onDidChangeActiveTextEditor(editor => {
-    if (extension.editor !== null) {
+    if (extension.editor !== undefined && extension.editor !== null) {
       saveDecorations(extension.editor.document, extension.deco);
     }
     window.visibleTextEditors.filter(e => e !== editor).forEach(e => {
@@ -416,6 +443,10 @@ export function activate(context: ExtensionContext) {
       q.push((cb) => updateDecorations(event.contentChanges, extension, cb));
     }
   }, null, context.subscriptions);
+
+  if (configuration.get('activate_variables_beta') === true) {
+    q.push(cb => seekForColorVariables(cb));
+  }
 
   window.visibleTextEditors.forEach(editor => {
     q.push(cb => colorize(editor, cb));

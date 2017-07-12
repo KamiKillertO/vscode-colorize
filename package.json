@@ -72,6 +72,12 @@
           "default": true,
           "type": "boolean",
           "description": "Hide decorations for the current line. Set to `false` to turn it off"
+        },
+        "colorize.activate_variables_beta": {
+          "title": "Activate the variables support (beta)",
+          "default": false,
+          "type": "boolean",
+          "description": "Activate the variables extractions/decorations feature (beta)"
         }
       }
     }
@@ -89,8 +95,8 @@
     "@types/node": "7.0.13",
     "chai": "4.0.2",
     "mocha": "3.3.0",
-    "tslint": "5.4.3",
+    "tslint": "5.5.0",
     "typescript": "2.4.1",
-    "vscode": "1.1.0"
+    "vscode": "1.1.1"
   }
 }
