@@ -46,7 +46,7 @@ class ColorUtil {
     return ColorExtractor.extract(text);
   }
 
-  public static findColorVariables(text): Promise <Set<String>> {
+  public static findColorVariables(text): Promise <Map<String, Color>> {
     return VariablesExtractor.extractDeclarations(text);
   }
 }
