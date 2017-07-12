@@ -2,8 +2,7 @@ import Color from './../color';
 import ColorExtractor, { IColorExtractor } from './color-extractor';
 
 export const REGEXP = /(#[\da-f]{3,4}|#[\da-f]{6}|#[\da-f]{8})(?:$|"|'|,| |;|\)|\r|\n)/gi;
-export const REGEXP = /(#[\da-f]{3}|#[\da-f]{6})(?:$|"|'|,| |;|\)|\r|\n)/gi;
-export const REGEXP_ONE = /^(#[\da-f]{3}|#[\da-f]{6})(?:$|"|'|,| |;|\)|\r|\n)/i;
+export const REGEXP_ONE = /^(#[\da-f]{3,4}|#[\da-f]{6}|#[\da-f]{8})(?:$|"|'|,| |;|\)|\r|\n)/i;
 
 class HexaColorExtractor implements IColorExtractor {
   public name: string = 'HEXA_EXTRACTOR';
