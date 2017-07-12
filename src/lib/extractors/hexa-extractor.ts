@@ -2,6 +2,7 @@ import Color from './../color';
 import ColorExtractor, { IColorExtractor } from './color-extractor';
 
 export const REGEXP = /(#[\da-f]{3,4}|#[\da-f]{6}|#[\da-f]{8})(?:$|"|'|,| |;|\)|\r|\n)/gi;
+export const REGEXP_ONE = /^(#[\da-f]{3,4}|#[\da-f]{6}|#[\da-f]{8})(?:$|"|'|,| |;|\)|\r|\n)/i;
 
 class HexaColorExtractor implements IColorExtractor {
   public name: string = 'HEXA_EXTRACTOR';
@@ -36,6 +37,13 @@ class HexaColorExtractor implements IColorExtractor {
       }
       return resolve(colors);
     });
+  }
+  public extractColor(text: string): Color {
+    let match: RegExpMatchArray = text.match(REGEXP_ONE);
+    if (match) {
+      return new Color(match[1], match.index, 1, this.extractRGBValue(match[1]));
+    }
+    return null;
   }
 }
 ColorExtractor.registerExtractor(new HexaColorExtractor());

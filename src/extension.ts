@@ -18,7 +18,9 @@ import {
   TextDocumentContentChangeEvent,
   TextEditorSelectionChangeEvent,
   // TextEditorSelectionChangeKind,
-  Selection
+  Selection,
+  StatusBarAlignment,
+  Uri
 } from 'vscode';
 
 import Color from './lib/color';
@@ -225,8 +227,8 @@ function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], 
           return context.deco;
         }
       })
-    ).then(() => {
-      decorateEditor(context);
+    ).then((decorations) => {
+      decorateEditor(m, context.editor, context.currentSelection);
       let it = m.entries();
       let tmp = it.next();
       while (!tmp.done) {
@@ -257,7 +259,7 @@ function initDecorations(context: ColorizeContext, cb) {
       }))
       .map(line => ColorUtil.findColors(line.text)
         .then(colors => generateDecorations(colors, line.line, context.deco))))
-    .then(() => decorateEditor(context))
+    .then(() => decorateEditor(context.deco, context.editor, context.currentSelection))
     .then(cb);
 }
 // Mut context ><
@@ -274,13 +276,13 @@ function generateDecorations(colors: Color[], line: number, decorations: Map<num
   return decorations;
 }
 // Run through all decoration to generate editor's decorations
-function decorateEditor(context: ColorizeContext) {
-  let it = context.deco.entries();
+function decorateEditor(decorations: Map<number, ColorDecoration[]>, editor: TextEditor, currentSelection: number) {
+  let it = decorations.entries();
   let tmp = it.next();
   while (!tmp.done) {
     let line = tmp.value[0];
-    if (line !== context.currentSelection) {
-      decorateLine(context.editor, tmp.value[1], line);
+    if (line !== currentSelection) {
+      decorateLine(editor, tmp.value[1], line);
     }
     tmp = it.next();
   }
@@ -315,15 +317,22 @@ function colorize(editor: TextEditor, cb) {
   if (deco) {
     extension.deco = deco;
     extension.nbLine = editor.document.lineCount;
-    decorateEditor(extension);
+    decorateEditor(extension.deco, extension.editor, extension.currentSelection);
     return cb();
   }
   extension.deco = new Map();
   extension.nbLine = editor.document.lineCount;
-  return initDecorations(extension, () => {
+
+  // q.push((cb) => seekForColorVariables(extension, cb));
+  seekForColorVariables(extension, cb);
+  return q.push((cb) => initDecorations(extension, () => {
     saveDecorations(extension.editor.document, extension.deco);
     return cb();
-  });
+  }));
+  // return initDecorations(extension, () => {
+  //   saveDecorations(extension.editor.document, extension.deco);
+  //   return cb();
+  // });
 }
 
 function getDecorations(editor: TextEditor): Map<number, ColorDecoration[]> | null  {
@@ -334,6 +343,43 @@ function getDecorations(editor: TextEditor): Map<number, ColorDecoration[]> | nu
     return dirtyFilesDecorations.get(editor.document.fileName);
   }
   return null;
+}
+
+function seekForColorVariables(context: ColorizeContext, cb) {
+  if (!context.editor) {
+    return cb();
+  }
+
+  const statusBar = window.createStatusBarItem(StatusBarAlignment.Right);
+
+  statusBar.text = 'Fetching files...';
+  statusBar.show();
+  q.push((cb) => {
+    console.time('Start variables extraction');
+    console.time('Start files search');
+    // not so bad
+    workspace.findFiles('{**/*.css,**/*.sass,**/*.scss,**/*.less,**/*.pcss,**/*.sss,**/*.stylus,**/*.styl}', '{**/.git,**/.svn,**/.hg,**/CVS,**/.DS_Store,**/.git,**/node_modules,**/bower_components}').then((files) => {
+    // faster but if no src? (use config?)
+    // workspace.findFiles('{**/src/**/*.css,**/*.sass,**/*.scss,**/*.less,**/*.pcss,**/*.sss,**/*.stylus,**/*.styl}', '{**/.git,**/.svn,**/.hg,**/CVS,**/.DS_Store,**/.git,**/node_modules,**/bower_components}').then((files) => {
+      console.timeEnd('Start files search');
+      statusBar.text = `Found ${files.length} files`;
+      console.time('Open documents');
+      Promise.all(
+        files.map((f: Uri) => workspace.openTextDocument(f.path).then(d => d.getText()))
+      ).then(res => {
+        console.timeEnd('Open documents');
+        console.time('Find color variables');
+        return ColorUtil.findColorVariables(res.join(' '));
+      })
+      .then(vars  => {
+        statusBar.text = `Found ${vars.size} variables`;
+        console.timeEnd('Find color variables');
+        console.timeEnd('Start variables extraction');
+        return cb();
+      });
+    }, (reason) => cb());
+  });
+  return cb();
 }
 
 function saveDecorations(document: TextDocument, deco: Map<number, ColorDecoration[]>) {
@@ -402,7 +448,7 @@ export function activate(context: ExtensionContext) {
   }, null, context.subscriptions);
 
   window.onDidChangeActiveTextEditor(editor => {
-    if (extension.editor !== null) {
+    if (extension.editor !== undefined && extension.editor !== null) {
       saveDecorations(extension.editor.document, extension.deco);
     }
     window.visibleTextEditors.filter(e => e !== editor).forEach(e => {

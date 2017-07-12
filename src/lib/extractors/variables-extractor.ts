@@ -8,24 +8,58 @@ export const REGEXP = /(?:((?:(?:\s|\$|@)(?:\w|-)+))|(var\((--\w+(?:-|\w)*)\)))(
 
 export const REGEXP_ONE = /^(?:((?:(?:\$|@)(?:\w|-)+))|(?:var\((--\w+(?:-|\w)*))\))(?:$|"|'|,| |;|\)|\r|\n)/gi;
 
-class VariablesExtractor {
+class VariablesExtractor implements IColorExtractor {
+
+  // public variablesDeclarations: Set<string> = new Set(); // use a map insteag (colorName: color)
+  public variablesDeclarations: Map<string, Color> = new Map(); // use a map insteag (colorName: color)
 
   public name: string = 'VARIABLE_EXTRACTOR';
 
-  public extractDeclarations(text: string): Promise<Object> {
+  public extractColors(text: string): Promise<Color[]> {
+    const variablesDeclarations = this.variablesDeclarations;
     return new Promise((resolve, reject) => {
       let match = null;
-      let variablesDeclarations: string[] = [];
-      while ((match = DECLARATION_REGEXP.exec(text)) !== null) {
-        // match[2] for stylus
-        variablesDeclarations.push(match[1] || match[2]);
+      let colors: Color[] = [];
+      while ((match = REGEXP.exec(text)) !== null) {
+        // match[3] for css variables
+        let varName =  match[1] || match[3];
+        // match[2] for css variables
+        let value =  match[1] || match[2];
+        if (this.variablesDeclarations.has(varName)) {
+          colors.push(new Color(value, match.index, 1, this.variablesDeclarations.get(varName).rgb));
+        }
       }
+      return resolve(colors);
+    });
+  }
+
+  public extractColor(text: string): Color {
+    let match: RegExpMatchArray = text.match(REGEXP_ONE);
+    if (match && this.variablesDeclarations[match[0]]) {
+      return new Color(match[1], match.index, 1, this.variablesDeclarations[match[0]]);
+    }
+    return null;
+  }
+
+  public extractDeclarations(text: string): Promise<Map<string, Color>> {
+    return new Promise((resolve, reject) => {
+      let match = null;
+      let variablesDeclarations: Map<string, Color> = new Map();
+      while ((match = DECLARATION_REGEXP.exec(text)) !== null) {
+        let color = ColorExtractor.extractOneColor(text.slice(match.index + match[0].length).trim());
+        if (color) {
+        // match[2] for stylus
+          variablesDeclarations.set(match[1] || match[2], color);
+        }
+      }
+      this.variablesDeclarations = variablesDeclarations;
       return resolve(variablesDeclarations);
     });
   }
 }
 const instance = new VariablesExtractor();
 
+ColorExtractor.registerExtractor(instance);
 export default instance;
 
 // WARNINGS/Questions
