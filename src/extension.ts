@@ -353,13 +353,13 @@ function seekForColorVariables(cb) {
     statusBar.text = `Found ${files.length} files`;
     console.time('Open documents');
     Promise.all(
-      files.map((f: Uri) => workspace.openTextDocument(f.path).then(d => d.getText()))
+      files.map((f: Uri) => workspace.openTextDocument(f.path).then(d => d.getText(), () => ''))
     ).then(res => {
       console.timeEnd('Open documents');
       console.time('Find color variables');
       return ColorUtil.findColorVariables(res.join(' '));
     })
-    .then(vars  => {
+    .then((vars: Map<string, Color>) => {
       statusBar.text = `Found ${vars.size} variables`;
       console.timeEnd('Find color variables');
       console.timeEnd('Start variables extraction');
