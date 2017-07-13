@@ -1,3 +1,7 @@
+## 0.6.1
+
+- [FIX] Add missing error callback to openTextDocument (variables beta). Fix errors with binary type documents
+
 ## 0.6.0
 
 - [ADD] Decorations toggle. Decorations on the current line are now hidden by default.
