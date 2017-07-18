@@ -250,7 +250,7 @@ async function initDecorations(context: ColorizeContext, cb) {
 
   let text = context.editor.document.getText();
   let n: number = context.editor.document.lineCount;
-  const colors = Promise.all(context.editor.document.getText()
+  const colors = await Promise.all(context.editor.document.getText()
       .split(/\n/)
       .map((text, index) => Object({
         'text': text,
@@ -260,7 +260,7 @@ async function initDecorations(context: ColorizeContext, cb) {
         const colors = await ColorUtil.findColors(line.text);
         return generateDecorations(colors, line.line, context.deco);
       }));
-  await decorateEditor(context.deco, context.editor, context.currentSelection);
+  decorateEditor(context.deco, context.editor, context.currentSelection);
   cb();
 }
 // Mut context ><
