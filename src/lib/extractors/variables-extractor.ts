@@ -15,22 +15,20 @@ class VariablesExtractor implements IColorExtractor {
 
   public name: string = 'VARIABLE_EXTRACTOR';
 
-  public extractColors(text: string): Promise<Color[]> {
+  public async extractColors(text: string): Promise<Color[]> {
     const variablesDeclarations = this.variablesDeclarations;
-    return new Promise((resolve, reject) => {
-      let match = null;
-      let colors: Color[] = [];
-      while ((match = REGEXP.exec(text)) !== null) {
-        // match[3] for css variables
-        let varName =  match[1] || match[3];
-        // match[2] for css variables
-        let value =  match[1] || match[2];
-        if (this.variablesDeclarations.has(varName)) {
-          colors.push(new Color(value, match.index, 1, this.variablesDeclarations.get(varName).rgb));
-        }
+    let match = null;
+    let colors: Color[] = [];
+    while ((match = REGEXP.exec(text)) !== null) {
+      // match[3] for css variables
+      let varName =  match[1] || match[3];
+      // match[2] for css variables
+      let value =  match[1] || match[2];
+      if (this.variablesDeclarations.has(varName)) {
+        colors.push(new Color(value, match.index, 1, this.variablesDeclarations.get(varName).rgb));
       }
-      return resolve(colors);
-    });
+    }
+    return colors;
   }
 
   public extractColor(text: string): Color {
@@ -41,20 +39,18 @@ class VariablesExtractor implements IColorExtractor {
     return null;
   }
 
-  public extractDeclarations(text: string): Promise<Map<string, Color>> {
-    return new Promise((resolve, reject) => {
-      let match = null;
-      let variablesDeclarations: Map<string, Color> = new Map();
-      while ((match = DECLARATION_REGEXP.exec(text)) !== null) {
-        let color = ColorExtractor.extractOneColor(text.slice(match.index + match[0].length).trim());
-        if (color) {
-        // match[2] for stylus
-          variablesDeclarations.set(match[1] || match[2], color);
-        }
+  public async extractDeclarations(text: string): Promise<Map<string, Color>> {
+    let match = null;
+    let variablesDeclarations: Map<string, Color> = new Map();
+    while ((match = DECLARATION_REGEXP.exec(text)) !== null) {
+      let color = ColorExtractor.extractOneColor(text.slice(match.index + match[0].length).trim());
+      if (color) {
+      // match[2] for stylus
+        variablesDeclarations.set(match[1] || match[2], color);
       }
-      this.variablesDeclarations = variablesDeclarations;
-      return resolve(variablesDeclarations);
-    });
+    }
+    this.variablesDeclarations = variablesDeclarations;
+    return variablesDeclarations;
   }
 }
 const instance = new VariablesExtractor();

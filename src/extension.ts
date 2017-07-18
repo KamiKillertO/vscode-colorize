@@ -207,60 +207,61 @@ function updateDecorations(editedLine: TextDocumentContentChangeEvent[], context
   checkDecorationForUpdate(editedLine, context, cb);
 }
 
-function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, cb) {
+async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, cb) {
   let m = new Map();
-  Promise.all(
-      editedLine.map(({
-        range
-      }: TextDocumentContentChangeEvent) => {
-        if (context.deco.has(range.start.line)) {
-          context.deco.get(range.start.line).forEach(decoration => {
-            decoration.dispose();
-          });
-        }
-        context.deco.set(range.start.line, []);
-        // lineAt raise an exception if line does not exist
-        try { // not really good
-          return ColorUtil.findColors(context.editor.document.lineAt(range.start.line).text)
-            .then(colors => generateDecorations(colors, range.start.line, m));
-        } catch (e) { // use promise catch instead?
-          return context.deco;
-        }
-      })
-    ).then((decorations) => {
-      decorateEditor(m, context.editor, context.currentSelection);
-      let it = m.entries();
-      let tmp = it.next();
-      while (!tmp.done) {
-        let line = tmp.value[0];
-        if (context.deco.has(line)) {
-          context.deco.set(line, context.deco.get(line).concat(m.get(line)));
-        } else {
-          context.deco.set(line, m.get(line));
-        }
-        tmp = it.next();
+  await Promise.all(
+    editedLine.map(async ({
+      range
+    }: TextDocumentContentChangeEvent) => {
+      if (context.deco.has(range.start.line)) {
+        context.deco.get(range.start.line).forEach(decoration => {
+          decoration.dispose();
+        });
+      }
+      context.deco.set(range.start.line, []);
+      // lineAt raise an exception if line does not exist
+      try {
+        const colors = await ColorUtil.findColors(context.editor.document.lineAt(range.start.line).text);
+        return generateDecorations(colors, range.start.line, m);
+      } catch (e) { // use promise catch instead?
+        return context.deco;
       }
     })
-    .then(cb);
+  );
+  decorateEditor(m, context.editor, context.currentSelection);
+  let it = m.entries();
+  let tmp = it.next();
+  while (!tmp.done) {
+    let line = tmp.value[0];
+    if (context.deco.has(line)) {
+      context.deco.set(line, context.deco.get(line).concat(m.get(line)));
+    } else {
+      context.deco.set(line, m.get(line));
+    }
+    tmp = it.next();
+  }
+  cb();
 }
 
-function initDecorations(context: ColorizeContext, cb) {
-    if (!context.editor) {
+async function initDecorations(context: ColorizeContext, cb) {
+  if (!context.editor) {
     return cb();
   }
 
   let text = context.editor.document.getText();
   let n: number = context.editor.document.lineCount;
-  Promise.all(context.editor.document.getText()
+  const colors = Promise.all(context.editor.document.getText()
       .split(/\n/)
       .map((text, index) => Object({
         'text': text,
         'line': index
       }))
-      .map(line => ColorUtil.findColors(line.text)
-        .then(colors => generateDecorations(colors, line.line, context.deco))))
-    .then(() => decorateEditor(context.deco, context.editor, context.currentSelection))
-    .then(cb);
+      .map(async line => {
+        const colors = await ColorUtil.findColors(line.text);
+        return generateDecorations(colors, line.line, context.deco);
+      }));
+  await decorateEditor(context.deco, context.editor, context.currentSelection);
+  cb();
 }
 // Mut context ><
 function generateDecorations(colors: Color[], line: number, decorations: Map<number, ColorDecoration[]>) {
@@ -339,7 +340,7 @@ function getDecorations(editor: TextEditor): Map<number, ColorDecoration[]> | nu
   return null;
 }
 
-function seekForColorVariables(cb) {
+async function seekForColorVariables(cb) {
 
   const statusBar = window.createStatusBarItem(StatusBarAlignment.Right);
 
@@ -348,26 +349,35 @@ function seekForColorVariables(cb) {
   console.time('Start variables extraction');
   console.time('Start files search');
   // not so bad
-  workspace.findFiles('{**/*.css,**/*.sass,**/*.scss,**/*.less,**/*.pcss,**/*.sss,**/*.stylus,**/*.styl}', '{**/.git,**/.svn,**/.hg,**/CVS,**/.DS_Store,**/.git,**/node_modules,**/bower_components}').then((files) => {
+  try {
+    // add options for include/excludes folders
+    const files = await workspace.findFiles('{**/*.css,**/*.sass,**/*.scss,**/*.less,**/*.pcss,**/*.sss,**/*.stylus,**/*.styl}', '{**/.git,**/.svn,**/.hg,**/CVS,**/.DS_Store,**/.git,**/node_modules,**/bower_components,**/tmp,**/dist,**/tests}');
     console.timeEnd('Start files search');
     statusBar.text = `Found ${files.length} files`;
     console.time('Open documents');
-    Promise.all(
-      files.map((f: Uri) => workspace.openTextDocument(f.path).then(d => d.getText(), () => ''))
-    ).then(res => {
-      console.timeEnd('Open documents');
-      console.time('Find color variables');
-      return ColorUtil.findColorVariables(res.join(' '));
-    })
-    .then((vars: Map<string, Color>) => {
-      statusBar.text = `Found ${vars.size} variables`;
-      console.timeEnd('Find color variables');
-      console.timeEnd('Start variables extraction');
-      return cb();
-    });
-  }, (reason) => cb());
+    const fileContents = await Promise.all(files.map(async (f: Uri) => {
+      try {
+    // vscode slow here
+        const document: TextDocument = await workspace.openTextDocument(f.path);
+        if (isSupported(document) === true) {
+          return document.getText();
+        }
+        return '';
+      } catch (err) {
+        return '';
+      }
+    }));
+    console.timeEnd('Open documents');
+    console.time('Find color variables');
+    const vars = await ColorUtil.findColorVariables(fileContents.join(' '));
+    statusBar.text = `Found ${vars.size} variables`;
+    console.timeEnd('Find color variables');
+    console.timeEnd('Start variables extraction');
+  } catch (err) {
+    console.error(err);
+  }
+  return cb();
 }
-
 function saveDecorations(document: TextDocument, deco: Map<number, ColorDecoration[]>) {
   document.isDirty ? _saveDirtyDecoration(document.fileName, deco) : _saveSavedDecorations(document.fileName, deco);
 }

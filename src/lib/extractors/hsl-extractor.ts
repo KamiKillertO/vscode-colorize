@@ -92,18 +92,16 @@ class HSLColorExtractor implements IColorExtractor {
     return tmp_2;
   }
 
-  public extractColors(text: string): Promise < Color[] >  {
-    return new Promise((resolve, reject) => {
-      let match = null;
-      let colors: Color[] = [];
-      while ((match = REGEXP.exec(text)) !== null) {
-        const color = this.generateColorFromMatch(match);
-        if (color !== null) {
-          colors.push(color);
-        }
+  public async extractColors(text: string): Promise < Color[] >  {
+    let match = null;
+    let colors: Color[] = [];
+    while ((match = REGEXP.exec(text)) !== null) {
+      const color = this.generateColorFromMatch(match);
+      if (color !== null) {
+        colors.push(color);
       }
-      return resolve(colors);
-    });
+    }
+    return colors;
   }
   public extractColor(text: string): Color {
     let match: RegExpMatchArray = text.match(REGEXP_ONE);

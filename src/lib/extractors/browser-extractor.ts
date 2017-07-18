@@ -752,19 +752,17 @@ export const REGEXP_ONE = (() => RegExp(`^(?:^|,|\s|\\(|:)(${Object.keys(COLORS)
 class BrowsersColorExtractor implements IColorExtractor {
   public name: string = 'BROWSERS_COLORS_EXTRACTOR';
 
-  public extractColors(text: string): Promise<Color []> {
-    return new Promise((resolve, reject) => {
-      let match = null;
-      let colors: Color[] = [];
-      let position = 0;
-      while ((match = text.match(REGEXP)) !== null) {
-        position += match.index + 1;
-        colors.push(new Color(match[1], position, 1, COLORS[match[1]].rgb));
-        text = text.slice(match.index + 1 + match[1].length);
-        position += match[1].length;
-      }
-      return resolve(colors);
-    });
+  public async extractColors(text: string): Promise<Color []> {
+    let match = null;
+    let colors: Color[] = [];
+    let position = 0;
+    while ((match = text.match(REGEXP)) !== null) {
+      position += match.index + 1;
+      colors.push(new Color(match[1], position, 1, COLORS[match[1]].rgb));
+      text = text.slice(match.index + 1 + match[1].length);
+      position += match[1].length;
+    }
+    return colors;
   }
 
   public extractColor(text: string): Color {
