@@ -16,7 +16,6 @@ class VariablesExtractor implements IColorExtractor {
   public name: string = 'VARIABLE_EXTRACTOR';
 
   public async extractColors(text: string): Promise<Color[]> {
-    const variablesDeclarations = this.variablesDeclarations;
     let match = null;
     let colors: Color[] = [];
     while ((match = REGEXP.exec(text)) !== null) {
@@ -47,9 +46,10 @@ class VariablesExtractor implements IColorExtractor {
       if (color) {
       // match[2] for stylus
         variablesDeclarations.set(match[1] || match[2], color);
+        this.variablesDeclarations.set(match[1] || match[2], color);
       }
     }
-    this.variablesDeclarations = variablesDeclarations;
+    // this.variablesDeclarations = variablesDeclarations;
     return variablesDeclarations;
   }
 }
