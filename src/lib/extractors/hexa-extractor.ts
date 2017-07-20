@@ -27,16 +27,14 @@ class HexaColorExtractor implements IColorExtractor {
     }
     return 1;
   }
-  public extractColors(text: string): Promise < Color[] > {
-    return new Promise((resolve, reject) => {
-      let match = null;
-      let colors: Color[] = [];
+  public async extractColors(text: string): Promise < Color[] > {
+    let match = null;
+    let colors: Color[] = [];
 
-      while ((match = REGEXP.exec(text)) !== null) {
-        colors.push(new Color(match[1], match.index, this.extractAlphaValue(match[1]), this.extractRGBValue(match[1])));
-      }
-      return resolve(colors);
-    });
+    while ((match = REGEXP.exec(text)) !== null) {
+      colors.push(new Color(match[1], match.index, this.extractAlphaValue(match[1]), this.extractRGBValue(match[1])));
+    }
+    return colors;
   }
   public extractColor(text: string): Color {
     let match: RegExpMatchArray = text.match(REGEXP_ONE);

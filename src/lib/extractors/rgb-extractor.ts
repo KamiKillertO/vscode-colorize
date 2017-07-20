@@ -13,20 +13,18 @@ class RgbExtractor implements IColorExtractor {
     return rgba.slice(0, 3);
   }
 
-  public extractColors(text: string): Promise<Color[]> {
-    return new Promise((resolve, reject) => {
-      let match = null;
-      let colors: Color[] = [];
-      // Get rgb "like" colors
-      while ((match = REGEXP.exec(text)) !== null) {
-        let rgba = match[1].replace(/rgb(a){0,1}\(/, '').replace(/\)/, '').split(/,/gi).map(c => parseFloat(c));
-        // Check if it's a valid rgb(a) color
-        if (rgba.slice(0, 3).every(c => c <= 255)) {
-          colors.push(new Color(match[1], match.index, 1, this.extractRGBAValue(match[1])));
-        }
+  public async extractColors(text: string): Promise<Color[]> {
+    let match = null;
+    let colors: Color[] = [];
+    // Get rgb "like" colors
+    while ((match = REGEXP.exec(text)) !== null) {
+      let rgba = match[1].replace(/rgb(a){0,1}\(/, '').replace(/\)/, '').split(/,/gi).map(c => parseFloat(c));
+      // Check if it's a valid rgb(a) color
+      if (rgba.slice(0, 3).every(c => c <= 255)) {
+        colors.push(new Color(match[1], match.index, 1, this.extractRGBAValue(match[1])));
       }
-      return resolve(colors);
-    });
+    }
+    return colors;
   }
   public extractColor(text: string): Color {
     let match: RegExpMatchArray = text.match(REGEXP_ONE);

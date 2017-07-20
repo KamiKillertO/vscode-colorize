@@ -1,3 +1,12 @@
+## 0.6.1
+
+- [FIX] #61 New variables not colorized
+- [CHANGE] Use await/async to improve code readability
+
+## 0.6.1
+
+- [FIX] Add missing error callback to openTextDocument (variables beta). Fix errors with binary type documents
+
 ## 0.6.0
 
 - [ADD] Decorations toggle. Decorations on the current line are now hidden by default.
@@ -6,7 +15,7 @@
 
 ## 0.5.1
 
-- [Fixed] fix a typo error that prevent postcss files to be colorized by default
+- [FIX] fix a typo error that prevent postcss files to be colorized by default
 
 ## 0.5.0
 
@@ -21,7 +30,7 @@
 
 ## 0.4.1
 
-- [FIX] #26 Do non colorize browsers colors inside a word
+- [FIX] #26 Do not colorize browsers colors inside a word
 - [CHANGE] Remove the use of `Promise` in `queue.ts` to fix an error of background generation/update caused by a 1s timeout
 
 ## 0.4.0
