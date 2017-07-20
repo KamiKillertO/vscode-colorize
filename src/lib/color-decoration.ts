@@ -74,8 +74,6 @@ class ColorDecoration {
   private _generateDecorator() {
     let textColor = null;
     let luminance = ColorUtil.luminance(this.color);
-    console.log(this.color.value);
-    console.log(luminance);
     if (luminance < 0.7) {
       textColor = '#fff';
     } else {

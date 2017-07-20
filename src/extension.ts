@@ -15,7 +15,12 @@ import {
   TextLine,
   Position,
   TextDocumentChangeEvent,
-  TextDocumentContentChangeEvent
+  TextDocumentContentChangeEvent,
+  TextEditorSelectionChangeEvent,
+  // TextEditorSelectionChangeKind,
+  Selection,
+  StatusBarAlignment,
+  Uri
 } from 'vscode';
 
 import Color from './lib/color';
@@ -33,12 +38,14 @@ interface ColorizeContext {
   editor: TextEditor;
   nbLine: number;
   deco: Map < number, ColorDecoration[] >;
+  currentSelection: number;
 }
 
 let extension: ColorizeContext = {
   editor: window.activeTextEditor,
   nbLine: 0,
-  deco: null
+  deco: null,
+  currentSelection: null
 };
 let dirtyFilesDecorations: Map < string, Map < number, ColorDecoration[] > > = new Map();
 let savedFilesDecorations: Map < string, Map < number, ColorDecoration[] > > = new Map();
@@ -178,7 +185,6 @@ function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context: C
 }
 
 function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position) {
-  // debugger;
   editedLine = mutEditedLIne(editedLine);
   editedLine.forEach((line) => {
     position.forEach(position => {
@@ -192,7 +198,7 @@ function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position)
 }
 
 function updateDecorations(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, cb: Function) {
-    let diffLine = context.editor.document.lineCount - context.nbLine;
+  let diffLine = context.editor.document.lineCount - context.nbLine;
   let positions;
   if (diffLine !== 0) {
     editedLine = handleLineDiff(editedLine, context, diffLine);
@@ -201,85 +207,93 @@ function updateDecorations(editedLine: TextDocumentContentChangeEvent[], context
   checkDecorationForUpdate(editedLine, context, cb);
 }
 
-function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, cb) {
+async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, cb) {
   let m = new Map();
-  Promise.all(
-      editedLine.map(({
-        range
-      }: TextDocumentContentChangeEvent) => {
-        if (context.deco.has(range.start.line)) {
-          context.deco.get(range.start.line).forEach(decoration => {
-            decoration.dispose();
-          });
-        }
-        context.deco.set(range.start.line, []);
-        // lineAt raise an exception if line does not exist
-        try { // not really good
-          return ColorUtil.findColors(context.editor.document.lineAt(range.start.line).text)
-            .then(colors => generateDecorations(colors, range.start.line, m));
-        } catch (e) { // use promise catch instead?
-          return context.deco;
-        }
-      })
-    ).then(() => {
-      decorateEditor(context.editor, m);
-      let it = m.entries();
-      let tmp = it.next();
-      while (!tmp.done) {
-        let line = tmp.value[0];
-        if (context.deco.has(line)) {
-          context.deco.set(line, context.deco.get(line).concat(m.get(line)));
-        } else {
-          context.deco.set(line, m.get(line));
-        }
-        tmp = it.next();
+  await Promise.all(
+    editedLine.map(async ({
+      range
+    }: TextDocumentContentChangeEvent) => {
+      if (context.deco.has(range.start.line)) {
+        context.deco.get(range.start.line).forEach(decoration => {
+          decoration.dispose();
+        });
+      }
+      context.deco.set(range.start.line, []);
+      // lineAt raise an exception if line does not exist
+      try {
+        const text = context.editor.document.lineAt(range.start.line).text;
+        const variables = await ColorUtil.findColorVariables(text);
+        const colors = await ColorUtil.findColors(text);
+        return generateDecorations(colors, range.start.line, m);
+      } catch (e) { // use promise catch instead?
+        return context.deco;
       }
     })
-    .then(cb);
+  );
+  decorateEditor(m, context.editor, context.currentSelection);
+  let it = m.entries();
+  let tmp = it.next();
+  while (!tmp.done) {
+    let line = tmp.value[0];
+    if (context.deco.has(line)) {
+      context.deco.set(line, context.deco.get(line).concat(m.get(line)));
+    } else {
+      context.deco.set(line, m.get(line));
+    }
+    tmp = it.next();
+  }
+  cb();
 }
 
-function initDecorations(context: ColorizeContext, cb) {
-    if (!context.editor) {
+async function initDecorations(context: ColorizeContext, cb) {
+  if (!context.editor) {
     return cb();
   }
 
   let text = context.editor.document.getText();
   let n: number = context.editor.document.lineCount;
-  Promise.all(context.editor.document.getText()
+  const colors = await Promise.all(context.editor.document.getText()
       .split(/\n/)
       .map((text, index) => Object({
         'text': text,
         'line': index
       }))
-      .map(line => ColorUtil.findColors(line.text)
-        .then(colors => generateDecorations(colors, line.line, context.deco))))
-    .then(() => decorateEditor(context.editor, context.deco))
-    .then(cb);
+      .map(async line => {
+        const colors = await ColorUtil.findColors(line.text);
+        return generateDecorations(colors, line.line, context.deco);
+      }));
+  decorateEditor(context.deco, context.editor, context.currentSelection);
+  cb();
 }
-
+// Mut context ><
 function generateDecorations(colors: Color[], line: number, decorations: Map<number, ColorDecoration[]>) {
   colors.forEach((color) => {
     let startPos = new Position(line, color.positionInText);
     let endPos = new Position(line, color.positionInText + color.value.length);
-    let range = new Range(startPos, endPos);
     if (decorations.has(line)) {
-      decorations.set(line, decorations.get(line).concat([new ColorDecoration( /*range, */ color)]));
+      decorations.set(line, decorations.get(line).concat([new ColorDecoration(color)]));
     } else {
-      decorations.set(line, [new ColorDecoration( /*range, */ color)]);
+      decorations.set(line, [new ColorDecoration(color)]);
     }
   });
-  return decorations; // return decoration instead?
+  return decorations;
 }
-
-function decorateEditor(editor: TextEditor, decorations: Map<number, ColorDecoration[]>) {
+// Run through all decoration to generate editor's decorations
+function decorateEditor(decorations: Map<number, ColorDecoration[]>, editor: TextEditor, currentSelection: number) {
   let it = decorations.entries();
   let tmp = it.next();
   while (!tmp.done) {
     let line = tmp.value[0];
-    tmp.value[1].forEach(decoration => editor.setDecorations(decoration.decoration, [decoration.generateRange(line)]));
+    if (line !== currentSelection) {
+      decorateLine(editor, tmp.value[1], line);
+    }
     tmp = it.next();
   }
   return;
+}
+// Decorate editor's decorations for one line
+function decorateLine(editor: TextEditor, decorations: ColorDecoration[], line: number) {
+  decorations.forEach(decoration => editor.setDecorations(decoration.decoration, [decoration.generateRange(line)]));
 }
 function isLanguageSupported(languageId): boolean {
   return config.languages.indexOf(languageId) !== -1;
@@ -294,22 +308,24 @@ function isSupported(document: TextDocument) {
 }
 
 function colorize(editor: TextEditor, cb) {
-      if (!editor) {
+  if (!editor) {
     return cb();
   }
   if (!isSupported(editor.document)) {
     return cb();
   }
   extension.editor = editor;
+  extension.currentSelection = null;
   const deco = getDecorations(editor);
   if (deco) {
     extension.deco = deco;
     extension.nbLine = editor.document.lineCount;
-    decorateEditor(extension.editor, extension.deco);
+    decorateEditor(extension.deco, extension.editor, extension.currentSelection);
     return cb();
   }
   extension.deco = new Map();
   extension.nbLine = editor.document.lineCount;
+
   return initDecorations(extension, () => {
     saveDecorations(extension.editor.document, extension.deco);
     return cb();
@@ -326,6 +342,44 @@ function getDecorations(editor: TextEditor): Map<number, ColorDecoration[]> | nu
   return null;
 }
 
+async function seekForColorVariables(cb) {
+
+  const statusBar = window.createStatusBarItem(StatusBarAlignment.Right);
+
+  statusBar.text = 'Fetching files...';
+  statusBar.show();
+  console.time('Start variables extraction');
+  console.time('Start files search');
+  // not so bad
+  try {
+    // add options for include/excludes folders
+    const files = await workspace.findFiles('{**/*.css,**/*.sass,**/*.scss,**/*.less,**/*.pcss,**/*.sss,**/*.stylus,**/*.styl}', '{**/.git,**/.svn,**/.hg,**/CVS,**/.DS_Store,**/.git,**/node_modules,**/bower_components,**/tmp,**/dist,**/tests}');
+    console.timeEnd('Start files search');
+    statusBar.text = `Found ${files.length} files`;
+    console.time('Open documents');
+    const fileContents = await Promise.all(files.map(async (f: Uri) => {
+      try {
+    // vscode slow here
+        const document: TextDocument = await workspace.openTextDocument(f.path);
+        if (isSupported(document) === true) {
+          return document.getText();
+        }
+        return '';
+      } catch (err) {
+        return '';
+      }
+    }));
+    console.timeEnd('Open documents');
+    console.time('Find color variables');
+    const vars = await ColorUtil.findColorVariables(fileContents.join(' '));
+    statusBar.text = `Found ${vars.size} variables`;
+    console.timeEnd('Find color variables');
+    console.timeEnd('Start variables extraction');
+  } catch (err) {
+    console.error(err);
+  }
+  return cb();
+}
 function saveDecorations(document: TextDocument, deco: Map<number, ColorDecoration[]>) {
   document.isDirty ? _saveDirtyDecoration(document.fileName, deco) : _saveSavedDecorations(document.fileName, deco);
 }
@@ -334,41 +388,59 @@ function _saveDirtyDecoration(fileName: string, decorations: Map<number, ColorDe
   return dirtyFilesDecorations.set(fileName, decorations);
 }
 
-
 function _saveSavedDecorations(fileName: string, decorations: Map<number, ColorDecoration[]>) {
   return savedFilesDecorations.set(fileName, decorations);
 }
 
+function handleTextSelectionChange(event: TextEditorSelectionChangeEvent) {
+  if (event.textEditor !== extension.editor) {
+    return;
+  }
+  // if (event.kind !== TextEditorSelectionChangeKind.Mouse || event.kind === TextEditorSelectionChangeKind.Keyboard ) { // 'command' kind is fired when click occur inside a selected zone
+  // vscode issue?
+  if (event.kind !== undefined ) {
+    q.push(cb => {
+      if (extension.currentSelection !== null && extension.deco.get(extension.currentSelection) !== undefined) {
+        decorateLine(extension.editor, extension.deco.get(extension.currentSelection), extension.currentSelection);
+      }
+      extension.currentSelection =  null;
+      event.selections.forEach((selection: Selection) => {
+        let decorations = extension.deco.get(selection.active.line);
+        if (decorations) {
+          extension.currentSelection = selection.active.line;
+          decorations.forEach(_ => _.dispose());
+        }
+      });
+      return cb();
+    });
+  }
+}
+
+function handleCloseOpen(document) {
+  q.push((cb) => {
+    if (extension.editor && extension.editor.document.fileName === document.fileName) {
+      saveDecorations(document, extension.deco);
+      return cb();
+    }
+    return cb();
+  });
+}
 
 export function activate(context: ExtensionContext) {
-    const configuration = workspace.getConfiguration('colorize');
+  const configuration = workspace.getConfiguration('colorize');
   config.languages = configuration.get('languages', []);
   config.filesExtensions = configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`));
 
-  workspace.onDidCloseTextDocument(document => {
-        q.push((cb) => {
-      if (extension.editor && extension.editor.document.fileName === document.fileName) {
-        saveDecorations(document, extension.deco);
-        return cb();
-      }
-      return cb();
-    });
-  }, null, context.subscriptions);
+  if (configuration.get('hide_current_line_decorations') === true) {
+    window.onDidChangeTextEditorSelection(handleTextSelectionChange, null, context.subscriptions);
+  }
 
-  workspace.onDidSaveTextDocument(document => {
-    // add last saved deco for a document
-    // need to be checked
-    // open color.sass, delete all, close without saving and reopen
-    q.push((cb) => {
-      if (extension.editor && extension.editor.document.fileName === document.fileName) {
-        saveDecorations(document, extension.deco);
-        return cb();
-      }
-      return cb();
-    });
-  }, null, context.subscriptions);
+  workspace.onDidCloseTextDocument(handleCloseOpen, null, context.subscriptions);
+
+  workspace.onDidSaveTextDocument(handleCloseOpen, null, context.subscriptions);
+
   window.onDidChangeActiveTextEditor(editor => {
-    if (extension.editor) {
+    if (extension.editor !== undefined && extension.editor !== null) {
       saveDecorations(extension.editor.document, extension.deco);
     }
     window.visibleTextEditors.filter(e => e !== editor).forEach(e => {
@@ -376,12 +448,17 @@ export function activate(context: ExtensionContext) {
     });
     q.push(cb => colorize(editor, cb));
   }, null, context.subscriptions);
+
   workspace.onDidChangeTextDocument((event: TextDocumentChangeEvent) => {
     if (extension.editor && event.document.fileName === extension.editor.document.fileName) {
       extension.editor = window.activeTextEditor;
       q.push((cb) => updateDecorations(event.contentChanges, extension, cb));
     }
   }, null, context.subscriptions);
+
+  if (configuration.get('activate_variables_support_beta') === true) {
+    q.push(cb => seekForColorVariables(cb));
+  }
 
   window.visibleTextEditors.forEach(editor => {
     q.push(cb => colorize(editor, cb));
@@ -390,7 +467,7 @@ export function activate(context: ExtensionContext) {
 
 // this method is called when your extension is deactivated
 export function deactivate() {
-    extension.nbLine = null;
+  extension.nbLine = null;
   extension.editor = null;
   extension.deco.clear();
   extension.deco = null;
@@ -398,16 +475,4 @@ export function deactivate() {
   dirtyFilesDecorations = null;
   savedFilesDecorations.clear();
   savedFilesDecorations = null;
-  // need to clean up everything
 }
-
-
-
-
-/////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////
-///////////////////                                   ///////////////////
-/////////////////// generate decorations one by one ? ///////////////////
-///////////////////                                   ///////////////////
-/////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////

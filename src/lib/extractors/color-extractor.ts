@@ -3,6 +3,7 @@ import Color from './../color';
 export interface IColorExtractor {
   name: string;
   extractColors(text: string): Promise < Color[] >;
+  extractColor(text: string): Color;
 }
 
 const flatten = arr => arr.reduce((a, b) => a.concat(Array.isArray(b) ? flatten(b) : b), []);
@@ -23,13 +24,13 @@ class ColorExtractor {
     }
     return !!this.extractors.find(_ => _.name === extractor.name);
   }
-  public extract(text: string): Promise < Color[] > {
-    let start = Date.now();
-     return Promise.all(
-       this.extractors.map(extractor => extractor.extractColors(text))
-     ).then(colors => {
-      return flatten(colors);
-    });
+  public async extract(text: string): Promise < Color[] > {
+    const colors = await Promise.all(this.extractors.map(extractor => extractor.extractColors(text)));
+    return flatten(colors);
+  }
+  public extractOneColor(text: string): Color {
+    let colors = this.extractors.map(extractor => extractor.extractColor(text));
+    return colors.find(color => color !== null);
   }
 }
 const instance = new ColorExtractor();
