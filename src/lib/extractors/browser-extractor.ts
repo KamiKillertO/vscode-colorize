@@ -745,31 +745,32 @@ export const COLORS = Object({
 });
 
 export const REGEXP = (() => RegExp(`(?:,| |\\(|:)(${Object.keys(COLORS).map((color) => `(?:${color.toLowerCase()})`).join('|')})(?:$|,| |;|\\)|\\r|\\n)`, 'i'))();
+// export const REGEXP_ONE = (() => RegExp(`^(?:,| |\\(|:)(${Object.keys(COLORS).map((color) => `(?:${color.toLowerCase()})`).join('|')})(?:$|,| |;|\\)|\\r|\\n)`, 'i'))();
+// Checking for beginning beginning allow to catch stylus var value
+export const REGEXP_ONE = (() => RegExp(`^(?:^|,|\s|\\(|:)(${Object.keys(COLORS).map((color) => `(?:${color.toLowerCase()})`).join('|')})(?:$|,| |;|\\)|\\r|\\n)`, 'i'))();
 
 class BrowsersColorExtractor implements IColorExtractor {
   public name: string = 'BROWSERS_COLORS_EXTRACTOR';
 
-  private extractRGBValue(value): number[] {
-    let rgb: any = /#(.+)/gi.exec(value);
-    if (rgb[1].length === 3) {
-      return rgb[1].split('').map(_ => parseInt(_ + _, 16));
+  public async extractColors(text: string): Promise<Color []> {
+    let match = null;
+    let colors: Color[] = [];
+    let position = 0;
+    while ((match = text.match(REGEXP)) !== null) {
+      position += match.index + 1;
+      colors.push(new Color(match[1], position, 1, COLORS[match[1]].rgb));
+      text = text.slice(match.index + 1 + match[1].length);
+      position += match[1].length;
     }
-    rgb = rgb[1].split('').map(_ => parseInt(_, 16));
-    return [16 * rgb[0] + rgb[1], 16 * rgb[2] + rgb[3], 16 * rgb[4] + rgb[5]];
+    return colors;
   }
-  public extractColors(text: string) {
-    return new Promise((resolve, reject) => {
-      let match = null;
-      let colors: Color[] = [];
-      let position = 0;
-      while ((match = text.match(REGEXP)) !== null) {
-        position += match.index + 1;
-        colors.push(new Color(match[1], position, 1, COLORS[match[1]].rgb));
-        text = text.slice(match.index + 1 + match[1].length);
-        position += match[1].length;
-      }
-      return resolve(colors);
-    });
+
+  public extractColor(text: string): Color {
+    let match = text.match(REGEXP_ONE);
+    if (match) {
+      return new Color(match[1], match.index, 1, COLORS[match[1]].rgb);
+    }
+    return null;
   }
 }
 ColorExtractor.registerExtractor(new BrowsersColorExtractor());

@@ -2,6 +2,7 @@ import Color from './../color';
 import ColorExtractor, { IColorExtractor } from './color-extractor';
 
 export const REGEXP = /(#[\da-f]{3,4}|#[\da-f]{6}|#[\da-f]{8})(?:$|"|'|,| |;|\)|\r|\n)/gi;
+export const REGEXP_ONE = /^(#[\da-f]{3,4}|#[\da-f]{6}|#[\da-f]{8})(?:$|"|'|,| |;|\)|\r|\n)/i;
 
 class HexaColorExtractor implements IColorExtractor {
   public name: string = 'HEXA_EXTRACTOR';
@@ -26,35 +27,23 @@ class HexaColorExtractor implements IColorExtractor {
     }
     return 1;
   }
-  public extractColors(text: string) {
-    return new Promise((resolve, reject) => {
-      let match = null;
-      let colors: Color[] = [];
+  public async extractColors(text: string): Promise < Color[] > {
+    let match = null;
+    let colors: Color[] = [];
 
-      while ((match = REGEXP.exec(text)) !== null) {
-        colors.push(new Color(match[1], match.index, this.extractAlphaValue(match[1]), this.extractRGBValue(match[1])));
-      }
-      return resolve(colors);
-    });
+    while ((match = REGEXP.exec(text)) !== null) {
+      colors.push(new Color(match[1], match.index, this.extractAlphaValue(match[1]), this.extractRGBValue(match[1])));
+    }
+    return colors;
+  }
+  public extractColor(text: string): Color {
+    let match: RegExpMatchArray = text.match(REGEXP_ONE);
+    if (match) {
+      return new Color(match[1], match.index, 1, this.extractRGBValue(match[1]));
+    }
+    return null;
   }
 }
 ColorExtractor.registerExtractor(new HexaColorExtractor());
 
-  // public value: string;
-  // public rgb: number[];
-  // public alpha: number;
-  // public positionInText: number;
-
-  // public constructor(value: string, positionInText: number = 0) {
-  //   this.value = value;
-  //   this.positionInText = positionInText;
-  //   this.alpha = 1;
-  //   this.rgb = this._extractRGBValue();
-  // }
-
-  // public toRgbString(): string {
-  //   return `rgb(${this.rgb.join(',')})`;
-  // }
-
-// }
- export default HexaColorExtractor;
+export default HexaColorExtractor;
