@@ -1,4 +1,4 @@
-import Color from './color';
+import Color, {IColor} from './color';
 import './extractors/hexa-extractor';
 import './extractors/rgb-extractor';
 import './extractors/browser-extractor';
@@ -42,8 +42,10 @@ class ColorUtil {
    *
    * @memberOf ColorUtil
    */
-  public static findColors(text): Promise < Color[] > {
-    return ColorExtractor.extract(text);
+   public static async findColors(text, fileName): Promise < IColor[] > {
+    const colors = await ColorExtractor.extract(text, fileName);
+    return colors;
+   }
   }
 
   public static findColorVariables(text): Promise <Map<String, Color>> {

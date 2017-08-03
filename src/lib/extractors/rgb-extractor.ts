@@ -13,7 +13,7 @@ class RgbExtractor implements IColorExtractor {
     return rgba.slice(0, 3);
   }
 
-  public async extractColors(text: string): Promise<Color[]> {
+  public async extractColors(text: string, fileName = null): Promise<Color[]> {
     let match = null;
     let colors: Color[] = [];
     // Get rgb "like" colors

@@ -23,7 +23,7 @@ import {
   Uri
 } from 'vscode';
 
-import Color from './lib/color';
+import Color, {IColor} from './lib/color';
 import ColorUtil from './lib/color-util';
 import ColorDecoration from './lib/color-decoration';
 import Queue from './lib/queue';
@@ -222,8 +222,8 @@ async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEve
       // lineAt raise an exception if line does not exist
       try {
         const text = context.editor.document.lineAt(range.start.line).text;
-        const variables = await ColorUtil.findColorVariables(text);
         const colors = await ColorUtil.findColors(text);
+        const colors = await ColorUtil.findColors(text, context.editor.document.fileName);
         return generateDecorations(colors, range.start.line, m);
       } catch (e) { // use promise catch instead?
         return context.deco;
@@ -258,18 +258,16 @@ async function initDecorations(context: ColorizeContext, cb) {
         'text': text,
         'line': index
       }))
-      .map(async line => {
-        const colors = await ColorUtil.findColors(line.text);
+      .map(async line =>  {
+        let colors = await ColorUtil.findColors(line.text, context.editor.document.fileName);
         return generateDecorations(colors, line.line, context.deco);
       }));
   decorateEditor(context.deco, context.editor, context.currentSelection);
   cb();
 }
 // Mut context ><
-function generateDecorations(colors: Color[], line: number, decorations: Map<number, ColorDecoration[]>) {
+function generateDecorations(colors: IColor[], line: number, decorations: Map<number, ColorDecoration[]>) {
   colors.forEach((color) => {
-    let startPos = new Position(line, color.positionInText);
-    let endPos = new Position(line, color.positionInText + color.value.length);
     if (decorations.has(line)) {
       decorations.set(line, decorations.get(line).concat([new ColorDecoration(color)]));
     } else {
