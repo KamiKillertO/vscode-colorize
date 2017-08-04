@@ -22,8 +22,8 @@ import {
   StatusBarAlignment,
   Uri
 } from 'vscode';
-
-import Color from './lib/color';
+import VariablesExtractor from './lib/extractors/variables-extractor';
+import Color, {IColor} from './lib/color';
 import ColorUtil from './lib/color-util';
 import ColorDecoration from './lib/color-decoration';
 import Queue from './lib/queue';
@@ -141,7 +141,10 @@ function updatePositionsDeletion(range, positions) {
 
 function handleLineRemoved(editedLine: TextDocumentContentChangeEvent[], positions) {
   editedLine.reverse();
-  editedLine.forEach((line) => {
+  editedLine.forEach((line: TextDocumentContentChangeEvent) => {
+    for (let i = line.range.start.line; i <= line.range.end.line; i++) {
+      VariablesExtractor.deleteVariableInLine(extension.editor.document.fileName, i);
+    }
     positions = updatePositionsDeletion(line.range, positions);
   });
   return editedLine;
@@ -222,8 +225,8 @@ async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEve
       // lineAt raise an exception if line does not exist
       try {
         const text = context.editor.document.lineAt(range.start.line).text;
-        const variables = await ColorUtil.findColorVariables(text);
-        const colors = await ColorUtil.findColors(text);
+        const variables = await ColorUtil.findColorVariables(context.editor.document.fileName, text, range.start.line);
+        const colors = await ColorUtil.findColors(text, context.editor.document.fileName);
         return generateDecorations(colors, range.start.line, m);
       } catch (e) { // use promise catch instead?
         return context.deco;
@@ -258,22 +261,22 @@ async function initDecorations(context: ColorizeContext, cb) {
         'text': text,
         'line': index
       }))
-      .map(async line => {
-        const colors = await ColorUtil.findColors(line.text);
+      .map(async line =>  {
+        let colors = await ColorUtil.findColors(line.text, context.editor.document.fileName);
         return generateDecorations(colors, line.line, context.deco);
       }));
   decorateEditor(context.deco, context.editor, context.currentSelection);
   cb();
 }
 // Mut context ><
-function generateDecorations(colors: Color[], line: number, decorations: Map<number, ColorDecoration[]>) {
+function generateDecorations(colors: IColor[], line: number, decorations: Map<number, ColorDecoration[]>) {
   colors.forEach((color) => {
-    let startPos = new Position(line, color.positionInText);
-    let endPos = new Position(line, color.positionInText + color.value.length);
+    const decoration = ColorUtil.generateDecoration(color);
     if (decorations.has(line)) {
-      decorations.set(line, decorations.get(line).concat([new ColorDecoration(color)]));
+      decorations.set(line, decorations.get(line).concat([decoration]));
+      // decorations.set(line, decorations.get(line).concat([new ColorDecoration(color)]));
     } else {
-      decorations.set(line, [new ColorDecoration(color)]);
+      decorations.set(line, [decoration]);
     }
   });
   return decorations;
@@ -356,24 +359,26 @@ async function seekForColorVariables(cb) {
     const files = await workspace.findFiles('{**/*.css,**/*.sass,**/*.scss,**/*.less,**/*.pcss,**/*.sss,**/*.stylus,**/*.styl}', '{**/.git,**/.svn,**/.hg,**/CVS,**/.DS_Store,**/.git,**/node_modules,**/bower_components,**/tmp,**/dist,**/tests}');
     console.timeEnd('Start files search');
     statusBar.text = `Found ${files.length} files`;
-    console.time('Open documents');
-    const fileContents = await Promise.all(files.map(async (f: Uri) => {
-      try {
-    // vscode slow here
-        const document: TextDocument = await workspace.openTextDocument(f.path);
-        if (isSupported(document) === true) {
-          return document.getText();
-        }
-        return '';
-      } catch (err) {
-        return '';
+
+    // a little bit slower
+    console.time('Variables extraction v2');
+    let variables: any = await Promise.all(files.map(async (file: Uri) => {
+      const document: TextDocument =  await workspace.openTextDocument(file.path);
+      if (isSupported(document) === false) {
+        return;
       }
+      const text = document.getText()
+        .split(/\n/)
+        .map((text, index) => Object({
+          'text': text,
+          'line': index
+        }));
+      const variables = await Promise.all(text.map(line => ColorUtil.findColorVariables(document.fileName, line.text, line.line)));
+      return variables[variables.length - 1 ];
     }));
-    console.timeEnd('Open documents');
-    console.time('Find color variables');
-    const vars = await ColorUtil.findColorVariables(fileContents.join(' '));
-    statusBar.text = `Found ${vars.size} variables`;
-    console.timeEnd('Find color variables');
+    variables = variables[variables.length - 1];
+    statusBar.text = `Found ${variables.size} variables`;
+    console.timeEnd('Variables extraction v2');
     console.timeEnd('Start variables extraction');
   } catch (err) {
     console.error(err);

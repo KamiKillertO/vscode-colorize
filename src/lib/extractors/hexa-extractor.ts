@@ -27,7 +27,7 @@ class HexaColorExtractor implements IColorExtractor {
     }
     return 1;
   }
-  public async extractColors(text: string): Promise < Color[] > {
+  public async extractColors(text: string, fileName = null): Promise < Color[] > {
     let match = null;
     let colors: Color[] = [];
 
@@ -36,7 +36,7 @@ class HexaColorExtractor implements IColorExtractor {
     }
     return colors;
   }
-  public extractColor(text: string): Color {
+  public extractColor(text: string, fileName = null): Color {
     let match: RegExpMatchArray = text.match(REGEXP_ONE);
     if (match) {
       return new Color(match[1], match.index, 1, this.extractRGBValue(match[1]));

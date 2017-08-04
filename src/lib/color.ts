@@ -1,4 +1,7 @@
-class Color {
+interface IColor {
+  toRgbString(): string;
+}
+class Color implements IColor {
   /**
    * The extracted text corresponding to the color
    * example: #fff, #fffff, rgba(0,0,0,0.1)...
@@ -63,3 +66,5 @@ class Color {
   }
 }
 export default Color;
+
+export { IColor };
