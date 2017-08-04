@@ -22,7 +22,7 @@ import {
   StatusBarAlignment,
   Uri
 } from 'vscode';
-
+import VariablesExtractor from './lib/extractors/variables-extractor';
 import Color, {IColor} from './lib/color';
 import ColorUtil from './lib/color-util';
 import ColorDecoration from './lib/color-decoration';
@@ -141,7 +141,10 @@ function updatePositionsDeletion(range, positions) {
 
 function handleLineRemoved(editedLine: TextDocumentContentChangeEvent[], positions) {
   editedLine.reverse();
-  editedLine.forEach((line) => {
+  editedLine.forEach((line: TextDocumentContentChangeEvent) => {
+    for (let i = line.range.start.line; i <= line.range.end.line; i++) {
+      VariablesExtractor.deleteVariableInLine(extension.editor.document.fileName, i);
+    }
     positions = updatePositionsDeletion(line.range, positions);
   });
   return editedLine;
