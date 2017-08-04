@@ -32,6 +32,35 @@ class VariablesExtractor implements IColorExtractor {
     return decorations;
   }
 
+  public delete(variable: string, fileName: string, line: number) {
+    let decorations = this.get(variable);
+    if (decorations === undefined) {
+      return;
+    }
+    if (fileName !== null) {
+      if (line !== null) {
+        decorations = decorations.filter(_ => _.declaration.fileName === fileName && _.declaration.line !== line);
+        this.variablesDeclarations_2.set(variable, decorations);
+        return;
+      }
+        decorations = decorations.filter(_ => _.declaration.fileName !== fileName);
+        this.variablesDeclarations_2.set(variable, decorations);
+        return;
+    }
+    this.variablesDeclarations_2.delete(variable);
+    return;
+  }
+
+  public deleteVariableInLine(fileName: string, line: number) {
+    const IT: IterableIterator<[string, Variable[]]> = this.variablesDeclarations_2.entries();
+    let tmp: IteratorResult<[string, Variable[]]> = IT.next();
+    while (tmp.done === false) {
+      const varName: string = tmp.value[0];
+      this.delete(varName, fileName, line);
+      tmp = IT.next();
+    }
+  }
+
   public async extractColors(text: string, fileName: string): Promise<IColor[]> {
     let match = null;
     let colors: IColor[] = [];
