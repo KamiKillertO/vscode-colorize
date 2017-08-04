@@ -222,7 +222,7 @@ async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEve
       // lineAt raise an exception if line does not exist
       try {
         const text = context.editor.document.lineAt(range.start.line).text;
-        const colors = await ColorUtil.findColors(text);
+        const variables = await ColorUtil.findColorVariables(context.editor.document.fileName, text, range.start.line);
         const colors = await ColorUtil.findColors(text, context.editor.document.fileName);
         return generateDecorations(colors, range.start.line, m);
       } catch (e) { // use promise catch instead?
