@@ -357,24 +357,26 @@ async function seekForColorVariables(cb) {
     const files = await workspace.findFiles('{**/*.css,**/*.sass,**/*.scss,**/*.less,**/*.pcss,**/*.sss,**/*.stylus,**/*.styl}', '{**/.git,**/.svn,**/.hg,**/CVS,**/.DS_Store,**/.git,**/node_modules,**/bower_components,**/tmp,**/dist,**/tests}');
     console.timeEnd('Start files search');
     statusBar.text = `Found ${files.length} files`;
-    console.time('Open documents');
-    const fileContents = await Promise.all(files.map(async (f: Uri) => {
-      try {
-    // vscode slow here
-        const document: TextDocument = await workspace.openTextDocument(f.path);
-        if (isSupported(document) === true) {
-          return document.getText();
-        }
-        return '';
-      } catch (err) {
-        return '';
+
+    // a little bit slower
+    console.time('Variables extraction v2');
+    let variables: any = await Promise.all(files.map(async (file: Uri) => {
+      const document: TextDocument =  await workspace.openTextDocument(file.path);
+      if (isSupported(document) === false) {
+        return;
       }
+      const text = document.getText()
+        .split(/\n/)
+        .map((text, index) => Object({
+          'text': text,
+          'line': index
+        }));
+      const variables = await Promise.all(text.map(line => ColorUtil.findColorVariables(document.fileName, line.text, line.line)));
+      return variables[variables.length - 1 ];
     }));
-    console.timeEnd('Open documents');
-    console.time('Find color variables');
-    const vars = await ColorUtil.findColorVariables(fileContents.join(' '));
-    statusBar.text = `Found ${vars.size} variables`;
-    console.timeEnd('Find color variables');
+    variables = variables[variables.length - 1];
+    statusBar.text = `Found ${variables.size} variables`;
+    console.timeEnd('Variables extraction v2');
     console.timeEnd('Start variables extraction');
   } catch (err) {
     console.error(err);
