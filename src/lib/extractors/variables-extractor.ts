@@ -37,17 +37,17 @@ class VariablesExtractor implements IColorExtractor {
     if (decorations === undefined) {
       return;
     }
-    if (fileName !== null) {
-      if (line !== null) {
-        decorations = decorations.filter(_ => _.declaration.fileName === fileName && _.declaration.line !== line);
-        this.variablesDeclarations_2.set(variable, decorations);
-        return;
-      }
-        decorations = decorations.filter(_ => _.declaration.fileName !== fileName);
-        this.variablesDeclarations_2.set(variable, decorations);
-        return;
+    if (fileName === null) {
+      this.variablesDeclarations_2.delete(variable);
+      return;
     }
-    this.variablesDeclarations_2.delete(variable);
+    if (line !== null) {
+      decorations = decorations.filter(_ => _.declaration.fileName === fileName && _.declaration.line !== line);
+      this.variablesDeclarations_2.set(variable, decorations);
+      return;
+    }
+    decorations = decorations.filter(_ => _.declaration.fileName !== fileName);
+    this.variablesDeclarations_2.set(variable, decorations);
     return;
   }
 
@@ -69,20 +69,21 @@ class VariablesExtractor implements IColorExtractor {
       let varName =  match[1] || match[3];
       // match[2] for css variables
       let value =  match[1] || match[2];
-      if (this.has(varName)) {
-
-        let decorations = this.get(varName, fileName);
-        decorations = decorations.sort((a, b) => a.declaration.line - b.declaration.line);
-        if (decorations.length === 0) {
-          decorations = this.get(varName);
-        }
-        if (decorations.length === 0) {
-          this.variablesDeclarations_2.delete(varName);
-        }
-        let deco = decorations[decorations.length - 1];
-        // reference error >< multiple instance
-        colors.push(new Color(varName, match.index, deco.color.alpha, deco.color.rgb));
+      if (!this.has(varName)) {
+        continue;
       }
+
+      let decorations = this.get(varName, fileName);
+      decorations = decorations.sort((a, b) => a.declaration.line - b.declaration.line);
+      if (decorations.length === 0) {
+        decorations = this.get(varName);
+      }
+      if (decorations.length === 0) {
+        this.variablesDeclarations_2.delete(varName);
+      }
+      let deco = decorations[decorations.length - 1];
+      // reference error >< multiple instance
+      colors.push(new Color(varName, match.index, deco.color.alpha, deco.color.rgb));
     }
     return colors;
   }
@@ -100,15 +101,16 @@ class VariablesExtractor implements IColorExtractor {
     let match = null;
     while ((match = DECLARATION_REGEXP.exec(text)) !== null) {
       let color = ColorExtractor.extractOneColor(text.slice(match.index + match[0].length).trim());
-      if (color) {
-        const varName = match[1] || match[2];
-        const variable = new Variable(varName, <Color> color, {fileName, line});
-        if (this.has(varName)) {
-          const decorations = this.get(varName);
-          this.variablesDeclarations_2.set(varName, decorations.concat([variable]));
-        } else {
-          this.variablesDeclarations_2.set(varName, [variable]);
-        }
+      if (color === null) {
+        continue;
+      }
+      const varName = match[1] || match[2];
+      const variable = new Variable(varName, <Color> color, {fileName, line});
+      if (this.has(varName)) {
+        const decorations = this.get(varName);
+        this.variablesDeclarations_2.set(varName, decorations.concat([variable]));
+      } else {
+        this.variablesDeclarations_2.set(varName, [variable]);
       }
     }
     return this.variablesDeclarations_2;
