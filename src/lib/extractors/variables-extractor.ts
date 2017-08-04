@@ -157,3 +157,35 @@ export default instance;
 // @stylistic
 // @styleset
 // @character-variant)
+
+
+
+
+// in sass order matter
+//
+// ```css
+// $t: #fff
+// $a: $t
+// $t: #ccc
+//
+// p
+//   color: $a
+// ```
+// here p.color === #fff
+
+// in less order does not matter
+//
+// ```css
+// @t: #fff
+// @a: $t
+// @t: #ccc
+//
+// p
+//   color: @a
+// ```
+// here p.color === #ccc
+
+
+// What about stylus, postcss ???
+// should i always use the latest declaration in file?
+// vcode-colorize only colorize (does not validate code ¯\_(ツ)_/¯)
