@@ -6,6 +6,7 @@ import './extractors/browser-extractor';
 import './extractors/hsl-extractor';
 import ColorExtractor from './extractors/color-extractor';
 import VariablesExtractor from './extractors/variables-extractor';
+import ColorDecoration from './color-decoration';
 
 class ColorUtil {
   /**
@@ -52,6 +53,12 @@ class ColorUtil {
     return VariablesExtractor.extractDeclarations(fileName, text, line);
   }
 
+
+  public static generateDecoration(color: IColor) {
+    if ('declaration' in color) {
+      return new ColorDecoration((<Variable>color).color);
+    }
+    return new ColorDecoration(<Color>color);
   }
 }
 export default ColorUtil;

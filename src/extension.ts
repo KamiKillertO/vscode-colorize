@@ -271,10 +271,12 @@ async function initDecorations(context: ColorizeContext, cb) {
 // Mut context ><
 function generateDecorations(colors: IColor[], line: number, decorations: Map<number, ColorDecoration[]>) {
   colors.forEach((color) => {
+    const decoration = ColorUtil.generateDecoration(color);
     if (decorations.has(line)) {
-      decorations.set(line, decorations.get(line).concat([new ColorDecoration(color)]));
+      decorations.set(line, decorations.get(line).concat([decoration]));
+      // decorations.set(line, decorations.get(line).concat([new ColorDecoration(color)]));
     } else {
-      decorations.set(line, [new ColorDecoration(color)]);
+      decorations.set(line, [decoration]);
     }
   });
   return decorations;
