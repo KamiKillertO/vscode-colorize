@@ -23,11 +23,13 @@ class VariablesExtractor implements IColorExtractor {
 
   public get(variable: string, fileName: string  = null, line: number = null): Variable[] {
     let decorations = this.variablesDeclarations_2.get(variable);
-    if (fileName !== null) {
-      decorations = decorations.filter(_ => _.declaration.fileName === fileName);
-      if (line !== null) {
-        decorations = decorations.filter(_ => _.declaration.line === line);
-      }
+
+    if (fileName === null) {
+      return decorations;
+    }
+    decorations = decorations.filter(_ => _.declaration.fileName === fileName);
+    if (line !== null) {
+      decorations = decorations.filter(_ => _.declaration.line === line);
     }
     return decorations;
   }
