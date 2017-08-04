@@ -97,5 +97,6 @@ describe('Test variables use regexp', function() {
   it('Should not match (stylus variables)', function () {
     assert.notOk('var'.match(REGEXP));
     assert.notOk('--'.match(REGEXP));
+    assert.notOk(' 120'.match(REGEXP));
   });
 });

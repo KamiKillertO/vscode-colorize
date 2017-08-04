@@ -1,10 +1,12 @@
-import Color from './color';
+import Color, {IColor} from './color';
+import Variable from './variable';
 import './extractors/hexa-extractor';
 import './extractors/rgb-extractor';
 import './extractors/browser-extractor';
 import './extractors/hsl-extractor';
 import ColorExtractor from './extractors/color-extractor';
 import VariablesExtractor from './extractors/variables-extractor';
+import ColorDecoration from './color-decoration';
 
 class ColorUtil {
   /**
@@ -42,12 +44,21 @@ class ColorUtil {
    *
    * @memberOf ColorUtil
    */
-  public static findColors(text): Promise < Color[] > {
-    return ColorExtractor.extract(text);
+   public static async findColors(text, fileName = null): Promise < IColor[] > {
+    const colors = await ColorExtractor.extract(text, fileName);
+    return colors;
+   }
+
+  public static findColorVariables(fileName, text, line): Promise <Map<String, Variable[]>> {
+    return VariablesExtractor.extractDeclarations(fileName, text, line);
   }
 
-  public static findColorVariables(text): Promise <Map<String, Color>> {
-    return VariablesExtractor.extractDeclarations(text);
+
+  public static generateDecoration(color: IColor) {
+    if ('declaration' in color) {
+      return new ColorDecoration((<Variable>color).color);
+    }
+    return new ColorDecoration(<Color>color);
   }
 }
 export default ColorUtil;
