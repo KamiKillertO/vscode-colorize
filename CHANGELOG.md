@@ -1,4 +1,8 @@
-## 0.6.1
+## 0.6.3
+
+- [FIX] #62 variables not deleted
+
+## 0.6.2
 
 - [FIX] #61 New variables not colorized
 - [CHANGE] Use await/async to improve code readability
