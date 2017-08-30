@@ -9,7 +9,12 @@ import {
 import ColorUtil from './color-util';
 import Color from './color';
 
-class ColorDecoration {
+interface Observer {
+  update(args: any);
+}
+
+class ColorDecoration implements Observer {
+  public updateCallback: Function;
   /**
    * The color used to generate the TextEditorDecorationType
    *
@@ -26,6 +31,7 @@ class ColorDecoration {
    * @memberOf ColorDecoration
    */
   public disposed: boolean = false;
+  public currentRange: Range;
   private _decoration: TextEditorDecorationType;
   /**
    * The TextEditorDecorationType associated to the color
@@ -68,7 +74,9 @@ class ColorDecoration {
    * @memberOf ColorDecoration
    */
   public generateRange(line: number): Range {
-    return new Range(new Position(line, this.color.positionInText), new Position(line, this.color.positionInText + this.color.value.length));
+    const range = new Range(new Position(line, this.color.positionInText), new Position(line, this.color.positionInText + this.color.value.length));
+    this.currentRange = range;
+    return range;
   }
 
   private _generateDecorator() {
@@ -87,6 +95,13 @@ class ColorDecoration {
       color: textColor
     });
     this.decoration = backgroundDecorationType;
+  }
+  
+  update(color: Color) {
+    this._decoration.dispose();
+    this.color.rgb = color.rgb
+    this._generateDecorator();
+    return this.updateCallback(this);
   }
 }
 export default ColorDecoration;

@@ -1,4 +1,12 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const color_1 = require("./../color");
 const color_extractor_1 = require("./color-extractor");
@@ -752,8 +760,8 @@ class BrowsersColorExtractor {
     constructor() {
         this.name = 'BROWSERS_COLORS_EXTRACTOR';
     }
-    extractColors(text) {
-        return new Promise((resolve, reject) => {
+    extractColors(text, fileName = null) {
+        return __awaiter(this, void 0, void 0, function* () {
             let match = null;
             let colors = [];
             let position = 0;
@@ -763,7 +771,7 @@ class BrowsersColorExtractor {
                 text = text.slice(match.index + 1 + match[1].length);
                 position += match[1].length;
             }
-            return resolve(colors);
+            return colors;
         });
     }
     extractColor(text) {

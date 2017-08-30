@@ -54,11 +54,15 @@ class ColorUtil {
   }
 
 
-  public static generateDecoration(color: IColor) {
+  public static generateDecoration(color: IColor, ) {
     if ('declaration' in color) {
       return new ColorDecoration((<Variable>color).color);
     }
-    return new ColorDecoration(<Color>color);
+    const deco = new ColorDecoration(<Color>color);
+    if ('_variable' in color) {
+      (<Color>color)._variable.registerObserver(deco);
+    }
+    return deco;
   }
 }
 export default ColorUtil;

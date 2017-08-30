@@ -30,6 +30,7 @@ class Variable extends Observable implements IColor {
 
   public name: string;
 
+  // public _color: Color;
   public color: Color;
 
   public declaration: FileDeclaration;
@@ -37,9 +38,22 @@ class Variable extends Observable implements IColor {
   public constructor(name: string, color: Color, declaration: FileDeclaration) {
     super();
     this.name = name;
+    // this._color = color;
     this.color = color;
     this.declaration = declaration;
   }
+
+  public updateColor(c) { // use get/set instead?
+    this.color = c;
+    this.notify(c);
+  }
+  // public get color() {
+  //   return this._color;
+  // }
+  // public set color(c: Color) {
+  //   this._color = c;
+  //   this.notify(c);
+  // }
   /**
    * Generate the color string rgb representation
    * example :
