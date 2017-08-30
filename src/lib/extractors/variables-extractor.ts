@@ -83,10 +83,10 @@ class VariablesExtractor implements IColorExtractor {
         this.variablesDeclarations_2.delete(varName);
       }
       let deco = decorations[decorations.length - 1];
-      const color = new Color(varName, match.index, deco.color.alpha, deco.color.rgb);
-      color._variable = deco;
+      deco.color = new Color(varName, match.index, deco.color.alpha, deco.color.rgb);
+      // color._variable = deco;
       // reference error >< multiple instance
-      colors.push(color);
+      colors.push(deco);
     }
     return colors;
   }
