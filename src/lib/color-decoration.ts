@@ -14,7 +14,7 @@ interface Observer {
 }
 
 class ColorDecoration implements Observer {
-  public updateCallback: Function;
+  private _updateCallback: Function;
   /**
    * The color used to generate the TextEditorDecorationType
    *
@@ -96,12 +96,14 @@ class ColorDecoration implements Observer {
     });
     this.decoration = backgroundDecorationType;
   }
-  
+  addUpdateCallback(callback) {
+    this._updateCallback = callback;
+  }
   update(color: Color) {
     this._decoration.dispose();
-    this.color.rgb = color.rgb
+    this.color.rgb = color.rgb;
     this._generateDecorator();
-    return this.updateCallback(this);
+    return this._updateCallback(this);
   }
 }
 export default ColorDecoration;

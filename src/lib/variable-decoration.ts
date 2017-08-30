@@ -8,12 +8,12 @@ import {
 
 import ColorUtil from './color-util';
 import Color from './color';
+import Variable from './variable';
 import ColorDecoration from './color-decoration';
 
-interface Observer {
-  update(args: any);
-}
-
 class VariableDecoration extends ColorDecoration {
+  public constructor(variable: Variable) {
+    super(variable.color);
+  }
 }
-export default ColorDecoration;
+export default VariableDecoration;

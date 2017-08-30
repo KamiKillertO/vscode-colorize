@@ -7,6 +7,7 @@ import './extractors/hsl-extractor';
 import ColorExtractor from './extractors/color-extractor';
 import VariablesExtractor from './extractors/variables-extractor';
 import ColorDecoration from './color-decoration';
+import VariableDecoration from './variable-decoration';
 
 class ColorUtil {
   /**
@@ -53,16 +54,13 @@ class ColorUtil {
     return VariablesExtractor.extractDeclarations(fileName, text, line);
   }
 
-
-  public static generateDecoration(color: IColor, ) {
+  public static generateDecoration(color: IColor) {
     if ('declaration' in color) {
-      return new ColorDecoration((<Variable>color).color);
+      const deco = new VariableDecoration(<Variable>color);
+      (<Variable>color).registerObserver(deco);
+      return deco;
     }
-    const deco = new ColorDecoration(<Color>color);
-    if ('_variable' in color) {
-      (<Color>color)._variable.registerObserver(deco);
-    }
-    return deco;
+    return new ColorDecoration(<Color>color);
   }
 }
 export default ColorUtil;

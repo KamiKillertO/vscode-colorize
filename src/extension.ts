@@ -287,11 +287,9 @@ function decorateEditor(decorations: Map<number, ColorDecoration[]>, editor: Tex
   let tmp = it.next();
   while (!tmp.done) {
     let line = tmp.value[0];
-
-    tmp.value[1].forEach(_ => _.updateCallback = (decoration) => {
+    tmp.value[1].forEach(_ => _.addUpdateCallback((decoration) => {
       decorateLine(editor, [decoration], decoration.currentRange.start.line);
-    });
-
+    }));
     if (line !== currentSelection) {
       decorateLine(editor, tmp.value[1], line);
     }
