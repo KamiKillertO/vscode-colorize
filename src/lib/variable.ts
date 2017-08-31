@@ -43,10 +43,6 @@ class Variable extends Observable implements IColor {
     this.declaration = declaration;
   }
 
-  public updateColor(c) { // use get/set instead?
-    this.color = c;
-    this.notify(c);
-  }
   // public get color() {
   //   return this._color;
   // }

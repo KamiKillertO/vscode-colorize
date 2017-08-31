@@ -99,11 +99,18 @@ class ColorDecoration implements Observer {
   addUpdateCallback(callback) {
     this._updateCallback = callback;
   }
-  update(color: Color) {
+  updateDecoration(color: Color) {
     this._decoration.dispose();
     this.color.rgb = color.rgb;
     this._generateDecorator();
     return this._updateCallback(this);
+  }
+  disposeDecoration() {
+    this._decoration.dispose();
+  }
+  update(args: Object[]) {
+    const action = args[0];
+    this[`${action}Decoration`](...args.slice(1));
   }
 }
 export default ColorDecoration;

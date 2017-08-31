@@ -39,14 +39,20 @@ class VariablesExtractor implements IColorExtractor {
       return;
     }
     if (fileName === null) {
+      const variables = this.variablesDeclarations_2.get(variable);
+      variables.forEach(_ => _.dispose());
       this.variablesDeclarations_2.delete(variable);
       return;
     }
     if (line !== null) {
+      const variables = this.get(variable, fileName, line);
+      variables.forEach(_ => _.dispose());
       decorations = decorations.filter(_ => _.declaration.fileName === fileName && _.declaration.line !== line);
       this.variablesDeclarations_2.set(variable, decorations);
       return;
     }
+    const variables = this.get(variable, fileName);
+    variables.forEach(_ => _.dispose());
     decorations = decorations.filter(_ => _.declaration.fileName !== fileName);
     this.variablesDeclarations_2.set(variable, decorations);
     return;
@@ -111,7 +117,7 @@ class VariablesExtractor implements IColorExtractor {
       const variable = new Variable(varName, <Color> color, {fileName, line});
       if (this.has(varName, fileName, line)) {
         const decoration = this.get(varName, fileName, line);
-        decoration[0].updateColor(<Color>color);
+        decoration[0].update(<Color>color);
         continue;
       }
       if (this.has(varName)) {

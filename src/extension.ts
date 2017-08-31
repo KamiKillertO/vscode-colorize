@@ -28,6 +28,7 @@ import ColorUtil from './lib/color-util';
 import ColorDecoration from './lib/color-decoration';
 import Queue from './lib/queue';
 import ColorExtractor from './lib/extractors/color-extractor';
+import VariableDecoration from './lib/variable-decoration';
 
 let config = {
   languages: null,
@@ -286,10 +287,15 @@ function decorateEditor(decorations: Map<number, ColorDecoration[]>, editor: Tex
   let it = decorations.entries();
   let tmp = it.next();
   while (!tmp.done) {
-    let line = tmp.value[0];
-    tmp.value[1].forEach(_ => _.addUpdateCallback((decoration) => {
-      decorateLine(editor, [decoration], decoration.currentRange.start.line);
-    }));
+    const line = tmp.value[0];
+    const decorations = tmp.value[1];
+    decorations.forEach(_ => {
+      if (_ instanceof VariableDecoration) {
+        _.addUpdateCallback((decoration) => {
+          decorateLine(editor, [decoration], decoration.currentRange.start.line);
+        });
+      }
+    });
     if (line !== currentSelection) {
       decorateLine(editor, tmp.value[1], line);
     }
