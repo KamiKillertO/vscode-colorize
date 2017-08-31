@@ -1,4 +1,4 @@
-import { IColor } from './../color';
+import { IColor } from './color';
 
 export interface IColorExtractor {
   name: string;

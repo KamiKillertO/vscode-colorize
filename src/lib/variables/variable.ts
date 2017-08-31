@@ -1,4 +1,4 @@
-import Color, { IColor } from './color';
+import Color, { IColor } from '../colors/color';
 
 interface FileDeclaration {
   fileName: string;
@@ -30,7 +30,6 @@ class Variable extends Observable implements IColor {
 
   public name: string;
 
-  // public _color: Color;
   public color: Color;
 
   public declaration: FileDeclaration;

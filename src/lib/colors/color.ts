@@ -1,11 +1,8 @@
-import Variable from './variable';
-
 interface IColor {
   toRgbString(): string;
 }
 
 class Color implements IColor {
-  public _variable;
   /**
    * The extracted text corresponding to the color
    * example: #fff, #fffff, rgba(0,0,0,0.1)...

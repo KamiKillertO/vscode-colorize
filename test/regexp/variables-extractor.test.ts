@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { REGEXP, DECLARATION_REGEXP } from '../../src/lib/extractors/variables-extractor';
+import { REGEXP, DECLARATION_REGEXP } from '../../src/lib/variables/variables-extractor';
 // Defines a Mocha test suite to group tests of similar kind together
 describe('Test variables declaration Regex', () => {
   // Sass

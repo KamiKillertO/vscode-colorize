@@ -3,7 +3,7 @@ import {
 } from 'chai';
 
 import ColorUtil from '../src/lib/color-util';
-import Color from '../src/lib/color';
+import Color from '../src/lib/colors/color';
 
 describe('Test utility fonction', () => {
   it('Should not extract invalid colors from a text', async () => {

@@ -1,6 +1,6 @@
-import Color, {IColor} from './../color';
-import Variable from './../variable';
-import ColorExtractor, { IColorExtractor } from './color-extractor';
+import Variable from './variable';
+import Color from '../colors/color';
+import ColorExtractor from '../colors/color-extractor';
 
 // stylus no prefix needed and = instead of :
 export const DECLARATION_REGEXP = /(?:(?:((?:\$|@|--)(?:\w|-)+\s*):)|(\w(?:\w|-)*)\=)(?:$|"|'|,| |;|\)|\r|\n)/gi;
@@ -10,7 +10,7 @@ export const REGEXP = /(?:((?:(?:\s|\$|@)(?:(?:[a-z]|\d+[a-z])[a-z\d]*|-)+))|(va
 
 export const REGEXP_ONE = /^(?:((?:(?:\$|@)(?:(?:[a-z]|\d+[a-z])[a-z\d]*|-)+))|(?:var\((--\w+(?:-|\w)*))\))(?:$|"|'|,| |;|\)|\r|\n)/gi;
 
-class VariablesExtractor implements IColorExtractor {
+class VariablesExtractor {
 
   public variablesDeclarations_2: Map<string, Variable[]> = new Map(); // use a map insteag (colorName: color)
 
@@ -68,9 +68,9 @@ class VariablesExtractor implements IColorExtractor {
     }
   }
 
-  public async extractColors(text: string, fileName: string): Promise<IColor[]> {
+  public async extractVariables(text: string, fileName: string): Promise<Variable[]> {
     let match = null;
-    let colors: IColor[] = [];
+    let colors: Variable[] = [];
     while ((match = REGEXP.exec(text)) !== null) {
       // match[3] for css variables
       let varName =  match[1] || match[3];
@@ -97,14 +97,14 @@ class VariablesExtractor implements IColorExtractor {
     return colors;
   }
   // Need to be updated
-  public extractColor(text: string): Color {
-    let match: RegExpMatchArray = text.match(REGEXP_ONE);
-    if (match && this.has(match[0])) {
-      const variable = [].concat(this.get(match[0]));
-      return new Color(match[0], match.index, 1, variable.pop().color.rgb);
-    }
-    return null;
-  }
+  // public extractColor(text: string): Color {
+  //   let match: RegExpMatchArray = text.match(REGEXP_ONE);
+  //   if (match && this.has(match[0])) {
+  //     const variable: Variable[] = [].concat(this.get(match[0]));
+  //     return new Color(match[0], match.index, 1, variable.pop().color.rgb);
+  //   }
+  //   return null;
+  // }
 
   public async extractDeclarations(fileName: string, text: string, line: number): Promise<Map<string, Variable[]>> {
     let match = null;
@@ -132,7 +132,6 @@ class VariablesExtractor implements IColorExtractor {
 }
 const instance = new VariablesExtractor();
 
-ColorExtractor.registerExtractor(instance);
 export default instance;
 
 // WARNINGS/Questions

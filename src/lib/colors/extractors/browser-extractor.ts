@@ -1,5 +1,5 @@
 import Color from './../color';
-import ColorExtractor, { IColorExtractor } from './color-extractor';
+import ColorExtractor, { IColorExtractor } from '../color-extractor';
 
 export const COLORS = Object({
     'aliceblue': {
