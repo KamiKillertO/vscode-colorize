@@ -68,7 +68,7 @@ class Variable extends Observable implements IColor {
   }
 
   public update(color: Color) {
-    this.color = color;
+    this.color.rgb = color.rgb;
     this.notify(['update', color]);
   }
 }

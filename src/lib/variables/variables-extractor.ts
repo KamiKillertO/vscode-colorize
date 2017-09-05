@@ -48,12 +48,15 @@ class VariablesExtractor {
       const variables = this.get(variable, fileName, line);
       variables.forEach(_ => _.dispose());
       decorations = decorations.filter(_ => _.declaration.fileName === fileName && _.declaration.line !== line);
-      this.variablesDeclarations_2.set(variable, decorations);
+    } else {
+      const variables = this.get(variable, fileName);
+      variables.forEach(_ => _.dispose());
+      decorations = decorations.filter(_ => _.declaration.fileName !== fileName);
+    }
+    if (decorations.length === 0) {
+      this.variablesDeclarations_2.delete(variable);
       return;
     }
-    const variables = this.get(variable, fileName);
-    variables.forEach(_ => _.dispose());
-    decorations = decorations.filter(_ => _.declaration.fileName !== fileName);
     this.variablesDeclarations_2.set(variable, decorations);
     return;
   }
@@ -110,16 +113,20 @@ class VariablesExtractor {
     let match = null;
     while ((match = DECLARATION_REGEXP.exec(text)) !== null) {
       let color = ColorExtractor.extractOneColor(text.slice(match.index + match[0].length).trim());
-      if (color === null) {
-        continue;
-      }
       const varName = match[1] || match[2];
-      const variable = new Variable(varName, <Color> color, {fileName, line});
       if (this.has(varName, fileName, line)) {
         const decoration = this.get(varName, fileName, line);
-        decoration[0].update(<Color>color);
+        if (color === undefined) {
+          this.delete(varName, fileName, line);
+        } else {
+          decoration[0].update(<Color>color);
+        }
         continue;
       }
+      if (color === undefined) {
+        continue;
+      }
+      const variable = new Variable(varName, <Color> color, {fileName, line});
       if (this.has(varName)) {
         const decorations = this.get(varName);
         this.variablesDeclarations_2.set(varName, decorations.concat([variable]));

@@ -92,7 +92,7 @@ class HSLColorExtractor implements IColorExtractor {
     return tmp_2;
   }
 
-  public async extractColors(text: string, fileName = null): Promise < Color[] >  {
+  public async extractColors(text: string): Promise < Color[] >  {
     let match = null;
     let colors: Color[] = [];
     while ((match = REGEXP.exec(text)) !== null) {

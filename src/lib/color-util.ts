@@ -68,7 +68,7 @@ class ColorUtil {
    * @memberOf ColorUtil
    */
    public static async findColors(text, fileName = null): Promise < IColor[] > {
-    const colors = await ColorExtractor.extract(text, fileName);
+    const colors = await ColorExtractor.extract(text);
     return colors;
    }
 

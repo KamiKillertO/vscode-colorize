@@ -108,6 +108,7 @@ class VariableDecoration implements Observer {
   }
   disposeDecoration() {
     this._decoration.dispose();
+    this._decoration = null;
   }
   update(args: Object[]) {
     const action = args[0];

@@ -22,7 +22,6 @@ import {
   StatusBarAlignment,
   Uri
 } from 'vscode';
-import VariablesExtractor from './lib/variables/variables-extractor';
 import Color, { IColor } from './lib/colors/color';
 import Variable from './lib/variables/variable';
 import ColorUtil, { IDecoration } from './lib/color-util';
@@ -146,7 +145,7 @@ function handleLineRemoved(editedLine: TextDocumentContentChangeEvent[], positio
   editedLine.reverse();
   editedLine.forEach((line: TextDocumentContentChangeEvent) => {
     for (let i = line.range.start.line; i <= line.range.end.line; i++) {
-      VariablesExtractor.deleteVariableInLine(extension.editor.document.fileName, i);
+      VariablesManager.deleteVariableInLine(extension.editor.document.fileName, i);
     }
     positions = updatePositionsDeletion(line.range, positions);
   });
@@ -230,8 +229,7 @@ async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEve
         const text = context.editor.document.lineAt(range.start.line).text;
         await VariablesManager.findVariablesDeclarations(context.editor.document.fileName, text, range.start.line);
         const colors = await ColorUtil.findColors(text, context.editor.document.fileName);
-        // const variables = await VariablesManager.findVariables(text, context.editor.document.fileName);
-        const variables = [];
+        const variables = await VariablesManager.findVariables(text, context.editor.document.fileName);
         return generateDecorations(colors, variables, range.start.line, m);
       } catch (e) { // use promise catch instead?
         return context.deco;
@@ -306,7 +304,7 @@ function decorateEditor(decorations: Map<number, IDecoration[]>, editor: TextEdi
     decorations.forEach(_ => {
       if (_ instanceof VariableDecoration) {
         _.addUpdateCallback((decoration) => {
-          decorateLine(editor, [decoration], decoration.currentRange.start.line);
+          return decorateLine(editor, [decoration], decoration.currentRange.start.line);
         });
       }
     });
@@ -319,7 +317,11 @@ function decorateEditor(decorations: Map<number, IDecoration[]>, editor: TextEdi
 }
 // Decorate editor's decorations for one line
 function decorateLine(editor: TextEditor, decorations: IDecoration[], line: number) {
-  decorations.forEach(decoration => editor.setDecorations(decoration.decoration, [decoration.generateRange(line)]));
+  decorations.forEach(decoration => {
+    if (decoration.decoration !== null) {
+      editor.setDecorations(decoration.decoration, [decoration.generateRange(line)]);
+    }
+  });
 }
 function isLanguageSupported(languageId): boolean {
   return config.languages.indexOf(languageId) !== -1;

@@ -27,7 +27,7 @@ class HexaColorExtractor implements IColorExtractor {
     }
     return 1;
   }
-  public async extractColors(text: string, fileName = null): Promise < Color[] > {
+  public async extractColors(text: string): Promise < Color[] > {
     let match = null;
     let colors: Color[] = [];
 

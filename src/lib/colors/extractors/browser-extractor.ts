@@ -752,7 +752,7 @@ export const REGEXP_ONE = (() => RegExp(`^(?:^|,|\s|\\(|:)(${Object.keys(COLORS)
 class BrowsersColorExtractor implements IColorExtractor {
   public name: string = 'BROWSERS_COLORS_EXTRACTOR';
 
-  public async extractColors(text: string, fileName = null): Promise<Color []> {
+  public async extractColors(text: string): Promise<Color []> {
     let match = null;
     let colors: Color[] = [];
     let position = 0;
