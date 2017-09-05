@@ -9,6 +9,7 @@ import ColorDecoration from './colors/color-decoration';
 import { Range, TextEditorDecorationType } from 'vscode';
 
 interface IDecoration {
+
   decoration: TextEditorDecorationType;
   /**
    * Disposed the TextEditorDecorationType
@@ -18,6 +19,15 @@ interface IDecoration {
    * @memberOf IDecoration
    */
   dispose(): void;
+
+  /**
+   * Is `true` when the decoration has been destroyed, `false` otherwise.
+   *
+   * @public
+   * @memberOf IDecoration
+   */
+  disposed: Boolean;
+
   /**
    * Generate the decoration Range (start and end position in line)
    *

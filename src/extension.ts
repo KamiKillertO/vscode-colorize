@@ -152,6 +152,19 @@ function handleLineRemoved(editedLine: TextDocumentContentChangeEvent[], positio
   return editedLine;
 }
 
+function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position) {
+  editedLine = mutEditedLIne(editedLine);
+  editedLine.forEach((line) => {
+    position.forEach(position => {
+      if (position.newPosition >= line.range.start.line) {
+        position.newPosition = position.newPosition + 1;
+      }
+    });
+  });
+
+  return editedLine;
+}
+
 function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, diffLine: number) {
   let positions = mapKeysToArray(context.deco).map(position => Object({
     oldPosition: position,
@@ -177,7 +190,7 @@ function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context: C
     }
     return true;
   });
-    let newDeco = new Map();
+  let newDeco = new Map();
   positions.forEach(position => {
     if (newDeco.has(position.newPosition)) {
       newDeco.set(position.newPosition, newDeco.get(position.newPosition).concat(context.deco.get(position.oldPosition)));
@@ -186,19 +199,6 @@ function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context: C
     }
   });
   context.deco = newDeco;
-  return editedLine;
-}
-
-function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position) {
-  editedLine = mutEditedLIne(editedLine);
-  editedLine.forEach((line) => {
-    position.forEach(position => {
-      if (position.newPosition >= line.range.start.line) {
-        position.newPosition = position.newPosition + 1;
-      }
-    });
-  });
-
   return editedLine;
 }
 
@@ -236,7 +236,7 @@ async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEve
       }
     })
   );
-  decorateEditor(m, context.editor, context.currentSelection);
+decorateEditor(m, context.editor, context.currentSelection);
   let it = m.entries();
   let tmp = it.next();
   while (!tmp.done) {
@@ -300,10 +300,10 @@ function decorateEditor(decorations: Map<number, IDecoration[]>, editor: TextEdi
   let tmp = it.next();
   while (!tmp.done) {
     const line = tmp.value[0];
-    const decorations: IDecoration[] = tmp.value[1];
-    decorations.forEach(_ => {
+    const deco: IDecoration[] = tmp.value[1];
+    deco.forEach(_ => {
       if (_ instanceof VariableDecoration) {
-        _.addUpdateCallback((decoration) => {
+        _.addUpdateCallback((decoration: VariableDecoration) => {
           return decorateLine(editor, [decoration], decoration.currentRange.start.line);
         });
       }
@@ -315,10 +315,11 @@ function decorateEditor(decorations: Map<number, IDecoration[]>, editor: TextEdi
   }
   return;
 }
+
 // Decorate editor's decorations for one line
 function decorateLine(editor: TextEditor, decorations: IDecoration[], line: number) {
-  decorations.forEach(decoration => {
-    if (decoration.decoration !== null) {
+  decorations.forEach((decoration: IDecoration) => {
+    if (!(<VariableDecoration>decoration).deleted) { // deleted decorations need to be removed from the deco list
       editor.setDecorations(decoration.decoration, [decoration.generateRange(line)]);
     }
   });
@@ -431,6 +432,7 @@ function handleTextSelectionChange(event: TextEditorSelectionChangeEvent) {
   if (event.kind !== undefined ) {
     q.push(cb => {
       if (extension.currentSelection !== null && extension.deco.get(extension.currentSelection) !== undefined) {
+        const decorations = extension.deco.get(extension.currentSelection);
         decorateLine(extension.editor, extension.deco.get(extension.currentSelection), extension.currentSelection);
       }
       extension.currentSelection =  null;

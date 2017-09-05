@@ -32,6 +32,9 @@ class VariableDecoration implements Observer {
    * @memberOf ColorDecoration
    */
   public disposed: boolean = false;
+
+  public deleted: boolean = false;
+
   public currentRange: Range;
   private _decoration: TextEditorDecorationType;
   /**
@@ -107,8 +110,8 @@ class VariableDecoration implements Observer {
     return this._updateCallback(this);
   }
   disposeDecoration() {
-    this._decoration.dispose();
-    this._decoration = null;
+    this.dispose();
+    this.deleted = true;
   }
   update(args: Object[]) {
     const action = args[0];
