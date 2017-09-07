@@ -1,5 +1,5 @@
 import Color from './../color';
-import ColorExtractor, { IColorExtractor } from './color-extractor';
+import ColorExtractor, { IColorExtractor } from '../color-extractor';
 
 export const REGEXP = /(#[\da-f]{3,4}|#[\da-f]{6}|#[\da-f]{8})(?:$|"|'|,| |;|\)|\r|\n)/gi;
 export const REGEXP_ONE = /^(#[\da-f]{3,4}|#[\da-f]{6}|#[\da-f]{8})(?:$|"|'|,| |;|\)|\r|\n)/i;
@@ -27,7 +27,7 @@ class HexaColorExtractor implements IColorExtractor {
     }
     return 1;
   }
-  public async extractColors(text: string, fileName = null): Promise < Color[] > {
+  public async extractColors(text: string): Promise < Color[] > {
     let match = null;
     let colors: Color[] = [];
 

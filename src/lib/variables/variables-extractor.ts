@@ -1,6 +1,6 @@
-import Color, {IColor} from './../color';
-import Variable from './../variable';
-import ColorExtractor, { IColorExtractor } from './color-extractor';
+import Variable from './variable';
+import Color from '../colors/color';
+import ColorExtractor from '../colors/color-extractor';
 
 // stylus no prefix needed and = instead of :
 export const DECLARATION_REGEXP = /(?:(?:((?:\$|@|--)(?:\w|-)+\s*):)|(\w(?:\w|-)*)\=)(?:$|"|'|,| |;|\)|\r|\n)/gi;
@@ -10,7 +10,7 @@ export const REGEXP = /(?:((?:(?:\s|\$|@)(?:(?:[a-z]|\d+[a-z])[a-z\d]*|-)+))|(va
 
 export const REGEXP_ONE = /^(?:((?:(?:\$|@)(?:(?:[a-z]|\d+[a-z])[a-z\d]*|-)+))|(?:var\((--\w+(?:-|\w)*))\))(?:$|"|'|,| |;|\)|\r|\n)/gi;
 
-class VariablesExtractor implements IColorExtractor {
+class VariablesExtractor {
 
   public variablesDeclarations_2: Map<string, Variable[]> = new Map(); // use a map insteag (colorName: color)
 
@@ -22,8 +22,7 @@ class VariablesExtractor implements IColorExtractor {
   }
 
   public get(variable: string, fileName: string  = null, line: number = null): Variable[] {
-    let decorations = this.variablesDeclarations_2.get(variable);
-
+    let decorations = this.variablesDeclarations_2.get(variable) || [];
     if (fileName === null) {
       return decorations;
     }
@@ -40,15 +39,24 @@ class VariablesExtractor implements IColorExtractor {
       return;
     }
     if (fileName === null) {
+      const variables = this.variablesDeclarations_2.get(variable);
+      variables.forEach(_ => _.dispose());
       this.variablesDeclarations_2.delete(variable);
       return;
     }
     if (line !== null) {
+      const variables = this.get(variable, fileName, line);
+      variables.forEach(_ => _.dispose());
       decorations = decorations.filter(_ => _.declaration.fileName === fileName && _.declaration.line !== line);
-      this.variablesDeclarations_2.set(variable, decorations);
+    } else {
+      const variables = this.get(variable, fileName);
+      variables.forEach(_ => _.dispose());
+      decorations = decorations.filter(_ => _.declaration.fileName !== fileName);
+    }
+    if (decorations.length === 0) {
+      this.variablesDeclarations_2.delete(variable);
       return;
     }
-    decorations = decorations.filter(_ => _.declaration.fileName !== fileName);
     this.variablesDeclarations_2.set(variable, decorations);
     return;
   }
@@ -63,9 +71,9 @@ class VariablesExtractor implements IColorExtractor {
     }
   }
 
-  public async extractColors(text: string, fileName: string): Promise<IColor[]> {
+  public async extractVariables(text: string, fileName: string): Promise<Variable[]> {
     let match = null;
-    let colors: IColor[] = [];
+    let colors: Variable[] = [];
     while ((match = REGEXP.exec(text)) !== null) {
       // match[3] for css variables
       let varName =  match[1] || match[3];
@@ -84,29 +92,40 @@ class VariablesExtractor implements IColorExtractor {
         this.variablesDeclarations_2.delete(varName);
       }
       let deco = decorations[decorations.length - 1];
+      deco.color = new Color(varName, match.index, deco.color.alpha, deco.color.rgb);
+      // color._variable = deco;
       // reference error >< multiple instance
-      colors.push(new Color(varName, match.index, deco.color.alpha, deco.color.rgb));
+      colors.push(deco);
     }
     return colors;
   }
   // Need to be updated
-  public extractColor(text: string): Color {
-    let match: RegExpMatchArray = text.match(REGEXP_ONE);
-    if (match && this.has(match[0])) {
-      const variable = [].concat(this.get(match[0]));
-      return new Color(match[0], match.index, 1, variable.pop().color.rgb);
-    }
-    return null;
-  }
+  // public extractColor(text: string): Color {
+  //   let match: RegExpMatchArray = text.match(REGEXP_ONE);
+  //   if (match && this.has(match[0])) {
+  //     const variable: Variable[] = [].concat(this.get(match[0]));
+  //     return new Color(match[0], match.index, 1, variable.pop().color.rgb);
+  //   }
+  //   return null;
+  // }
 
   public async extractDeclarations(fileName: string, text: string, line: number): Promise<Map<string, Variable[]>> {
     let match = null;
     while ((match = DECLARATION_REGEXP.exec(text)) !== null) {
       let color = ColorExtractor.extractOneColor(text.slice(match.index + match[0].length).trim());
-      if (color === null) {
+      const varName = match[1] || match[2];
+      if (this.has(varName, fileName, line)) {
+        const decoration = this.get(varName, fileName, line);
+        if (color === undefined) {
+          this.delete(varName, fileName, line);
+        } else {
+          decoration[0].update(<Color>color);
+        }
         continue;
       }
-      const varName = match[1] || match[2];
+      if (color === undefined) {
+        continue;
+      }
       const variable = new Variable(varName, <Color> color, {fileName, line});
       if (this.has(varName)) {
         const decorations = this.get(varName);
@@ -120,7 +139,6 @@ class VariablesExtractor implements IColorExtractor {
 }
 const instance = new VariablesExtractor();
 
-ColorExtractor.registerExtractor(instance);
 export default instance;
 
 // WARNINGS/Questions
