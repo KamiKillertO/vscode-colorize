@@ -1,3 +1,10 @@
+## 0.6.4
+
+- [FIX] #62 variables not deleted
+- [FIX] stylus variables not colorized
+- [FIX] multiple deco for one variables use positions of the last one
+- [CHANGE] Split code between color and variables (not same needs)
+
 ## 0.6.3
 
 - [FIX] #62 variables not deleted
