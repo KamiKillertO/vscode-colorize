@@ -94,10 +94,7 @@ class VariablesExtractor {
       if (decorations.length === 0) {
         this.variablesDeclarations_2.delete(varName);
       }
-      let deco = decorations[decorations.length - 1];
-      deco.color = new Color(varName, match.index, deco.color.alpha, deco.color.rgb);
-      // color._variable = deco;
-      // reference error >< multiple instance
+      let deco = Object.create(decorations[decorations.length - 1]);
       deco.color = new Color(value, match.index + spaces, deco.color.alpha, deco.color.rgb);
       colors.push(deco);
     }
