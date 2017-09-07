@@ -52,7 +52,9 @@ class ColorDecoration {
      * @memberOf ColorDecoration
      */
     generateRange(line) {
-        return new vscode_1.Range(new vscode_1.Position(line, this.color.positionInText), new vscode_1.Position(line, this.color.positionInText + this.color.value.length));
+        const range = new vscode_1.Range(new vscode_1.Position(line, this.color.positionInText), new vscode_1.Position(line, this.color.positionInText + this.color.value.length));
+        this.currentRange = range;
+        return range;
     }
     _generateDecorator() {
         let textColor = null;
@@ -71,6 +73,12 @@ class ColorDecoration {
             color: textColor
         });
         this.decoration = backgroundDecorationType;
+    }
+    update(color) {
+        this._decoration.dispose();
+        this.color.rgb = color.rgb;
+        this._generateDecorator();
+        return this.updateCallback(this);
     }
 }
 exports.default = ColorDecoration;
