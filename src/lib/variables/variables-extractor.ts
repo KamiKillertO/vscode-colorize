@@ -6,7 +6,7 @@ import ColorExtractor from '../colors/color-extractor';
 export const DECLARATION_REGEXP = /(?:(?:((?:\$|@|--)(?:\w|-)+\s*):)|(\w(?:\w|-)*)\=)(?:$|"|'|,| |;|\)|\r|\n)/gi;
 //  \b allow to catch stylus variables names
 // export const REGEXP = /(?:((?:(?:\s|\$|@)(?:\w|-)+))|(var\((--\w+(?:-|\w)*)\)))(?:$|"|'|,| |;|\)|\r|\n)/gi;
-export const REGEXP = /(?:((?:(?:\s|\$|@)(?:(?:[a-z]|\d+[a-z])[a-z\d]*|-)+))|(var\((--\w+(?:-|\w)*)\)))(?:$|"|'|,| |;|\)|\r|\n)/gi;
+export const REGEXP = /(?:((?:(?:@|\s|\$)(?:(?:[a-z]|\d+[a-z])[a-z\d]*|-)+))|(var\((--\w+(?:-|\w)*)\)))(?:$|"|'|,| |;|\)|\r|\n)/gi;
 
 export const REGEXP_ONE = /^(?:((?:(?:\$|@)(?:(?:[a-z]|\d+[a-z])[a-z\d]*|-)+))|(?:var\((--\w+(?:-|\w)*))\))(?:$|"|'|,| |;|\)|\r|\n)/gi;
 
@@ -77,8 +77,11 @@ class VariablesExtractor {
     while ((match = REGEXP.exec(text)) !== null) {
       // match[3] for css variables
       let varName =  match[1] || match[3];
+      varName = varName.trim();
       // match[2] for css variables
       let value =  match[1] || match[2];
+      let spaces = (value.match(/\s/g) || []).length;
+      value = value.trim();
       if (!this.has(varName)) {
         continue;
       }
@@ -91,10 +94,8 @@ class VariablesExtractor {
       if (decorations.length === 0) {
         this.variablesDeclarations_2.delete(varName);
       }
-      let deco = decorations[decorations.length - 1];
-      deco.color = new Color(varName, match.index, deco.color.alpha, deco.color.rgb);
-      // color._variable = deco;
-      // reference error >< multiple instance
+      let deco = Object.create(decorations[decorations.length - 1]);
+      deco.color = new Color(value, match.index + spaces, deco.color.alpha, deco.color.rgb);
       colors.push(deco);
     }
     return colors;
