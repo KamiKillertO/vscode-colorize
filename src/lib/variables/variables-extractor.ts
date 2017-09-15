@@ -106,8 +106,8 @@ class VariablesExtractor {
     let match: RegExpMatchArray = text.match(REGEXP_ONE);
     if (match && this.has(match[0])) {
       // // match[2] for css variables
-      let varName =  match[1] || match[2];
-      let variables: Variable[] = [].concat(this.get(varName), fileName, line);
+      let varName =  match[0] || match[1];
+      let variables: Variable[] = [].concat(this.get(varName, fileName, line));
       if (variables.length === 0) {
         variables = [].concat(this.get(varName));
       }
