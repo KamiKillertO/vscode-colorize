@@ -7,6 +7,7 @@ Instantly visualize css colors in your css/sass/less/postcss/stylus/XML... files
 This extension  your styles files looking for colors and generate a colored background (using the color) for each of them.
 
 ![](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/demo.gif)
+![](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/demo_variables.gif)
 
 ## Features
 
