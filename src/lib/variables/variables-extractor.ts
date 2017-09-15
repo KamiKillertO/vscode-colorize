@@ -93,6 +93,7 @@ class VariablesExtractor {
       }
       if (decorations.length === 0) {
         this.variablesDeclarations_2.delete(varName);
+        continue;
       }
       let deco = Object.create(decorations[decorations.length - 1]);
       deco.color = new Color(value, match.index + spaces, deco.color.alpha, deco.color.rgb);
@@ -101,20 +102,25 @@ class VariablesExtractor {
     return colors;
   }
   // Need to be updated
-  // public extractColor(text: string): Color {
-  //   let match: RegExpMatchArray = text.match(REGEXP_ONE);
-  //   if (match && this.has(match[0])) {
-  //     const variable: Variable[] = [].concat(this.get(match[0]));
-  //     return new Color(match[0], match.index, 1, variable.pop().color.rgb);
-  //   }
-  //   return null;
-  // }
+  public extractOneColor(text: string, fileName, line): Color {
+    let match: RegExpMatchArray = text.match(REGEXP_ONE);
+    if (match && this.has(match[0])) {
+      // // match[2] for css variables
+      let varName =  match[1] || match[2];
+      let variables: Variable[] = [].concat(this.get(varName), fileName, line);
+      if (variables.length === 0) {
+        variables = [].concat(this.get(varName));
+      }
+      return new Color(varName, match.index, 1, variables.pop().color.rgb);
+    }
+    return null;
+  }
 
   public async extractDeclarations(fileName: string, text: string, line: number): Promise<Map<string, Variable[]>> {
     let match = null;
     while ((match = DECLARATION_REGEXP.exec(text)) !== null) {
-      let color = ColorExtractor.extractOneColor(text.slice(match.index + match[0].length).trim());
       const varName = match[1] || match[2];
+      let color = ColorExtractor.extractOneColor(text.slice(match.index + match[0].length).trim()) || this.extractOneColor(text.slice(match.index + match[0].length).trim(), fileName, line);
       if (this.has(varName, fileName, line)) {
         const decoration = this.get(varName, fileName, line);
         if (color === undefined) {
@@ -124,7 +130,7 @@ class VariablesExtractor {
         }
         continue;
       }
-      if (color === undefined) {
+      if (color === undefined || color === null) {
         continue;
       }
       const variable = new Variable(varName, <Color> color, {fileName, line});
