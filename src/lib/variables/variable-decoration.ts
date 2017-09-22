@@ -104,6 +104,7 @@ class VariableDecoration implements Observer {
     this._updateCallback = callback;
   }
   updateDecoration(color: Color) {
+    this.deleted = false;
     this._decoration.dispose();
     this.variable.color.rgb = color.rgb;
     this._generateDecorator();
