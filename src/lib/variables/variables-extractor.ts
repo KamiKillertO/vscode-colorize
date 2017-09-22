@@ -47,7 +47,7 @@ class VariablesExtractor {
     if (line !== null) {
       const variables = this.get(variable, fileName, line);
       variables.forEach(_ => _.dispose());
-      decorations = decorations.filter(_ => _.declaration.fileName === fileName && _.declaration.line !== line);
+      decorations = decorations.filter(_ => _.declaration.fileName !== fileName && _.declaration.line !== line);
     } else {
       const variables = this.get(variable, fileName);
       variables.forEach(_ => _.dispose());
