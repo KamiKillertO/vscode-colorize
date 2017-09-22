@@ -1,10 +1,18 @@
 'use strict';
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 const vscode_1 = require("vscode");
+const variables_extractor_1 = require("./lib/extractors/variables-extractor");
 const color_util_1 = require("./lib/color-util");
-const color_decoration_1 = require("./lib/color-decoration");
 const queue_1 = require("./lib/queue");
 let config = {
     languages: null,
@@ -107,6 +115,9 @@ function updatePositionsDeletion(range, positions) {
 function handleLineRemoved(editedLine, positions) {
     editedLine.reverse();
     editedLine.forEach((line) => {
+        for (let i = line.range.start.line; i <= line.range.end.line; i++) {
+            variables_extractor_1.default.deleteVariableInLine(extension.editor.document.fileName, i);
+        }
         positions = updatePositionsDeletion(line.range, positions);
     });
     return editedLine;
@@ -169,23 +180,26 @@ function updateDecorations(editedLine, context, cb) {
     checkDecorationForUpdate(editedLine, context, cb);
 }
 function checkDecorationForUpdate(editedLine, context, cb) {
-    let m = new Map();
-    Promise.all(editedLine.map(({ range }) => {
-        if (context.deco.has(range.start.line)) {
-            context.deco.get(range.start.line).forEach(decoration => {
-                decoration.dispose();
-            });
-        }
-        context.deco.set(range.start.line, []);
-        // lineAt raise an exception if line does not exist
-        try {
-            return color_util_1.default.findColors(context.editor.document.lineAt(range.start.line).text)
-                .then(colors => generateDecorations(colors, range.start.line, m));
-        }
-        catch (e) {
-            return context.deco;
-        }
-    })).then((decorations) => {
+    return __awaiter(this, void 0, void 0, function* () {
+        let m = new Map();
+        yield Promise.all(editedLine.map(({ range }) => __awaiter(this, void 0, void 0, function* () {
+            if (context.deco.has(range.start.line)) {
+                context.deco.get(range.start.line).forEach(decoration => {
+                    decoration.dispose();
+                });
+            }
+            context.deco.set(range.start.line, []);
+            // lineAt raise an exception if line does not exist
+            try {
+                const text = context.editor.document.lineAt(range.start.line).text;
+                const variables = yield color_util_1.default.findColorVariables(context.editor.document.fileName, text, range.start.line);
+                const colors = yield color_util_1.default.findColors(text, context.editor.document.fileName);
+                return generateDecorations(colors, range.start.line, m);
+            }
+            catch (e) {
+                return context.deco;
+            }
+        })));
         decorateEditor(m, context.editor, context.currentSelection);
         let it = m.entries();
         let tmp = it.next();
@@ -199,36 +213,40 @@ function checkDecorationForUpdate(editedLine, context, cb) {
             }
             tmp = it.next();
         }
-    })
-        .then(cb);
+        cb();
+    });
 }
 function initDecorations(context, cb) {
-    if (!context.editor) {
-        return cb();
-    }
-    let text = context.editor.document.getText();
-    let n = context.editor.document.lineCount;
-    Promise.all(context.editor.document.getText()
-        .split(/\n/)
-        .map((text, index) => Object({
-        'text': text,
-        'line': index
-    }))
-        .map(line => color_util_1.default.findColors(line.text)
-        .then(colors => generateDecorations(colors, line.line, context.deco))))
-        .then(() => decorateEditor(context.deco, context.editor, context.currentSelection))
-        .then(cb);
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!context.editor) {
+            return cb();
+        }
+        let text = context.editor.document.getText();
+        let n = context.editor.document.lineCount;
+        const colors = yield Promise.all(context.editor.document.getText()
+            .split(/\n/)
+            .map((text, index) => Object({
+            'text': text,
+            'line': index
+        }))
+            .map((line) => __awaiter(this, void 0, void 0, function* () {
+            let colors = yield color_util_1.default.findColors(line.text, context.editor.document.fileName);
+            return generateDecorations(colors, line.line, context.deco);
+        })));
+        decorateEditor(context.deco, context.editor, context.currentSelection);
+        cb();
+    });
 }
 // Mut context ><
 function generateDecorations(colors, line, decorations) {
     colors.forEach((color) => {
-        let startPos = new vscode_1.Position(line, color.positionInText);
-        let endPos = new vscode_1.Position(line, color.positionInText + color.value.length);
+        const decoration = color_util_1.default.generateDecoration(color);
         if (decorations.has(line)) {
-            decorations.set(line, decorations.get(line).concat([new color_decoration_1.default(color)]));
+            decorations.set(line, decorations.get(line).concat([decoration]));
+            // decorations.set(line, decorations.get(line).concat([new ColorDecoration(color)]));
         }
         else {
-            decorations.set(line, [new color_decoration_1.default(color)]);
+            decorations.set(line, [decoration]);
         }
     });
     return decorations;
@@ -239,6 +257,9 @@ function decorateEditor(decorations, editor, currentSelection) {
     let tmp = it.next();
     while (!tmp.done) {
         let line = tmp.value[0];
+        tmp.value[1].forEach(_ => _.updateCallback = (decoration) => {
+            decorateLine(editor, [decoration], decoration.currentRange.start.line);
+        });
         if (line !== currentSelection) {
             decorateLine(editor, tmp.value[1], line);
         }
@@ -292,28 +313,44 @@ function getDecorations(editor) {
     return null;
 }
 function seekForColorVariables(cb) {
-    const statusBar = vscode_1.window.createStatusBarItem(vscode_1.StatusBarAlignment.Right);
-    statusBar.text = 'Fetching files...';
-    statusBar.show();
-    console.time('Start variables extraction');
-    console.time('Start files search');
-    // not so bad
-    vscode_1.workspace.findFiles('{**/*.css,**/*.sass,**/*.scss,**/*.less,**/*.pcss,**/*.sss,**/*.stylus,**/*.styl}', '{**/.git,**/.svn,**/.hg,**/CVS,**/.DS_Store,**/.git,**/node_modules,**/bower_components}').then((files) => {
-        console.timeEnd('Start files search');
-        statusBar.text = `Found ${files.length} files`;
-        console.time('Open documents');
-        Promise.all(files.map((f) => vscode_1.workspace.openTextDocument(f.path).then(d => d.getText()))).then(res => {
-            console.timeEnd('Open documents');
-            console.time('Find color variables');
-            return color_util_1.default.findColorVariables(res.join(' '));
-        })
-            .then(vars => {
-            statusBar.text = `Found ${vars.size} variables`;
-            console.timeEnd('Find color variables');
+    return __awaiter(this, void 0, void 0, function* () {
+        const statusBar = vscode_1.window.createStatusBarItem(vscode_1.StatusBarAlignment.Right);
+        statusBar.text = 'Fetching files...';
+        statusBar.show();
+        console.time('Start variables extraction');
+        console.time('Start files search');
+        // not so bad
+        try {
+            // add options for include/excludes folders
+            const files = yield vscode_1.workspace.findFiles('{**/*.css,**/*.sass,**/*.scss,**/*.less,**/*.pcss,**/*.sss,**/*.stylus,**/*.styl}', '{**/.git,**/.svn,**/.hg,**/CVS,**/.DS_Store,**/.git,**/node_modules,**/bower_components,**/tmp,**/dist,**/tests}');
+            console.timeEnd('Start files search');
+            statusBar.text = `Found ${files.length} files`;
+            // a little bit slower
+            console.time('Variables extraction v2');
+            let variables = yield Promise.all(files.map((file) => __awaiter(this, void 0, void 0, function* () {
+                const document = yield vscode_1.workspace.openTextDocument(file.path);
+                if (isSupported(document) === false) {
+                    return;
+                }
+                const text = document.getText()
+                    .split(/\n/)
+                    .map((text, index) => Object({
+                    'text': text,
+                    'line': index
+                }));
+                const variables = yield Promise.all(text.map(line => color_util_1.default.findColorVariables(document.fileName, line.text, line.line)));
+                return variables[variables.length - 1];
+            })));
+            variables = variables[variables.length - 1];
+            statusBar.text = `Found ${variables.size} variables`;
+            console.timeEnd('Variables extraction v2');
             console.timeEnd('Start variables extraction');
-            return cb();
-        });
-    }, (reason) => cb());
+        }
+        catch (err) {
+            console.error(err);
+        }
+        return cb();
+    });
 }
 function saveDecorations(document, deco) {
     document.isDirty ? _saveDirtyDecoration(document.fileName, deco) : _saveSavedDecorations(document.fileName, deco);
@@ -380,7 +417,7 @@ function activate(context) {
             q.push((cb) => updateDecorations(event.contentChanges, extension, cb));
         }
     }, null, context.subscriptions);
-    if (configuration.get('activate_variables_beta') === true) {
+    if (configuration.get('activate_variables_support_beta') === true) {
         q.push(cb => seekForColorVariables(cb));
     }
     vscode_1.window.visibleTextEditors.forEach(editor => {

@@ -8,6 +8,9 @@ This extension  your styles files looking for colors and generate a colored back
 
 ![](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/demo.gif)
 
+![](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/demo_variables.gif)
+💡 [How to enable variables support](#colorizeactivate_variables_support_beta-boolean-default-false)
+
 ## Features
 
 - 🆕 Generate colored background for css variables
@@ -85,6 +88,8 @@ By default decorations for the current line are hidden. Set this setting to fals
 ### colorize.activate_variables_support_beta _BOOLEAN_ _default: false_
 
 Set this options to true to enable variables support.
+Variables support is in beta and you might encounter bugs.
+Do not hesitate to report bugs [GitHub Issues](https://github.com/KamiKillertO/vscode-colorize/issues).
 
 ## Roadmap
 
@@ -100,10 +105,10 @@ Set this options to true to enable variables support.
 
 ## Release
 
-### Latest 0.6.0 (2017.07.12)
+### Latest 0.6.x (2017.07.12)
 
 - 💡 Hide decorations for the current line
-- Variables (css, stylus, sass, less...) beta (no decoration update)
+- Variables (css, stylus, sass, less...) beta (partial decoration update)
 - 🚀 Speed up decorations update
 
 ### 0.5.0 (2017.05.4)

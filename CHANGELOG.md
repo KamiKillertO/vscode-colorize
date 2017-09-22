@@ -1,3 +1,16 @@
+## 0.6.4
+
+- [CHANGE] Now variables created from an other variables are colorized
+- [CHANGE] Add a new gif to show variables support
+- [FIX] Do not extract variables without color (like size variables)
+
+## 0.6.4
+
+- [FIX] #62 variables not deleted
+- [FIX] stylus variables not colorized
+- [FIX] multiple deco for one variables use positions of the last one
+- [CHANGE] Split code between color and variables (not same needs)
+
 ## 0.6.3
 
 - [FIX] #62 variables not deleted
