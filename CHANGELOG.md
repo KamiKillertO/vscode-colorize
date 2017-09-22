@@ -1,4 +1,14 @@
-## 0.6.4
+## 0.6.7
+
+- [FIX] Line deletion truncate all stored variables
+- [FIX] Deleting a variable will now delete her decorations
+- [FIX] Updating a variable with an invalid color will now delete her decorations
+
+## 0.6.6
+
+- [FIX] Variables created from another variables not colorized
+
+## 0.6.5
 
 - [CHANGE] Now variables created from an other variables are colorized
 - [CHANGE] Add a new gif to show variables support

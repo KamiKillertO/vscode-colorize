@@ -39,18 +39,15 @@ class VariablesExtractor {
       return;
     }
     if (fileName === null) {
-      const variables = this.variablesDeclarations_2.get(variable);
-      variables.forEach(_ => _.dispose());
+      decorations.forEach(_ => _.dispose());
       this.variablesDeclarations_2.delete(variable);
       return;
     }
     if (line !== null) {
-      const variables = this.get(variable, fileName, line);
-      variables.forEach(_ => _.dispose());
-      decorations = decorations.filter(_ => _.declaration.fileName !== fileName && _.declaration.line !== line);
+      decorations.filter(_ => _.declaration.fileName === fileName && _.declaration.line === line).forEach(_ => _.dispose());
+      decorations = decorations.filter(_ => _.declaration.fileName !== fileName || (_.declaration.fileName === fileName && _.declaration.line !== line));
     } else {
-      const variables = this.get(variable, fileName);
-      variables.forEach(_ => _.dispose());
+      decorations.filter(_ => _.declaration.fileName === fileName).forEach(_ => _.dispose());
       decorations = decorations.filter(_ => _.declaration.fileName !== fileName);
     }
     if (decorations.length === 0) {
