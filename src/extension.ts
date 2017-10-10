@@ -22,12 +22,14 @@ import {
   StatusBarAlignment,
   Uri
 } from 'vscode';
-import VariablesExtractor from './lib/extractors/variables-extractor';
-import Color, {IColor} from './lib/color';
-import ColorUtil from './lib/color-util';
-import ColorDecoration from './lib/color-decoration';
+import Color, { IColor } from './lib/colors/color';
+import Variable from './lib/variables/variable';
+import ColorUtil, { IDecoration } from './lib/color-util';
+import ColorDecoration from './lib/colors/color-decoration';
 import Queue from './lib/queue';
-import ColorExtractor from './lib/extractors/color-extractor';
+import ColorExtractor from './lib/colors/color-extractor';
+import VariableDecoration from './lib/variables/variable-decoration';
+import VariablesManager from './lib/variables/variables-manager';
 
 let config = {
   languages: null,
@@ -37,7 +39,7 @@ let config = {
 interface ColorizeContext {
   editor: TextEditor;
   nbLine: number;
-  deco: Map < number, ColorDecoration[] >;
+  deco: Map < number, IDecoration[] >;
   currentSelection: number;
 }
 
@@ -47,8 +49,8 @@ let extension: ColorizeContext = {
   deco: null,
   currentSelection: null
 };
-let dirtyFilesDecorations: Map < string, Map < number, ColorDecoration[] > > = new Map();
-let savedFilesDecorations: Map < string, Map < number, ColorDecoration[] > > = new Map();
+let dirtyFilesDecorations: Map < string, Map < number, IDecoration[] > > = new Map();
+let savedFilesDecorations: Map < string, Map < number, IDecoration[] > > = new Map();
 
 const q = new Queue();
 
@@ -143,10 +145,23 @@ function handleLineRemoved(editedLine: TextDocumentContentChangeEvent[], positio
   editedLine.reverse();
   editedLine.forEach((line: TextDocumentContentChangeEvent) => {
     for (let i = line.range.start.line; i <= line.range.end.line; i++) {
-      VariablesExtractor.deleteVariableInLine(extension.editor.document.fileName, i);
+      VariablesManager.deleteVariableInLine(extension.editor.document.fileName, i);
     }
     positions = updatePositionsDeletion(line.range, positions);
   });
+  return editedLine;
+}
+
+function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position) {
+  editedLine = mutEditedLIne(editedLine);
+  editedLine.forEach((line) => {
+    position.forEach(position => {
+      if (position.newPosition >= line.range.start.line) {
+        position.newPosition = position.newPosition + 1;
+      }
+    });
+  });
+
   return editedLine;
 }
 
@@ -175,7 +190,7 @@ function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context: C
     }
     return true;
   });
-    let newDeco = new Map();
+  let newDeco = new Map();
   positions.forEach(position => {
     if (newDeco.has(position.newPosition)) {
       newDeco.set(position.newPosition, newDeco.get(position.newPosition).concat(context.deco.get(position.oldPosition)));
@@ -184,19 +199,6 @@ function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context: C
     }
   });
   context.deco = newDeco;
-  return editedLine;
-}
-
-function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position) {
-  editedLine = mutEditedLIne(editedLine);
-  editedLine.forEach((line) => {
-    position.forEach(position => {
-      if (position.newPosition >= line.range.start.line) {
-        position.newPosition = position.newPosition + 1;
-      }
-    });
-  });
-
   return editedLine;
 }
 
@@ -225,15 +227,16 @@ async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEve
       // lineAt raise an exception if line does not exist
       try {
         const text = context.editor.document.lineAt(range.start.line).text;
-        const variables = await ColorUtil.findColorVariables(context.editor.document.fileName, text, range.start.line);
+        await VariablesManager.findVariablesDeclarations(context.editor.document.fileName, text, range.start.line);
         const colors = await ColorUtil.findColors(text, context.editor.document.fileName);
-        return generateDecorations(colors, range.start.line, m);
+        const variables = await VariablesManager.findVariables(text, context.editor.document.fileName);
+        return generateDecorations(colors, variables, range.start.line, m);
       } catch (e) { // use promise catch instead?
         return context.deco;
       }
     })
   );
-  decorateEditor(m, context.editor, context.currentSelection);
+decorateEditor(m, context.editor, context.currentSelection);
   let it = m.entries();
   let tmp = it.next();
   while (!tmp.done) {
@@ -262,14 +265,16 @@ async function initDecorations(context: ColorizeContext, cb) {
         'line': index
       }))
       .map(async line =>  {
-        let colors = await ColorUtil.findColors(line.text, context.editor.document.fileName);
-        return generateDecorations(colors, line.line, context.deco);
+        const colors = await ColorUtil.findColors(line.text, context.editor.document.fileName);
+        const variables = await VariablesManager.findVariables(line.text, context.editor.document.fileName);
+        // const variables = [];
+        return generateDecorations(colors, variables, line.line, context.deco);
       }));
   decorateEditor(context.deco, context.editor, context.currentSelection);
   cb();
 }
 // Mut context ><
-function generateDecorations(colors: IColor[], line: number, decorations: Map<number, ColorDecoration[]>) {
+function generateDecorations(colors: IColor[], variables: Variable[], line: number, decorations: Map<number, IDecoration[]>) {
   colors.forEach((color) => {
     const decoration = ColorUtil.generateDecoration(color);
     if (decorations.has(line)) {
@@ -279,14 +284,30 @@ function generateDecorations(colors: IColor[], line: number, decorations: Map<nu
       decorations.set(line, [decoration]);
     }
   });
+  variables.forEach((variable) => {
+    const decoration = VariablesManager.generateDecoration(variable);
+    if (decorations.has(line)) {
+      decorations.set(line, decorations.get(line).concat([decoration]));
+    } else {
+      decorations.set(line, [decoration]);
+    }
+  });
   return decorations;
 }
 // Run through all decoration to generate editor's decorations
-function decorateEditor(decorations: Map<number, ColorDecoration[]>, editor: TextEditor, currentSelection: number) {
+function decorateEditor(decorations: Map<number, IDecoration[]>, editor: TextEditor, currentSelection: number) {
   let it = decorations.entries();
   let tmp = it.next();
   while (!tmp.done) {
-    let line = tmp.value[0];
+    const line = tmp.value[0];
+    const deco: IDecoration[] = tmp.value[1];
+    deco.forEach(_ => {
+      if (_ instanceof VariableDecoration) {
+        _.addUpdateCallback((decoration: VariableDecoration) => {
+          return decorateLine(editor, [decoration], decoration.currentRange.start.line);
+        });
+      }
+    });
     if (line !== currentSelection) {
       decorateLine(editor, tmp.value[1], line);
     }
@@ -294,9 +315,14 @@ function decorateEditor(decorations: Map<number, ColorDecoration[]>, editor: Tex
   }
   return;
 }
+
 // Decorate editor's decorations for one line
-function decorateLine(editor: TextEditor, decorations: ColorDecoration[], line: number) {
-  decorations.forEach(decoration => editor.setDecorations(decoration.decoration, [decoration.generateRange(line)]));
+function decorateLine(editor: TextEditor, decorations: IDecoration[], line: number) {
+  decorations.forEach((decoration: IDecoration) => {
+    if (!(<VariableDecoration>decoration).deleted) { // deleted decorations need to be removed from the deco list
+      editor.setDecorations(decoration.decoration, [decoration.generateRange(line)]);
+    }
+  });
 }
 function isLanguageSupported(languageId): boolean {
   return config.languages.indexOf(languageId) !== -1;
@@ -335,7 +361,7 @@ function colorize(editor: TextEditor, cb) {
   });
 }
 
-function getDecorations(editor: TextEditor): Map<number, ColorDecoration[]> | null  {
+function getDecorations(editor: TextEditor): Map<number, IDecoration[]> | null  {
   if (!editor.document.isDirty && savedFilesDecorations.has(editor.document.fileName)) {
     return savedFilesDecorations.get(editor.document.fileName);
   }
@@ -373,7 +399,7 @@ async function seekForColorVariables(cb) {
           'text': text,
           'line': index
         }));
-      const variables = await Promise.all(text.map(line => ColorUtil.findColorVariables(document.fileName, line.text, line.line)));
+      const variables = await Promise.all(text.map(line => VariablesManager.findVariablesDeclarations(document.fileName, line.text, line.line)));
       return variables[variables.length - 1 ];
     }));
     variables = variables[variables.length - 1];
@@ -385,15 +411,15 @@ async function seekForColorVariables(cb) {
   }
   return cb();
 }
-function saveDecorations(document: TextDocument, deco: Map<number, ColorDecoration[]>) {
+function saveDecorations(document: TextDocument, deco: Map<number, IDecoration[]>) {
   document.isDirty ? _saveDirtyDecoration(document.fileName, deco) : _saveSavedDecorations(document.fileName, deco);
 }
 
-function _saveDirtyDecoration(fileName: string, decorations: Map<number, ColorDecoration[]>) {
+function _saveDirtyDecoration(fileName: string, decorations: Map<number, IDecoration[]>) {
   return dirtyFilesDecorations.set(fileName, decorations);
 }
 
-function _saveSavedDecorations(fileName: string, decorations: Map<number, ColorDecoration[]>) {
+function _saveSavedDecorations(fileName: string, decorations: Map<number, IDecoration[]>) {
   return savedFilesDecorations.set(fileName, decorations);
 }
 
@@ -406,6 +432,7 @@ function handleTextSelectionChange(event: TextEditorSelectionChangeEvent) {
   if (event.kind !== undefined ) {
     q.push(cb => {
       if (extension.currentSelection !== null && extension.deco.get(extension.currentSelection) !== undefined) {
+        const decorations = extension.deco.get(extension.currentSelection);
         decorateLine(extension.editor, extension.deco.get(extension.currentSelection), extension.currentSelection);
       }
       extension.currentSelection =  null;

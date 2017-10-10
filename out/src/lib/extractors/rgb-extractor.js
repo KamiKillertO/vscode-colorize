@@ -1,4 +1,12 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const color_extractor_1 = require("./color-extractor");
 const color_1 = require("./../color");
@@ -12,8 +20,8 @@ class RgbExtractor {
         let rgba = value.replace(/rgb(a){0,1}\(/, '').replace(/\)/, '').split(/,/gi).map(c => parseFloat(c));
         return rgba.slice(0, 3);
     }
-    extractColors(text) {
-        return new Promise((resolve, reject) => {
+    extractColors(text, fileName = null) {
+        return __awaiter(this, void 0, void 0, function* () {
             let match = null;
             let colors = [];
             // Get rgb "like" colors
@@ -24,7 +32,7 @@ class RgbExtractor {
                     colors.push(new color_1.default(match[1], match.index, 1, this.extractRGBAValue(match[1])));
                 }
             }
-            return resolve(colors);
+            return colors;
         });
     }
     extractColor(text) {

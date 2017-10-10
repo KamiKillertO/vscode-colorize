@@ -1,6 +1,7 @@
 interface IColor {
   toRgbString(): string;
 }
+
 class Color implements IColor {
   /**
    * The extracted text corresponding to the color
@@ -64,6 +65,7 @@ class Color implements IColor {
   public toRgbString(): string {
     return `rgb(${this.rgb.join(', ')})`;
   }
+
 }
 export default Color;
 

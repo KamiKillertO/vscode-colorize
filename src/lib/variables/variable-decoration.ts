@@ -6,18 +6,24 @@ import {
   window
 } from 'vscode';
 
-import ColorUtil from './color-util';
-import Color from './color';
+import ColorUtil from '../color-util';
+import Color from '../colors/color';
+import Variable from './variable';
 
-class ColorDecoration {
+interface Observer {
+  update(args: any);
+}
+
+class VariableDecoration implements Observer {
+  private _updateCallback: Function;
   /**
-   * The color used to generate the TextEditorDecorationType
+   * The color variable used to generate the TextEditorDecorationType
    *
-   * @type {Color}
+   * @type {Variable}
    * @public
    * @memberOf ColorDecoration
    */
-  public color: Color;
+  public variable: Variable;
   /**
    * Keep track of the TextEditorDecorationType status
    *
@@ -26,6 +32,10 @@ class ColorDecoration {
    * @memberOf ColorDecoration
    */
   public disposed: boolean = false;
+
+  public deleted: boolean = false;
+
+  public currentRange: Range;
   private _decoration: TextEditorDecorationType;
   /**
    * The TextEditorDecorationType associated to the color
@@ -43,8 +53,8 @@ class ColorDecoration {
   set decoration(deco: TextEditorDecorationType) {
     this._decoration = deco;
   }
-  public constructor(color: Color) {
-    this.color = color;
+  public constructor(variable: Variable) {
+    this.variable = variable;
     this._generateDecorator();
   }
   /**
@@ -68,12 +78,14 @@ class ColorDecoration {
    * @memberOf ColorDecoration
    */
   public generateRange(line: number): Range {
-    return new Range(new Position(line, this.color.positionInText), new Position(line, this.color.positionInText + this.color.value.length));
+    const range = new Range(new Position(line, this.variable.color.positionInText), new Position(line, this.variable.color.positionInText + this.variable.color.value.length));
+    this.currentRange = range;
+    return range;
   }
 
   private _generateDecorator() {
     let textColor = null;
-    let luminance = ColorUtil.luminance(this.color);
+    let luminance = ColorUtil.luminance(this.variable.color);
     if (luminance < 0.7) {
       textColor = '#fff';
     } else {
@@ -82,11 +94,29 @@ class ColorDecoration {
     let backgroundDecorationType = window.createTextEditorDecorationType({
       borderWidth: '1px',
       borderStyle: 'solid',
-      borderColor: this.color.toRgbString(),
-      backgroundColor: this.color.toRgbString(),
+      borderColor: this.variable.color.toRgbString(),
+      backgroundColor: this.variable.color.toRgbString(),
       color: textColor
     });
     this.decoration = backgroundDecorationType;
   }
+  addUpdateCallback(callback) {
+    this._updateCallback = callback;
+  }
+  updateDecoration(color: Color) {
+    this.deleted = false;
+    this._decoration.dispose();
+    this.variable.color.rgb = color.rgb;
+    this._generateDecorator();
+    return this._updateCallback(this);
+  }
+  disposeDecoration() {
+    this.dispose();
+    this.deleted = true;
+  }
+  update(args: Object[]) {
+    const action = args[0];
+    this[`${action}Decoration`](...args.slice(1));
+  }
 }
-export default ColorDecoration;
+export default VariableDecoration;
