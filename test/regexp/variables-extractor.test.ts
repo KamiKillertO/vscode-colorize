@@ -7,6 +7,7 @@ describe('Test variables declaration Regex', () => {
   it('Should match (sass variables)', function () {
     assert.ok('$var:'.match(DECLARATION_REGEXP));
     assert.ok('$var-two:'.match(DECLARATION_REGEXP));
+    assert.ok('$var-two       :'.match(DECLARATION_REGEXP));
   });
   it('Should not match (sass variables)', function () {
     assert.notOk('$var'.match(DECLARATION_REGEXP));
@@ -17,6 +18,7 @@ describe('Test variables declaration Regex', () => {
   it('Should match (less variables)', function () {
     assert.ok('@var:'.match(DECLARATION_REGEXP));
     assert.ok('@var-two:'.match(DECLARATION_REGEXP));
+    assert.ok('@var-two       :'.match(DECLARATION_REGEXP));
   });
   it('Should not match (less variables)', function () {
     assert.notOk('@var'.match(DECLARATION_REGEXP));
@@ -30,6 +32,7 @@ describe('Test variables declaration Regex', () => {
     assert.ok('--var-:'.match(DECLARATION_REGEXP));
     assert.ok('--var--two:'.match(DECLARATION_REGEXP));
     assert.ok('--varTwo:'.match(DECLARATION_REGEXP));
+    assert.ok('--varTwo       :'.match(DECLARATION_REGEXP));
   });
   it('Should not match (css variables)', function () {
     assert.notMatch('--var', DECLARATION_REGEXP);
@@ -42,6 +45,7 @@ describe('Test variables declaration Regex', () => {
   it('Should match (stylus variables)', function () {
     assert.ok('var='.match(DECLARATION_REGEXP));
     assert.ok('var-two='.match(DECLARATION_REGEXP));
+    assert.ok('var-two      ='.match(DECLARATION_REGEXP));
   });
   it('Should not match (stylus variables)', function () {
     assert.notOk('var'.match(DECLARATION_REGEXP));
