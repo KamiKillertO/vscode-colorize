@@ -3,12 +3,12 @@ import Color from '../colors/color';
 import ColorExtractor from '../colors/color-extractor';
 
 // stylus no prefix needed and = instead of :
-export const DECLARATION_REGEXP = /(?:(?:((?:\$|@|--)(?:\w|-)+\s*):)|(\w(?:\w|-)*)\=)(?:$|"|'|,| |;|\)|\r|\n)/gi;
+export const DECLARATION_REGEXP = /(?:(?:((?:\$|@|--)(?:\w|-)+\s*):)|(\w(?:\w|-)*)\s*=)(?:$|"|'|,| |;|\)|\r|\n)/gi;
 //  \b allow to catch stylus variables names
 // export const REGEXP = /(?:((?:(?:\s|\$|@)(?:\w|-)+))|(var\((--\w+(?:-|\w)*)\)))(?:$|"|'|,| |;|\)|\r|\n)/gi;
-export const REGEXP = /(?:((?:(?:@|\s|\$)(?:(?:[a-z]|\d+[a-z])[a-z\d]*|-)+))|(var\((--\w+(?:-|\w)*)\)))(?:$|"|'|,| |;|\)|\r|\n)/gi;
+export const REGEXP = /(?:((?:(?:@|\s|\$)(?:(?:[a-z]|\d+[a-z])[a-z\d]*|-)+))|(var\((--\w+(?:-|\w)*)\)))(?:$|"|'|,| |;|\)|\r|\n)(?!\s*(?:=|:))/gi;
 
-export const REGEXP_ONE = /^(?:((?:(?:\$|@)(?:(?:[a-z]|\d+[a-z])[a-z\d]*|-)+))|(?:var\((--\w+(?:-|\w)*))\))(?:$|"|'|,| |;|\)|\r|\n)/gi;
+export const REGEXP_ONE = /^(?:((?:(?:\$|@)(?:(?:[a-z]|\d+[a-z])[a-z\d]*|-)+))|(?:var\((--\w+(?:-|\w)*))\))(?:$|"|'|,| |;|\)|\r|\n)(?!\s*(?:=|:))/gi;
 
 class VariablesExtractor {
 
@@ -116,7 +116,7 @@ class VariablesExtractor {
   public async extractDeclarations(fileName: string, text: string, line: number): Promise<Map<string, Variable[]>> {
     let match = null;
     while ((match = DECLARATION_REGEXP.exec(text)) !== null) {
-      const varName = match[1] || match[2];
+      const varName = (match[1] || match[2]).trim();
       let color = ColorExtractor.extractOneColor(text.slice(match.index + match[0].length).trim()) || this.extractOneColor(text.slice(match.index + match[0].length).trim(), fileName, line);
       if (this.has(varName, fileName, line)) {
         const decoration = this.get(varName, fileName, line);
