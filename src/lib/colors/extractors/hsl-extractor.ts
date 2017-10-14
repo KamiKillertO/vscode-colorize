@@ -1,5 +1,5 @@
 import Color from './../color';
-import ColorExtractor, { IColorExtractor } from './color-extractor';
+import ColorExtractor, { IColorExtractor } from '../color-extractor';
 
 
 export const REGEXP = /((?:hsl\(\d*\s*,\s*\d{1,3}%\s*,\s*\d{1,3}%\))|(?:hsla\(\d*\s*,\s*(?:\d{1,3}%\s*,\s*){2}(?:[0-1]|1\.0|[0](?:\.\d+){0,1}|(?:\.\d+))\)))(?:$|"|'|,| |;|\)|\r|\n)/gi;
@@ -92,7 +92,7 @@ class HSLColorExtractor implements IColorExtractor {
     return tmp_2;
   }
 
-  public async extractColors(text: string, fileName = null): Promise < Color[] >  {
+  public async extractColors(text: string): Promise < Color[] >  {
     let match = null;
     let colors: Color[] = [];
     while ((match = REGEXP.exec(text)) !== null) {

@@ -1,4 +1,12 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const flatten = arr => arr.reduce((a, b) => a.concat(Array.isArray(b) ? flatten(b) : b), []);
 class ColorExtractor {
@@ -12,13 +20,19 @@ class ColorExtractor {
     }
     has(extractor) {
         if (typeof extractor === 'string') {
-            return !!this.extractors.find(_ => _.name === extractor);
+            return this.extractors.some(_ => _.name === extractor);
         }
-        return !!this.extractors.find(_ => _.name === extractor.name);
+        return this.extractors.some(_ => _.name === extractor.name);
     }
-    extract(text) {
-        let start = Date.now();
-        return Promise.all(this.extractors.map(extractor => extractor.extractColors(text))).then(colors => {
+    get(extractor) {
+        if (this.has(extractor) === false) {
+            return null;
+        }
+        return this.extractors.find(_ => _.name === extractor);
+    }
+    extract(text, fileName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const colors = yield Promise.all(this.extractors.map(extractor => extractor.extractColors(text, fileName)));
             return flatten(colors);
         });
     }

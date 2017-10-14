@@ -1,6 +1,5 @@
-import { IColorExtractor } from './color-extractor';
-import ColorExtractor from './color-extractor';
-import Color from './../color';
+import ColorExtractor, { IColorExtractor } from '../color-extractor';
+import Color from '../color';
 
 export const REGEXP = /((?:rgb\((?:\d{1,3}\s*,\s*){2}\d{1,3}\))|(?:rgba\((?:\d{1,3}\s*,\s*){3}(?:[0-1]|1\.0|[0](?:\.\d+){0,1}|(?:\.\d+))\)))(?:$|"|'|,| |;|\)|\r|\n)/gi;
 export const REGEXP_ONE = /^((?:rgb\((?:\d{1,3}\s*,\s*){2}\d{1,3}\))|(?:rgba\((?:\d{1,3}\s*,\s*){3}(?:[0-1]|1\.0|[0](?:\.\d+){0,1}|(?:\.\d+))\)))(?:$|"|'|,| |;|\)|\r|\n)/i;
@@ -13,7 +12,7 @@ class RgbExtractor implements IColorExtractor {
     return rgba.slice(0, 3);
   }
 
-  public async extractColors(text: string, fileName = null): Promise<Color[]> {
+  public async extractColors(text: string): Promise<Color[]> {
     let match = null;
     let colors: Color[] = [];
     // Get rgb "like" colors

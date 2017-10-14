@@ -1,12 +1,22 @@
 # __Colorize__
 
-[![codebeat badge](https://codebeat.co/badges/aec222e1-64ae-4360-a849-d077040694ca)](https://codebeat.co/projects/github-com-kamikillerto-vscode-colorize) [![Build Status](https://travis-ci.org/KamiKillertO/vscode-colorize.svg?branch=master)](https://travis-ci.org/KamiKillertO/vscode-colorize) [![Build status](https://ci.appveyor.com/api/projects/status/db69dsx996bdnj4p/branch/develop?svg=true)](https://ci.appveyor.com/project/KamiKillertO/vscode-colorize/branch/develop) [![Licence](https://img.shields.io/github/license/KamiKillertO/vscode_colorize.svg)](https://github.com/KamiKillertO/vscode_colorize) ![VS Code Marketplace](https://vsmarketplacebadge.apphb.com/version-short/kamikillerto.vscode-colorize.svg)
+[![codebeat badge](https://codebeat.co/badges/aec222e1-64ae-4360-a849-d077040694ca)](https://codebeat.co/projects/github-com-kamikillerto-vscode-colorize)
+[![Build Status](https://travis-ci.org/KamiKillertO/vscode-colorize.svg?branch=master)](https://travis-ci.org/KamiKillertO/vscode-colorize)
+[![Build status](https://ci.appveyor.com/api/projects/status/db69dsx996bdnj4p/branch/develop?svg=true)](https://ci.appveyor.com/project/KamiKillertO/vscode-colorize/branch/develop)
+[![Licence](https://img.shields.io/github/license/KamiKillertO/vscode_colorize.svg)](https://github.com/KamiKillertO/vscode_colorize)
+![Version](https://vsmarketplacebadge.apphb.com/version-short/kamikillerto.vscode-colorize.svg)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/LICENSE)
+[![Installs](https://vsmarketplacebadge.apphb.com/installs/KamiKillertO.vscode-colorize.svg)](https://marketplace.visualstudio.com/items?itemName=kamikillerto.vscode-colorize)
+[![Ratings](https://vsmarketplacebadge.apphb.com/rating/kamikillerto.vscode-colorize.svg)](https://marketplace.visualstudio.com/items?itemName=kamikillerto.vscode-colorize)
 
 Instantly visualize css colors in your css/sass/less/postcss/stylus/XML... files.
 
 This extension  your styles files looking for colors and generate a colored background (using the color) for each of them.
 
 ![](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/demo.gif)
+
+![](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/demo_variables.gif)
+💡 [How to enable variables support](#colorizeactivate_variables_support_beta-boolean-default-false)
 
 ## Features
 
@@ -85,6 +95,8 @@ By default decorations for the current line are hidden. Set this setting to fals
 ### colorize.activate_variables_support_beta _BOOLEAN_ _default: false_
 
 Set this options to true to enable variables support.
+Variables support is in beta and you might encounter bugs.
+Do not hesitate to report bugs [GitHub Issues](https://github.com/KamiKillertO/vscode-colorize/issues).
 
 ## Roadmap
 
@@ -100,10 +112,10 @@ Set this options to true to enable variables support.
 
 ## Release
 
-### Latest 0.6.0 (2017.07.12)
+### Latest 0.6.x (2017.07.12)
 
 - 💡 Hide decorations for the current line
-- Variables (css, stylus, sass, less...) beta (no decoration update)
+- Variables (css, stylus, sass, less...) beta (partial decoration update)
 - 🚀 Speed up decorations update
 
 ### 0.5.0 (2017.05.4)

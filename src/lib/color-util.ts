@@ -1,14 +1,47 @@
-import Color, {IColor} from './color';
-import Variable from './variable';
-import './extractors/hexa-extractor';
-import './extractors/rgb-extractor';
-import './extractors/browser-extractor';
-import './extractors/hsl-extractor';
-import ColorExtractor from './extractors/color-extractor';
-import VariablesExtractor from './extractors/variables-extractor';
-import ColorDecoration from './color-decoration';
+import Color, {IColor} from './colors/color';
+import Variable from './variables/variable';
+import './colors/extractors/hexa-extractor';
+import './colors/extractors/rgb-extractor';
+import './colors/extractors/browser-extractor';
+import './colors/extractors/hsl-extractor';
+import ColorExtractor from './colors/color-extractor';
+import ColorDecoration from './colors/color-decoration';
+import { Range, TextEditorDecorationType } from 'vscode';
+
+interface IDecoration {
+
+  decoration: TextEditorDecorationType;
+  /**
+   * Disposed the TextEditorDecorationType
+   * (destroy the colored background)
+   *
+   * @public
+   * @memberOf IDecoration
+   */
+  dispose(): void;
+
+  /**
+   * Is `true` when the decoration has been destroyed, `false` otherwise.
+   *
+   * @public
+   * @memberOf IDecoration
+   */
+  disposed: Boolean;
+
+  /**
+   * Generate the decoration Range (start and end position in line)
+   *
+   * @param {number} line
+   * @returns {Range}
+   *
+   * @memberOf ColorDecoration
+   */
+  generateRange(line: number): Range;
+}
+
 
 class ColorUtil {
+
   /**
    * Generate the color luminance.
    * The luminance value is between 0 and 1
@@ -45,20 +78,14 @@ class ColorUtil {
    * @memberOf ColorUtil
    */
    public static async findColors(text, fileName = null): Promise < IColor[] > {
-    const colors = await ColorExtractor.extract(text, fileName);
+    const colors = await ColorExtractor.extract(text);
     return colors;
    }
 
-  public static findColorVariables(fileName, text, line): Promise <Map<String, Variable[]>> {
-    return VariablesExtractor.extractDeclarations(fileName, text, line);
-  }
-
-
-  public static generateDecoration(color: IColor) {
-    if ('declaration' in color) {
-      return new ColorDecoration((<Variable>color).color);
-    }
+  public static generateDecoration(color: IColor): IDecoration {
     return new ColorDecoration(<Color>color);
   }
 }
 export default ColorUtil;
+
+export { IDecoration };

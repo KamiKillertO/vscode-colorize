@@ -1,4 +1,4 @@
-import Color, { IColor } from './color';
+import Color, { IColor } from '../colors/color';
 
 interface FileDeclaration {
   fileName: string;
@@ -37,9 +37,18 @@ class Variable extends Observable implements IColor {
   public constructor(name: string, color: Color, declaration: FileDeclaration) {
     super();
     this.name = name;
+    // this._color = color;
     this.color = color;
     this.declaration = declaration;
   }
+
+  // public get color() {
+  //   return this._color;
+  // }
+  // public set color(c: Color) {
+  //   this._color = c;
+  //   this.notify(c);
+  // }
   /**
    * Generate the color string rgb representation
    * example :
@@ -59,7 +68,10 @@ class Variable extends Observable implements IColor {
   }
 
   public update(color: Color) {
-    this.color = color;
+    if (color === null) {
+      return this.notify(['dispose']);
+    }
+    this.color.rgb = color.rgb;
     this.notify(['update', color]);
   }
 }

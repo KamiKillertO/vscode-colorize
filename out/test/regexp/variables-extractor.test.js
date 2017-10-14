@@ -90,6 +90,7 @@ describe('Test variables use regexp', function () {
     it('Should not match (stylus variables)', function () {
         chai_1.assert.notOk('var'.match(variables_extractor_1.REGEXP));
         chai_1.assert.notOk('--'.match(variables_extractor_1.REGEXP));
+        chai_1.assert.notOk(' 120'.match(variables_extractor_1.REGEXP));
     });
 });
 //# sourceMappingURL=variables-extractor.test.js.map
