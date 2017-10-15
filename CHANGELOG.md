@@ -1,3 +1,24 @@
+## 0.6.8
+
+- [FIX] #76 - Now spaces between variables names and declarations delimiters are accepted. It means this `$myVar     :      #ffffff` is a valid variable declaration
+- [ADDED] Multi-lignes cursor support to "Hide current line decorations"
+
+## 0.6.7
+
+- [FIX] Line deletion truncate all stored variables
+- [FIX] Deleting a variable will now delete her decorations
+- [FIX] Updating a variable with an invalid color will now delete her decorations
+
+## 0.6.6
+
+- [FIX] Variables created from another variables not colorized
+
+## 0.6.5
+
+- [CHANGE] Now variables created from an other variables are colorized
+- [CHANGE] Add a new gif to show variables support
+- [FIX] Do not extract variables without color (like size variables)
+
 ## 0.6.4
 
 - [FIX] #62 variables not deleted
