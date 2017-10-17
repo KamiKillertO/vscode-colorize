@@ -276,23 +276,22 @@ async function initDecorations(context: ColorizeContext, cb) {
   cb();
 }
 
+function updateDecorationMap(map: Map<number, IDecoration[]>, line: number, decoration: IDecoration ) {
+  if (map.has(line)) {
+    map.set(line, map.get(line).concat([decoration]));
+  } else {
+    map.set(line, [decoration]);
+  }
+}
+
 function generateDecorations(colors: IColor[], variables: Variable[], line: number, decorations: Map<number, IDecoration[]>) {
   colors.forEach((color) => {
     const decoration = ColorUtil.generateDecoration(color);
-    if (decorations.has(line)) {
-      decorations.set(line, decorations.get(line).concat([decoration]));
-      // decorations.set(line, decorations.get(line).concat([new ColorDecoration(color)]));
-    } else {
-      decorations.set(line, [decoration]);
-    }
+    updateDecorationMap(decorations, line, decoration);
   });
   variables.forEach((variable) => {
     const decoration = VariablesManager.generateDecoration(variable);
-    if (decorations.has(line)) {
-      decorations.set(line, decorations.get(line).concat([decoration]));
-    } else {
-      decorations.set(line, [decoration]);
-    }
+    updateDecorationMap(decorations, line, decoration);
   });
   return decorations;
 }
