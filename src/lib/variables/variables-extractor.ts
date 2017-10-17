@@ -16,6 +16,16 @@ class VariablesExtractor {
 
   public name: string = 'VARIABLE_EXTRACTOR';
 
+  private _add(varName: string, variable: Variable) {
+    if (this.has(varName)) {
+      const decorations = this.get(varName);
+      this.variablesDeclarations_2.set(varName, decorations.concat([variable]));
+    } else {
+      this.variablesDeclarations_2.set(varName, [variable]);
+    }
+    return;
+  }
+
   public has(variable: string = null, fileName: string = null, line: number = null) {
     const declarations = this.get(variable, fileName, line);
     return declarations && declarations.length > 0;
@@ -131,12 +141,7 @@ class VariablesExtractor {
         continue;
       }
       const variable = new Variable(varName, <Color> color, {fileName, line});
-      if (this.has(varName)) {
-        const decorations = this.get(varName);
-        this.variablesDeclarations_2.set(varName, decorations.concat([variable]));
-      } else {
-        this.variablesDeclarations_2.set(varName, [variable]);
-      }
+      this._add(varName, variable);
     }
     return this.variablesDeclarations_2;
   }
