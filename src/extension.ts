@@ -167,6 +167,21 @@ function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position)
   return editedLine;
 }
 
+function filterPositions(position, deco, diffLine) {
+  if (position.newPosition === null) {
+    deco.get(position.oldPosition).forEach(decoration => decoration.dispose());
+    return false;
+  }
+  if (position.newPosition === 0 && extension.editor.document.lineCount === 1 && extension.editor.document.lineAt(0).text === '') {
+    deco.get(position.oldPosition).forEach(decoration => decoration.dispose());
+    return false;
+  }
+  if (Math.abs(position.oldPosition - position.newPosition) > Math.abs(diffLine)) {
+    position.newPosition = position.oldPosition + diffLine;
+  }
+  return true;
+}
+
 function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, diffLine: number) {
   let positions = mapKeysToArray(context.deco).map(position => Object({
     oldPosition: position,
@@ -178,29 +193,13 @@ function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context: C
   } else {
     editedLine = handleLineAdded(editedLine, positions);
   }
-  positions = positions.filter(position => {
-    if (position.newPosition === null) {
-      context.deco.get(position.oldPosition).forEach(decoration => decoration.dispose());
-      return false;
+  positions = positions.filter(position => filterPositions(position, context.deco, diffLine));
+  context.deco = positions.reduce((decorations, position) => {
+    if (decorations.has(position.newPosition)) {
+      return decorations.set(position.newPosition, decorations.get(position.newPosition).concat(context.deco.get(position.oldPosition)));
     }
-    if (position.newPosition === 0 && extension.editor.document.lineCount === 1 && extension.editor.document.lineAt(0).text === '') {
-      context.deco.get(position.oldPosition).forEach(decoration => decoration.dispose());
-      return false;
-    }
-    if (Math.abs(position.oldPosition - position.newPosition) > Math.abs(diffLine)) {
-      position.newPosition = position.oldPosition + diffLine;
-    }
-    return true;
-  });
-  let newDeco = new Map();
-  positions.forEach(position => {
-    if (newDeco.has(position.newPosition)) {
-      newDeco.set(position.newPosition, newDeco.get(position.newPosition).concat(context.deco.get(position.oldPosition)));
-    } else {
-      newDeco.set(position.newPosition, context.deco.get(position.oldPosition));
-    }
-  });
-  context.deco = newDeco;
+    return decorations.set(position.newPosition, context.deco.get(position.oldPosition));
+  }, new Map());
   return editedLine;
 }
 
@@ -275,23 +274,22 @@ async function initDecorations(context: ColorizeContext, cb) {
   cb();
 }
 
+function updateDecorationMap(map: Map<number, IDecoration[]>, line: number, decoration: IDecoration ) {
+  if (map.has(line)) {
+    map.set(line, map.get(line).concat([decoration]));
+  } else {
+    map.set(line, [decoration]);
+  }
+}
+
 function generateDecorations(colors: IColor[], variables: Variable[], line: number, decorations: Map<number, IDecoration[]>) {
   colors.forEach((color) => {
     const decoration = ColorUtil.generateDecoration(color);
-    if (decorations.has(line)) {
-      decorations.set(line, decorations.get(line).concat([decoration]));
-      // decorations.set(line, decorations.get(line).concat([new ColorDecoration(color)]));
-    } else {
-      decorations.set(line, [decoration]);
-    }
+    updateDecorationMap(decorations, line, decoration);
   });
   variables.forEach((variable) => {
     const decoration = VariablesManager.generateDecoration(variable);
-    if (decorations.has(line)) {
-      decorations.set(line, decorations.get(line).concat([decoration]));
-    } else {
-      decorations.set(line, [decoration]);
-    }
+    updateDecorationMap(decorations, line, decoration);
   });
   return decorations;
 }
@@ -462,6 +460,24 @@ function colorize(editor: TextEditor, cb) {
     return cb();
   });
 }
+
+function handleChangeActiveTextEditor(editor: TextEditor) {
+  if (extension.editor !== undefined && extension.editor !== null) {
+    saveDecorations(extension.editor.document, extension.deco);
+  }
+  window.visibleTextEditors.filter(e => e !== editor).forEach(e => {
+    q.push(cb => colorize(e, cb));
+  });
+  q.push(cb => colorize(editor, cb));
+}
+
+function handleChangeTextDocument(event: TextDocumentChangeEvent) {
+  if (extension.editor && event.document.fileName === extension.editor.document.fileName) {
+    extension.editor = window.activeTextEditor;
+    q.push((cb) => updateDecorations(event.contentChanges, extension, cb));
+  }
+}
+
 export function activate(context: ExtensionContext) {
   const configuration = workspace.getConfiguration('colorize');
   config.languages = configuration.get('languages', []);
@@ -475,22 +491,9 @@ export function activate(context: ExtensionContext) {
 
   workspace.onDidSaveTextDocument(handleCloseOpen, null, context.subscriptions);
 
-  window.onDidChangeActiveTextEditor(editor => {
-    if (extension.editor !== undefined && extension.editor !== null) {
-      saveDecorations(extension.editor.document, extension.deco);
-    }
-    window.visibleTextEditors.filter(e => e !== editor).forEach(e => {
-      q.push(cb => colorize(e, cb));
-    });
-    q.push(cb => colorize(editor, cb));
-  }, null, context.subscriptions);
+  window.onDidChangeActiveTextEditor(handleChangeActiveTextEditor, null, context.subscriptions);
 
-  workspace.onDidChangeTextDocument((event: TextDocumentChangeEvent) => {
-    if (extension.editor && event.document.fileName === extension.editor.document.fileName) {
-      extension.editor = window.activeTextEditor;
-      q.push((cb) => updateDecorations(event.contentChanges, extension, cb));
-    }
-  }, null, context.subscriptions);
+  workspace.onDidChangeTextDocument(handleChangeTextDocument, null, context.subscriptions);
 
   if (configuration.get('activate_variables_support_beta') === true) {
     q.push(cb => seekForColorVariables(cb));
