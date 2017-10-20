@@ -167,21 +167,19 @@ function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position)
   return editedLine;
 }
 
-function filterPositions(positions, deco, diffLine) {
-  return positions.filter(position => {
-    if (position.newPosition === null) {
-      deco.get(position.oldPosition).forEach(decoration => decoration.dispose());
-      return false;
-    }
-    if (position.newPosition === 0 && extension.editor.document.lineCount === 1 && extension.editor.document.lineAt(0).text === '') {
-      deco.get(position.oldPosition).forEach(decoration => decoration.dispose());
-      return false;
-    }
-    if (Math.abs(position.oldPosition - position.newPosition) > Math.abs(diffLine)) {
-      position.newPosition = position.oldPosition + diffLine;
-    }
-    return true;
-  });
+function filterPositions(position, deco, diffLine) {
+  if (position.newPosition === null) {
+    deco.get(position.oldPosition).forEach(decoration => decoration.dispose());
+    return false;
+  }
+  if (position.newPosition === 0 && extension.editor.document.lineCount === 1 && extension.editor.document.lineAt(0).text === '') {
+    deco.get(position.oldPosition).forEach(decoration => decoration.dispose());
+    return false;
+  }
+  if (Math.abs(position.oldPosition - position.newPosition) > Math.abs(diffLine)) {
+    position.newPosition = position.oldPosition + diffLine;
+  }
+  return true;
 }
 
 function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, diffLine: number) {
@@ -195,7 +193,7 @@ function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context: C
   } else {
     editedLine = handleLineAdded(editedLine, positions);
   }
-  positions = filterPositions(positions, context.deco, diffLine);
+  positions = positions.filter(position => filterPositions(position, context.deco, diffLine));
   context.deco = positions.reduce((decorations, position) => {
     if (decorations.has(position.newPosition)) {
       return decorations.set(position.newPosition, decorations.get(position.newPosition).concat(context.deco.get(position.oldPosition)));
