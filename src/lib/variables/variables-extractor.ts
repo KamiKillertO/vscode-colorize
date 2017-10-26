@@ -1,7 +1,7 @@
 import Variable from './variable';
 import Color from '../colors/color';
 import ColorExtractor from '../colors/color-extractor';
-
+import { dirname } from 'path';
 // stylus no prefix needed and = instead of :
 export const DECLARATION_REGEXP = /(?:(?:((?:\$|@|--)(?:\w|-)+\s*):)|(\w(?:\w|-)*)\s*=)(?:$|"|'|,| |;|\)|\r|\n)/gi;
 //  \b allow to catch stylus variables names
@@ -41,6 +41,31 @@ class VariablesExtractor {
       decorations = decorations.filter(_ => _.declaration.line === line);
     }
     return decorations;
+  }
+
+  public findClosestDeclaration(variable, file) {
+    let decorations = this.get(variable, file);
+    decorations = decorations.sort((a, b) => a.declaration.line - b.declaration.line);
+    if (decorations.length !== 0) {
+      return decorations;
+    }
+    decorations = this.get(variable);
+    if (decorations.length === 0) {
+      return;
+    }
+    decorations = this.filterDecorations(decorations, file);
+    decorations = decorations.sort((a, b) => a.declaration.line - b.declaration.line);
+    return decorations;
+    // here should check all declaration file to find the closest (parent folder)
+  }
+  private filterDecorations(decorations, file) {
+    file = dirname(file);
+    let r = new RegExp(`^${file}`);
+    let decorationsFound = decorations.filter((deco: Variable) => r.test(deco.declaration.fileName));
+    if (decorationsFound.length !== 0) {
+      return decorationsFound;
+    }
+    return this.filterDecorations(decorations, file);
   }
 
   public delete(variable: string, fileName: string, line: number) {
@@ -92,17 +117,12 @@ class VariablesExtractor {
       if (!this.has(varName)) {
         continue;
       }
-
-      let decorations = this.get(varName, fileName);
-      decorations = decorations.sort((a, b) => a.declaration.line - b.declaration.line);
-      if (decorations.length === 0) {
-        decorations = this.get(varName);
-      }
+      let decorations = this.findClosestDeclaration(varName, fileName);
       if (decorations.length === 0) {
         this.variablesDeclarations_2.delete(varName);
         continue;
       }
-      let deco = Object.create(decorations[decorations.length - 1]);
+      let deco = Object.create(decorations.pop());
       deco.color = new Color(value, match.index + spaces, deco.color.alpha, deco.color.rgb);
       colors.push(deco);
     }
