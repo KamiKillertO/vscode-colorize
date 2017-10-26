@@ -8,6 +8,7 @@ platform:
 
 install:
   - ps: Install-Product node 8
+  - npm install
 
 cache:
  - node_modules
