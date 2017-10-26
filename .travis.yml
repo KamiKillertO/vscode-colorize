@@ -5,7 +5,6 @@ language: node_js
 node_js:
   - "8"
 cache:
-  yarn: true
   directories:
     - node_modules
 os:
@@ -21,9 +20,9 @@ before_install:
   - export PATH=$HOME/.yarn/bin:$PATH
 
 install:
-  - yarn
-  - yarn lint
-  - yarn run vscode:prepublish
+  - npm i
+  - npm run lint
+  - npm run vscode:prepublish
 
 script:
-  - yarn test --silent
+  - npm test --silent

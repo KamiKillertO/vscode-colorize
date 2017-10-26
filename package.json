@@ -7,7 +7,7 @@
   "license": "Apache-2.0",
   "icon": "assets/logo.png",
   "engines": {
-    "vscode": "^1.10.0"
+    "vscode": "^1.17.0"
   },
   "categories": [
     "Other"

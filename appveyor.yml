@@ -8,17 +8,17 @@ platform:
 
 install:
   - ps: Install-Product node 8
-  - yarn
 
 cache:
- - "%LOCALAPPDATA%\\Yarn"
+ - node_modules
+ - "%APPDATA%\\npm-cache"
 
 test_script:
   - node --version
-  - yarn --version
-  - yarn lint
-  - yarn vscode:prepublish
-  - yarn test --silent
+  - npm --version
+  - npm run lint
+  - npm run vscode:prepublish
+  - npm run test --silent
 #  - .\scripts\test.bat
 #  - .\scripts\test-integration.bat
 
