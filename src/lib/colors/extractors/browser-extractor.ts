@@ -744,10 +744,11 @@ export const COLORS = Object({
     }
 });
 
-export const REGEXP = (() => RegExp(`(?:,| |\\(|:)(${Object.keys(COLORS).map((color) => `(?:${color.toLowerCase()})`).join('|')})(?:$|,| |;|\\)|\\r|\\n)`, 'i'))();
+const REGEXP_BASE = Object.keys(COLORS).map((color) => `(?:${color.toLowerCase()})`).join('|');
+export const REGEXP = (() => RegExp(`(?:,| |\\(|:)(${REGEXP_BASE})(?:$|,| |;|\\)|\\r|\\n)`, 'i'))();
 // export const REGEXP_ONE = (() => RegExp(`^(?:,| |\\(|:)(${Object.keys(COLORS).map((color) => `(?:${color.toLowerCase()})`).join('|')})(?:$|,| |;|\\)|\\r|\\n)`, 'i'))();
 // Checking for beginning beginning allow to catch stylus var value
-export const REGEXP_ONE = (() => RegExp(`^(?:^|,|\s|\\(|:)(${Object.keys(COLORS).map((color) => `(?:${color.toLowerCase()})`).join('|')})(?:$|,| |;|\\)|\\r|\\n)`, 'i'))();
+export const REGEXP_ONE = (() => RegExp(`^(?:^|,|\s|\\(|:)(${REGEXP_BASE})(?:$|,| |;|\\)|\\r|\\n)`, 'i'))();
 
 class BrowsersColorExtractor implements IColorExtractor {
   public name: string = 'BROWSERS_COLORS_EXTRACTOR';
