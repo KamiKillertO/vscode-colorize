@@ -8,13 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-require("./extractors/hexa-extractor");
-require("./extractors/rgb-extractor");
-require("./extractors/browser-extractor");
-require("./extractors/hsl-extractor");
-const color_extractor_1 = require("./extractors/color-extractor");
-const variables_extractor_1 = require("./extractors/variables-extractor");
-const color_decoration_1 = require("./color-decoration");
+require("./colors/extractors/hexa-extractor");
+require("./colors/extractors/rgb-extractor");
+require("./colors/extractors/browser-extractor");
+require("./colors/extractors/hsl-extractor");
+const color_extractor_1 = require("./colors/color-extractor");
+const color_decoration_1 = require("./colors/color-decoration");
 class ColorUtil {
     /**
      * Generate the color luminance.
@@ -54,22 +53,12 @@ class ColorUtil {
      */
     static findColors(text, fileName = null) {
         return __awaiter(this, void 0, void 0, function* () {
-            const colors = yield color_extractor_1.default.extract(text, fileName);
+            const colors = yield color_extractor_1.default.extract(text);
             return colors;
         });
     }
-    static findColorVariables(fileName, text, line) {
-        return variables_extractor_1.default.extractDeclarations(fileName, text, line);
-    }
     static generateDecoration(color) {
-        if ('declaration' in color) {
-            return new color_decoration_1.default(color.color);
-        }
-        const deco = new color_decoration_1.default(color);
-        if ('_variable' in color) {
-            color._variable.registerObserver(deco);
-        }
-        return deco;
+        return new color_decoration_1.default(color);
     }
 }
 exports.default = ColorUtil;

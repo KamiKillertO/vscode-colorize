@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const chai_1 = require("chai");
-const hexa_extractor_1 = require("../../src/lib/extractors/hexa-extractor");
+const hexa_extractor_1 = require("../../src/lib/colors/extractors/hexa-extractor");
 // Defines a Mocha test suite to group tests of similar kind together
 describe('Test CSS hexa shorthand color Regex', () => {
     it('Should match color with only integer', function () {

@@ -355,45 +355,6 @@ function _saveSavedDecorations(fileName: string, decorations: Map<number, IDecor
   return savedFilesDecorations.set(fileName, decorations);
 }
 
-async function seekForColorVariables(cb) {
-
-  const statusBar = window.createStatusBarItem(StatusBarAlignment.Right);
-
-  statusBar.text = 'Fetching files...';
-  statusBar.show();
-  console.time('Start variables extraction');
-  console.time('Start files search');
-  // not so bad
-  try {
-    // add options for include/excludes folders
-    const files = await workspace.findFiles('{**/*.css,**/*.sass,**/*.scss,**/*.less,**/*.pcss,**/*.sss,**/*.stylus,**/*.styl}', '{**/.git,**/.svn,**/.hg,**/CVS,**/.DS_Store,**/.git,**/node_modules,**/bower_components,**/tmp,**/dist,**/tests}');
-    console.timeEnd('Start files search');
-    statusBar.text = `Found ${files.length} files`;
-    // a little bit slower
-    console.time('Variables extraction v2');
-    let variables: any = await Promise.all(files.map(async (file: Uri) => {
-      const document: TextDocument =  await workspace.openTextDocument(file.path);
-      if (canColorize(document) === false) {
-        return;
-      }
-      const text = document.getText()
-        .split(/\n/)
-        .map((text, index) => Object({
-          'text': text,
-          'line': index
-        }));
-      const variables = await Promise.all(text.map(line => VariablesManager.findVariablesDeclarations(document.fileName, line.text, line.line)));
-      return variables[variables.length - 1 ];
-    }));
-    variables = variables[variables.length - 1];
-    statusBar.text = `Found ${variables.size} variables`;
-    console.timeEnd('Variables extraction v2');
-    console.timeEnd('Start variables extraction');
-  } catch (err) {
-    console.error(err);
-  }
-  return cb();
-}
 
 function handleTextSelectionChange(event: TextEditorSelectionChangeEvent) {
   if (event.textEditor !== extension.editor) {
@@ -496,7 +457,8 @@ export function activate(context: ExtensionContext) {
   workspace.onDidChangeTextDocument(handleChangeTextDocument, null, context.subscriptions);
 
   if (configuration.get('activate_variables_support_beta') === true) {
-    q.push(cb => seekForColorVariables(cb));
+    // q.push(cb => seekForColorVariables(cb));
+    q.push(cb => VariablesManager.getWorkspaceVariables().then(cb));
   }
 
   window.visibleTextEditors.forEach(editor => {
@@ -515,3 +477,5 @@ export function deactivate() {
   savedFilesDecorations.clear();
   savedFilesDecorations = null;
 }
+
+export { canColorize };
