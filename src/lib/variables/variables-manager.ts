@@ -52,7 +52,6 @@ class VariablesManager {
     });
   }
 
-
   public static findVariablesDeclarations(fileName, text, line): Promise <Map<String, Variable[]>> {
     return VariablesExtractor.extractDeclarations(fileName, text, line);
   }
