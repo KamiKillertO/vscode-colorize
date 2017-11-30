@@ -6,7 +6,7 @@ import {
   window
 } from 'vscode';
 
-import ColorUtil from '../color-util';
+import { colorLuminance } from '../color-util';
 import Color from './color';
 
 
@@ -76,7 +76,7 @@ class ColorDecoration {
 
   private _generateDecorator() {
     let textColor = null;
-    let luminance = ColorUtil.luminance(this.color);
+    let luminance = colorLuminance(this.color);
     if (luminance < 0.7) {
       textColor = '#fff';
     } else {

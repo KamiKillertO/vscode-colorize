@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const chai_1 = require("chai");
 const color_util_1 = require("../src/lib/color-util");
-const color_1 = require("../src/lib/color");
+const color_1 = require("../src/lib/colors/color");
 describe('Test utility fonction', () => {
     it('Should not extract invalid colors from a text', () => __awaiter(this, void 0, void 0, function* () {
         const colors = yield color_util_1.default.findColors('#ffg, rgb(323,123,123)');

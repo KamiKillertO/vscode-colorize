@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const chai_1 = require("chai");
-const hsl_extractor_1 = require("../../src/lib/extractors/hsl-extractor");
+const hsl_extractor_1 = require("../../src/lib/colors/extractors/hsl-extractor");
 describe('Test hsl(a) color Regex', () => {
     it('Should match a simple hsl color', function () {
         chai_1.assert.ok('hsl(200,10%,10%)'.match(hsl_extractor_1.REGEXP));
