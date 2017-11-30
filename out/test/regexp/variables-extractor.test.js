@@ -1,13 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const chai_1 = require("chai");
-const variables_extractor_1 = require("../../src/lib/extractors/variables-extractor");
+const variables_extractor_1 = require("../../src/lib/variables/variables-extractor");
 // Defines a Mocha test suite to group tests of similar kind together
 describe('Test variables declaration Regex', () => {
     // Sass
     it('Should match (sass variables)', function () {
         chai_1.assert.ok('$var:'.match(variables_extractor_1.DECLARATION_REGEXP));
         chai_1.assert.ok('$var-two:'.match(variables_extractor_1.DECLARATION_REGEXP));
+        chai_1.assert.ok('$var-two       :'.match(variables_extractor_1.DECLARATION_REGEXP));
     });
     it('Should not match (sass variables)', function () {
         chai_1.assert.notOk('$var'.match(variables_extractor_1.DECLARATION_REGEXP));
@@ -17,6 +18,7 @@ describe('Test variables declaration Regex', () => {
     it('Should match (less variables)', function () {
         chai_1.assert.ok('@var:'.match(variables_extractor_1.DECLARATION_REGEXP));
         chai_1.assert.ok('@var-two:'.match(variables_extractor_1.DECLARATION_REGEXP));
+        chai_1.assert.ok('@var-two       :'.match(variables_extractor_1.DECLARATION_REGEXP));
     });
     it('Should not match (less variables)', function () {
         chai_1.assert.notOk('@var'.match(variables_extractor_1.DECLARATION_REGEXP));
@@ -29,6 +31,7 @@ describe('Test variables declaration Regex', () => {
         chai_1.assert.ok('--var-:'.match(variables_extractor_1.DECLARATION_REGEXP));
         chai_1.assert.ok('--var--two:'.match(variables_extractor_1.DECLARATION_REGEXP));
         chai_1.assert.ok('--varTwo:'.match(variables_extractor_1.DECLARATION_REGEXP));
+        chai_1.assert.ok('--varTwo       :'.match(variables_extractor_1.DECLARATION_REGEXP));
     });
     it('Should not match (css variables)', function () {
         chai_1.assert.notMatch('--var', variables_extractor_1.DECLARATION_REGEXP);
@@ -40,6 +43,7 @@ describe('Test variables declaration Regex', () => {
     it('Should match (stylus variables)', function () {
         chai_1.assert.ok('var='.match(variables_extractor_1.DECLARATION_REGEXP));
         chai_1.assert.ok('var-two='.match(variables_extractor_1.DECLARATION_REGEXP));
+        chai_1.assert.ok('var-two      ='.match(variables_extractor_1.DECLARATION_REGEXP));
     });
     it('Should not match (stylus variables)', function () {
         chai_1.assert.notOk('var'.match(variables_extractor_1.DECLARATION_REGEXP));
