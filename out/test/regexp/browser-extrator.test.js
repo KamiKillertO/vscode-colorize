@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const chai_1 = require("chai");
-const browser_extractor_1 = require("../../src/lib/extractors/browser-extractor");
+const browser_extractor_1 = require("../../src/lib/colors/extractors/browser-extractor");
 // Defines a Mocha test suite to group tests of similar kind together
 describe('Test browser predefined color Regex', () => {
     it('white should match', function () {

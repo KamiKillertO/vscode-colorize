@@ -1,3 +1,7 @@
+## 0.6.9
+
+- [CHANGE] Now variables decorations are generated using the closest declaration
+
 ## 0.6.8
 
 - [FIX] #76 - Now spaces between variables names and declarations delimiters are accepted. It means this `$myVar     :      #ffffff` is a valid variable declaration
