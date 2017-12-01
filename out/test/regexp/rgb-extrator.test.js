@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const chai_1 = require("chai");
-const rgb_extractor_1 = require("../../src/lib/extractors/rgb-extractor");
+const rgb_extractor_1 = require("../../src/lib/colors/extractors/rgb-extractor");
 describe('Test rgb(a) color Regex', () => {
     it('Should match a simple rgb color', function () {
         chai_1.assert.ok('rgb(123,123,123)'.match(rgb_extractor_1.REGEXP));
