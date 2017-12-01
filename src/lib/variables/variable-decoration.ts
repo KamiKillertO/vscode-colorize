@@ -6,7 +6,7 @@ import {
   window
 } from 'vscode';
 
-import ColorUtil from '../color-util';
+import { colorLuminance } from '../color-util';
 import Color from '../colors/color';
 import Variable from './variable';
 
@@ -85,7 +85,7 @@ class VariableDecoration implements Observer {
 
   private _generateDecorator() {
     let textColor = null;
-    let luminance = ColorUtil.luminance(this.variable.color);
+    let luminance = colorLuminance(this.variable.color);
     if (luminance < 0.7) {
       textColor = '#fff';
     } else {
@@ -111,7 +111,7 @@ class VariableDecoration implements Observer {
     return this._updateCallback(this);
   }
   disposeDecoration() {
-    this.dispose();
+    this.dispose(); // should trigger new search for this variable?
     this.deleted = true;
   }
   update(args: Object[]) {

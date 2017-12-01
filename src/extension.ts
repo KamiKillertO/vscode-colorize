@@ -20,7 +20,8 @@ import {
   // TextEditorSelectionChangeKind,
   Selection,
   StatusBarAlignment,
-  Uri
+  Uri,
+  WorkspaceConfiguration
 } from 'vscode';
 import Color, { IColor } from './lib/colors/color';
 import Variable from './lib/variables/variable';
@@ -30,7 +31,7 @@ import Queue from './lib/queue';
 import ColorExtractor from './lib/colors/color-extractor';
 import VariableDecoration from './lib/variables/variable-decoration';
 import VariablesManager from './lib/variables/variables-manager';
-
+import CacheManager from './lib/cache-manager';
 import EditorManager from './lib/editor-manager';
 
 let config = {
@@ -51,8 +52,6 @@ let extension: ColorizeContext = {
   deco: null,
   currentSelection: null
 };
-let dirtyFilesDecorations: Map < string, Map < number, IDecoration[] > > = new Map();
-let savedFilesDecorations: Map < string, Map < number, IDecoration[] > > = new Map();
 
 const q = new Queue();
 
@@ -252,9 +251,9 @@ async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEve
   cb();
 }
 
-async function initDecorations(context: ColorizeContext, cb) {
+async function initDecorations(context: ColorizeContext) {
   if (!context.editor) {
-    return cb();
+    return;
   }
   let text = context.editor.document.getText();
   let n: number = context.editor.document.lineCount;
@@ -270,8 +269,7 @@ async function initDecorations(context: ColorizeContext, cb) {
         // const variables = [];
         return generateDecorations(colors, variables, line.line, context.deco);
       }));
-  EditorManager.decorate(context.editor, context.deco, context.currentSelection);
-  cb();
+  return EditorManager.decorate(context.editor, context.deco, context.currentSelection);
 }
 
 function updateDecorationMap(map: Map<number, IDecoration[]>, line: number, decoration: IDecoration ) {
@@ -322,85 +320,12 @@ function isFileExtensionSupported(fileName: string): boolean {
 function canColorize(document: TextDocument) {
   return isLanguageSupported(document.languageId) || isFileExtensionSupported(document.fileName);
 }
-/**
- * Return the saved decorations for a document or return null if the file has never been opened before.
- *
- * @param {TextEditor} editor
- * @returns {(Map<number, IDecoration[]> | null)}
- */
-function getSavedDecorations(document: TextDocument): Map<number, IDecoration[]> | null  {
-  if (!document.isDirty && savedFilesDecorations.has(document.fileName)) {
-    return savedFilesDecorations.get(document.fileName);
-  }
-  if (dirtyFilesDecorations.has(document.fileName)) {
-    return dirtyFilesDecorations.get(document.fileName);
-  }
-  return null;
-}
-/**
- * Save a file decorations
- *
- * @param {TextDocument} document
- * @param {Map<number, IDecoration[]>} deco
- */
-function saveDecorations(document: TextDocument, deco: Map<number, IDecoration[]>) {
-  document.isDirty ? _saveDirtyDecoration(document.fileName, deco) : _saveSavedDecorations(document.fileName, deco);
-}
-
-function _saveDirtyDecoration(fileName: string, decorations: Map<number, IDecoration[]>) {
-  return dirtyFilesDecorations.set(fileName, decorations);
-}
-
-function _saveSavedDecorations(fileName: string, decorations: Map<number, IDecoration[]>) {
-  return savedFilesDecorations.set(fileName, decorations);
-}
-
-async function seekForColorVariables(cb) {
-
-  const statusBar = window.createStatusBarItem(StatusBarAlignment.Right);
-
-  statusBar.text = 'Fetching files...';
-  statusBar.show();
-  console.time('Start variables extraction');
-  console.time('Start files search');
-  // not so bad
-  try {
-    // add options for include/excludes folders
-    const files = await workspace.findFiles('{**/*.css,**/*.sass,**/*.scss,**/*.less,**/*.pcss,**/*.sss,**/*.stylus,**/*.styl}', '{**/.git,**/.svn,**/.hg,**/CVS,**/.DS_Store,**/.git,**/node_modules,**/bower_components,**/tmp,**/dist,**/tests}');
-    console.timeEnd('Start files search');
-    statusBar.text = `Found ${files.length} files`;
-    // a little bit slower
-    console.time('Variables extraction v2');
-    let variables: any = await Promise.all(files.map(async (file: Uri) => {
-      const document: TextDocument =  await workspace.openTextDocument(file.path);
-      if (canColorize(document) === false) {
-        return;
-      }
-      const text = document.getText()
-        .split(/\n/)
-        .map((text, index) => Object({
-          'text': text,
-          'line': index
-        }));
-      const variables = await Promise.all(text.map(line => VariablesManager.findVariablesDeclarations(document.fileName, line.text, line.line)));
-      return variables[variables.length - 1 ];
-    }));
-    variables = variables[variables.length - 1];
-    statusBar.text = `Found ${variables.size} variables`;
-    console.timeEnd('Variables extraction v2');
-    console.timeEnd('Start variables extraction');
-  } catch (err) {
-    console.error(err);
-  }
-  return cb();
-}
 
 function handleTextSelectionChange(event: TextEditorSelectionChangeEvent) {
   if (event.textEditor !== extension.editor) {
     return;
   }
   // if (event.kind !== TextEditorSelectionChangeKind.Mouse || event.kind === TextEditorSelectionChangeKind.Keyboard ) { // 'command' kind is fired when click occur inside a selected zone
-  // vscode issue?
   if (event.kind === undefined ) {
     return;
   }
@@ -428,15 +353,14 @@ function handleTextSelectionChange(event: TextEditorSelectionChangeEvent) {
 function handleCloseOpen(document) {
   q.push((cb) => {
     if (extension.editor && extension.editor.document.fileName === document.fileName) {
-      saveDecorations(document, extension.deco);
+      CacheManager.saveDecorations(document, extension.deco);
       return cb();
     }
     return cb();
   });
 }
 
-
-function colorize(editor: TextEditor, cb) {
+async function colorize(editor: TextEditor, cb) {
   if (!editor) {
     return cb();
   }
@@ -445,7 +369,7 @@ function colorize(editor: TextEditor, cb) {
   }
   extension.editor = editor;
   extension.currentSelection = [];
-  const deco = getSavedDecorations(editor.document);
+  const deco = CacheManager.getCachedDecorations(editor.document);
   if (deco) {
     extension.deco = deco;
     extension.nbLine = editor.document.lineCount;
@@ -455,15 +379,14 @@ function colorize(editor: TextEditor, cb) {
   extension.deco = new Map();
   extension.nbLine = editor.document.lineCount;
 
-  return initDecorations(extension, () => {
-    saveDecorations(extension.editor.document, extension.deco);
-    return cb();
-  });
+  await initDecorations(extension);
+  CacheManager.saveDecorations(extension.editor.document, extension.deco);
+  return cb();
 }
 
 function handleChangeActiveTextEditor(editor: TextEditor) {
   if (extension.editor !== undefined && extension.editor !== null) {
-    saveDecorations(extension.editor.document, extension.deco);
+    CacheManager.saveDecorations(extension.editor.document, extension.deco);
   }
   window.visibleTextEditors.filter(e => e !== editor).forEach(e => {
     q.push(cb => colorize(e, cb));
@@ -478,15 +401,11 @@ function handleChangeTextDocument(event: TextDocumentChangeEvent) {
   }
 }
 
-export function activate(context: ExtensionContext) {
-  const configuration = workspace.getConfiguration('colorize');
-  config.languages = configuration.get('languages', []);
-  config.filesExtensions = configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`));
+function initEventListeners(context: ExtensionContext, configuration: WorkspaceConfiguration) {
 
   if (configuration.get('hide_current_line_decorations') === true) {
     window.onDidChangeTextEditorSelection(handleTextSelectionChange, null, context.subscriptions);
   }
-
   workspace.onDidCloseTextDocument(handleCloseOpen, null, context.subscriptions);
 
   workspace.onDidSaveTextDocument(handleCloseOpen, null, context.subscriptions);
@@ -494,9 +413,20 @@ export function activate(context: ExtensionContext) {
   window.onDidChangeActiveTextEditor(handleChangeActiveTextEditor, null, context.subscriptions);
 
   workspace.onDidChangeTextDocument(handleChangeTextDocument, null, context.subscriptions);
+}
+
+export function activate(context: ExtensionContext) {
+  const configuration: WorkspaceConfiguration = workspace.getConfiguration('colorize');
+  config.languages = configuration.get('languages', []);
+  config.filesExtensions = configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`));
 
   if (configuration.get('activate_variables_support_beta') === true) {
-    q.push(cb => seekForColorVariables(cb));
+    q.push(cb => VariablesManager.getWorkspaceVariables().then(() => {
+      initEventListeners(context, configuration);
+      return cb();
+    }));
+  } else {
+    initEventListeners(context, configuration);
   }
 
   window.visibleTextEditors.forEach(editor => {
@@ -510,8 +440,7 @@ export function deactivate() {
   extension.editor = null;
   extension.deco.clear();
   extension.deco = null;
-  dirtyFilesDecorations.clear();
-  dirtyFilesDecorations = null;
-  savedFilesDecorations.clear();
-  savedFilesDecorations = null;
+  CacheManager.clearCache();
 }
+
+export { canColorize };
