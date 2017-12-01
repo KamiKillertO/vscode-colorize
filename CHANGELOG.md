@@ -1,3 +1,8 @@
+## 0.6.10
+
+- [IMPROVE] Wait for the end of the variables extraction before settings files/editor changes listener. Previous behavior were causing multiple useless call to the CacheManager
+- Continue code splitting.
+
 ## 0.6.9
 
 - [CHANGE] Now variables decorations are generated using the closest declaration
