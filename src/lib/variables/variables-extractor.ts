@@ -130,10 +130,12 @@ class VariablesExtractor {
   }
   // Need to be updated
   public extractOneColor(text: string, fileName, line): Color {
-    let match: RegExpMatchArray = text.match(REGEXP_ONE);
+    let match: RegExpExecArray = REGEXP_ONE.exec(text);
+    REGEXP_ONE.exec(text); // prevent null return for later calls
+
     if (match && this.has(match[0])) {
       // // match[2] for css variables
-      let varName =  match[0] || match[1];
+      let varName =  match[1] || match[2];
       let variables: Variable[] = [].concat(this.get(varName, fileName, line));
       if (variables.length === 0) {
         variables = [].concat(this.get(varName));
