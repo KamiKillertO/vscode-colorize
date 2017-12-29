@@ -2,7 +2,7 @@
   "name": "vscode-colorize",
   "displayName": "colorize",
   "description": "A vscode extension to help visualize css colors in files.",
-  "version": "0.6.10",
+  "version": "0.6.11",
   "publisher": "kamikillerto",
   "license": "Apache-2.0",
   "icon": "assets/logo.png",
@@ -91,12 +91,12 @@
   },
   "devDependencies": {
     "@types/chai": "3.4.35",
-    "@types/mocha": "2.2.43",
-    "@types/node": "8.0.34",
+    "@types/mocha": "2.2.45",
+    "@types/node": "8.5.2",
     "chai": "4.1.2",
-    "mocha": "3.3.0",
+    "mocha": "4.1.0",
     "tslint": "5.8.0",
     "typescript": "2.6.1",
-    "vscode": "1.1.7"
+    "vscode": "1.1.10"
   }
 }

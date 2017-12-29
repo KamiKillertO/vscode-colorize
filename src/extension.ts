@@ -231,7 +231,7 @@ async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEve
         const colors = await ColorUtil.findColors(text, context.editor.document.fileName);
         const variables = await VariablesManager.findVariables(text, context.editor.document.fileName);
         return generateDecorations(colors, variables, range.start.line, m);
-      } catch (e) { // use promise catch instead?
+      } catch (e) {
         return context.deco;
       }
     })
@@ -378,8 +378,11 @@ async function colorize(editor: TextEditor, cb) {
   }
   extension.deco = new Map();
   extension.nbLine = editor.document.lineCount;
-
-  await initDecorations(extension);
+  try {
+    await initDecorations(extension);
+  } catch (error) {
+    // handle promise rejection
+  }
   CacheManager.saveDecorations(extension.editor.document, extension.deco);
   return cb();
 }
@@ -421,10 +424,15 @@ export function activate(context: ExtensionContext) {
   config.filesExtensions = configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`));
 
   if (configuration.get('activate_variables_support_beta') === true) {
-    q.push(cb => VariablesManager.getWorkspaceVariables().then(() => {
-      initEventListeners(context, configuration);
+    q.push(async cb => {
+      try {
+        await VariablesManager.getWorkspaceVariables();
+        initEventListeners(context, configuration);
+      } catch (error) {
+        // handle promise rejection
+      }
       return cb();
-    }));
+    });
   } else {
     initEventListeners(context, configuration);
   }
