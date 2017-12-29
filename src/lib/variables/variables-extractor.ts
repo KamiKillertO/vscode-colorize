@@ -60,8 +60,8 @@ class VariablesExtractor {
   }
   private filterDecorations(decorations, file) {
     file = dirname(file);
-    let r = new RegExp(`^${file}`);
-    let decorationsFound = decorations.filter((deco: Variable) => r.test(deco.declaration.fileName));
+    let r = new RegExp(`^${encodeURI(file)}`);
+    let decorationsFound = decorations.filter((deco: Variable) => r.test(encodeURI(deco.declaration.fileName)));
     if (decorationsFound.length !== 0) {
       return decorationsFound;
     }
