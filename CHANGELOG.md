@@ -1,3 +1,9 @@
+## 0.6.11
+
+- [FIX] #97 - find closest declarations on windows not working due to trailing `\`
+- [FIX] Variables ending with ';' not extracted
+- [IMPROVE] Add more error handling
+
 ## 0.6.10
 
 - [IMPROVE] Wait for the end of the variables extraction before settings files/editor changes listener. Previous behavior were causing multiple useless call to the CacheManager
