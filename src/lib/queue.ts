@@ -25,7 +25,11 @@ class Queue {
     let action = this._queue.shift();
     if (action) {
       this._running = true;
-      action(this._next.bind(this));
+      try {
+        action(this._next.bind(this));
+      } catch (error) {
+        this._next.call(this);
+      }
     }
   }
 }
