@@ -91,12 +91,12 @@
   },
   "devDependencies": {
     "@types/chai": "3.4.35",
-    "@types/mocha": "2.2.43",
-    "@types/node": "8.0.34",
+    "@types/mocha": "2.2.45",
+    "@types/node": "8.5.2",
     "chai": "4.1.2",
     "mocha": "4.1.0",
     "tslint": "5.8.0",
     "typescript": "2.6.1",
-    "vscode": "1.1.7"
+    "vscode": "1.1.10"
   }
 }
