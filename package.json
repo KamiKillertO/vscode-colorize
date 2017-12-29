@@ -97,6 +97,6 @@
     "mocha": "3.3.0",
     "tslint": "5.8.0",
     "typescript": "2.6.1",
-    "vscode": "1.1.7"
+    "vscode": "1.1.10"
   }
 }
