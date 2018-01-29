@@ -6,8 +6,9 @@ import {
   window
 } from 'vscode';
 
-import { colorLuminance } from '../color-util';
+import { colorLuminance, generateOptimalTextColor } from '../color-util';
 import Color from './color';
+import color from './color';
 
 
 class ColorDecoration {
@@ -75,19 +76,12 @@ class ColorDecoration {
   }
 
   private _generateDecorator() {
-    let textColor = null;
-    let luminance = colorLuminance(this.color);
-    if (luminance < 0.7) {
-      textColor = '#fff';
-    } else {
-      textColor = '#000';
-    }
     let backgroundDecorationType = window.createTextEditorDecorationType({
       borderWidth: '1px',
       borderStyle: 'solid',
       borderColor: this.color.toRgbString(),
       backgroundColor: this.color.toRgbString(),
-      color: textColor
+      color: generateOptimalTextColor(this.color)
     });
     this.decoration = backgroundDecorationType;
   }
