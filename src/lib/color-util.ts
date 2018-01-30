@@ -8,8 +8,10 @@ import ColorExtractor from './colors/color-extractor';
 import ColorDecoration from './colors/color-decoration';
 import { Range, TextEditorDecorationType } from 'vscode';
 
-interface IDecoration {
+const WHITE = '#FFFFFF',
+      BLACK = '#000000';
 
+interface IDecoration {
   decoration: TextEditorDecorationType;
   /**
    * Disposed the TextEditorDecorationType
@@ -72,19 +74,35 @@ class ColorUtil {
    * @returns {number}
    */
 function colorLuminance(color: Color): number {
-    let rgb = color.rgb;
-    rgb = rgb.map(c => {
-      c = c / 255;
-      if (c < 0.03928) {
-        c = c / 12.92;
-      } else {
-        c = (c + .055) / 1.055;
-        c = Math.pow(c, 2.4);
-      }
-      return c;
-    });
-    return (0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]);
+  let rgb = color.rgb;
+  rgb = rgb.map(c => {
+    c = c / 255;
+    if (c < 0.03928) {
+      c = c / 12.92;
+    } else {
+      c = (c + .055) / 1.055;
+      c = Math.pow(c, 2.4);
+    }
+    return c;
+  });
+  return (0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]);
+}
+
+function generateOptimalTextColor(color: Color): string {
+  const luminance: number = colorLuminance(color);
+  const contrastRatioBlack: number = (luminance + 0.05) / 0.05;
+  if (contrastRatioBlack > 7) {
+    return BLACK;
   }
+  const contrastRatioWhite: number = 1.05 / (luminance + 0.05);
+  if (contrastRatioWhite > 7) {
+    return WHITE;
+  }
+  if (contrastRatioBlack > contrastRatioWhite) {
+    return BLACK;
+  }
+  return WHITE;
+}
   /**
  * Converts an RGB color value to HSL. Conversion formula
  * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
@@ -181,4 +199,4 @@ function executeHSLProperFormula(tmp_1: number, tmp_2: number, value: number): n
 
 export default ColorUtil;
 
-export { IDecoration, convertHslaToRgba, colorLuminance, convertRgbaToHsla };
+export { IDecoration, convertHslaToRgba, colorLuminance, convertRgbaToHsla, generateOptimalTextColor };
