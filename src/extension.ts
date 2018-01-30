@@ -325,10 +325,6 @@ function handleTextSelectionChange(event: TextEditorSelectionChangeEvent) {
   if (event.textEditor !== extension.editor) {
     return;
   }
-  // if (event.kind !== TextEditorSelectionChangeKind.Mouse || event.kind === TextEditorSelectionChangeKind.Keyboard ) { // 'command' kind is fired when click occur inside a selected zone
-  if (event.kind === undefined ) {
-    return;
-  }
   q.push(cb => {
     if (extension.currentSelection.length !== 0) {
       extension.currentSelection.forEach(line => {
