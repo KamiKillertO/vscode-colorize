@@ -1,8 +1,15 @@
 ## 0.6.11
 
+- [FIX] #106 - Decorations were not disable for a line accessed from a deletion. Also hide decorations on default selected line on file opening.
+- [FIX] #112 - Improve decorations contrast (between background and text) by following the WCAG guidelines ([Contrast (Enhanced)](https://www.w3.org/WAI/WCAG20/quickref/#qr-visual-audio-contrast7) and [Contrast (Minimum)](https://www.w3.org/WAI/WCAG20/quickref/#visual-audio-contrast-contrast)) 
+- [FIX] #113 - SASS and LESS variables like `$var_1A`, $var_A` and `$var-1` were extracted but not colorized.
+
+## 0.6.11
+
 - [FIX] #97 - find closest declarations on windows not working due to trailing `\`
 - [FIX] Variables ending with ';' not extracted
-- [IMPROVE] Add more error handling
+
+- [IMPROVE] Add more error handling to prevent colorize crash
 
 ## 0.6.10
 
