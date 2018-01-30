@@ -364,7 +364,7 @@ async function colorize(editor: TextEditor, cb) {
     return cb();
   }
   extension.editor = editor;
-  extension.currentSelection = [];
+  extension.currentSelection = editor.selections.map((selection: Selection) => selection.active.line);
   const deco = CacheManager.getCachedDecorations(editor.document);
   if (deco) {
     extension.deco = deco;
