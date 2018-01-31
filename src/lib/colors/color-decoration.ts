@@ -6,7 +6,7 @@ import {
   window
 } from 'vscode';
 
-import { colorLuminance, generateOptimalTextColor } from '../color-util';
+import { generateOptimalTextColor } from '../color-util';
 import Color from './color';
 import color from './color';
 
