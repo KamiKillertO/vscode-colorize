@@ -6,7 +6,7 @@ import {
   window
 } from 'vscode';
 
-import { colorLuminance } from '../color-util';
+import { generateOptimalTextColor } from '../color-util';
 import Color from '../colors/color';
 import Variable from './variable';
 
@@ -84,19 +84,12 @@ class VariableDecoration implements Observer {
   }
 
   private _generateDecorator() {
-    let textColor = null;
-    let luminance = colorLuminance(this.variable.color);
-    if (luminance < 0.7) {
-      textColor = '#fff';
-    } else {
-      textColor = '#000';
-    }
     let backgroundDecorationType = window.createTextEditorDecorationType({
       borderWidth: '1px',
       borderStyle: 'solid',
       borderColor: this.variable.color.toRgbString(),
       backgroundColor: this.variable.color.toRgbString(),
-      color: textColor
+      color: generateOptimalTextColor(this.variable.color)
     });
     this.decoration = backgroundDecorationType;
   }
