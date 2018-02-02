@@ -37,8 +37,7 @@ class ColorExtractor {
   }
   public async extract(fileLines: DocumentLine[]): Promise < LineExtraction[] > {
     const colors = await Promise.all(this.extractors.map(extractor => extractor.extractColors(fileLines)));
-
-    return flatten(colors);
+    return flatten(colors); // should regroup per lines?
   }
   public extractOneColor(text: string): IColor {
     let colors = this.extractors.map(extractor => extractor.extractColor(text));
