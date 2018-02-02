@@ -1,7 +1,9 @@
 import Variable from './variable';
 import Color from '../colors/color';
-import ColorExtractor from '../colors/color-extractor';
+import ColorExtractor, { LineExtraction } from '../colors/color-extractor';
 import { dirname } from 'path';
+import { DocumentLine } from './variables-manager';
+
 // stylus no prefix needed and = instead of :
 export const DECLARATION_REGEXP = /(?:(?:((?:\$|@|--)(?:[a-z]+[\-_a-z\d]*)\s*):)|(\w(?:\w|-)*)\s*=)(?:$|"|'|,| |;|\)|\r|\n)/gi;
 //  \b allow to catch stylus variables names
@@ -9,6 +11,8 @@ export const DECLARATION_REGEXP = /(?:(?:((?:\$|@|--)(?:[a-z]+[\-_a-z\d]*)\s*):)
 export const REGEXP = /(?:((?:(?:@|\s|\$)(?:[a-z]+[\-_a-z\d]*)+))|(var\((--\w+(?:-|\w)*)\)))(?:$|"|'|,| |;|\)|\r|\n)(?!\s*(?:=|:))/gi;
 
 export const REGEXP_ONE = /^(?:((?:(?:\$|@)(?:[a-z]+[\-_a-z\d]*)+))|(?:var\((--\w+(?:-|\w)*))\))(?:$|"|'|,| |;|\)|\r|\n)(?!\s*(?:=|:))/gi;
+
+const flatten = arr => arr.reduce((a, b) => a.concat(Array.isArray(b) ? flatten(b) : b), []).filter(_ => _.colors.length !== 0);
 
 class VariablesExtractor {
 
@@ -103,7 +107,17 @@ class VariablesExtractor {
     }
   }
 
-  public async extractVariables(text: string, fileName: string): Promise<Variable[]> {
+  public async extractVariables(fileName: string, fileLines: DocumentLine[]): Promise<LineExtraction[]> {
+
+    const variables = fileLines.map(({line, text}) => {
+      return {
+        line,
+        colors: this.__extractVariables(text, fileName)
+      };
+    });
+    return flatten(variables);
+  }
+  public __extractVariables(text: string, fileName: string): Variable[] {
     let match = null;
     let colors: Variable[] = [];
     while ((match = REGEXP.exec(text)) !== null) {
@@ -144,8 +158,10 @@ class VariablesExtractor {
     }
     return null;
   }
-
-  public async extractDeclarations(fileName: string, text: string, line: number): Promise<Map<string, Variable[]>> {
+  public async extractDeclarations(fileName: string, fileLines: DocumentLine[]): Promise<Map<string, Variable[]>> {
+    return fileLines.map(({text, line}) => this.__extractDeclarations(fileName, text, line)).pop();
+  }
+  public __extractDeclarations(fileName: string, text: string, line: number): Map<string, Variable[]> {
     let match = null;
     while ((match = DECLARATION_REGEXP.exec(text)) !== null) {
       const varName = (match[1] || match[2]).trim();
