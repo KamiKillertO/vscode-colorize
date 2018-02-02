@@ -212,9 +212,21 @@ function updateDecorations(editedLine: TextDocumentContentChangeEvent[], context
   }
   checkDecorationForUpdate(editedLine, context, cb);
 }
+function updateContextDecorations(decorations: Map<number, IDecoration[]>, context: ColorizeContext) {
+  let it = decorations.entries();
+  let tmp = it.next();
+  while (!tmp.done) {
+    let line = tmp.value[0];
+    if (context.deco.has(line)) {
+      context.deco.set(line, context.deco.get(line).concat(decorations.get(line)));
+    } else {
+      context.deco.set(line, decorations.get(line));
+    }
+    tmp = it.next();
+  }
 
+}
 async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, cb) {
-  let m = new Map();
   const text = context.editor.document.getText().split(/\n/);
   const fileLines: DocumentLine[] = editedLine.map(({range}: TextDocumentContentChangeEvent) => {
     const line = range.start.line;
@@ -226,7 +238,6 @@ async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEve
     context.deco.set(line, []);
     return {line, text: text[line]};
   });
-
   try {
     // should not run if variables support not activated
     await VariablesManager.findVariablesDeclarations(context.editor.document.fileName, fileLines);
@@ -235,22 +246,11 @@ async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEve
     // should not run if variables support not activated
     const variables = await VariablesManager.findVariables(context.editor.document.fileName, fileLines);
 
-    generateDecorations(colors, variables, m);
-  } catch (e) {
-    return cb();
-  }
-  EditorManager.decorate(context.editor, m, context.currentSelection);
-  let it = m.entries();
-  let tmp = it.next();
-  while (!tmp.done) {
-    let line = tmp.value[0];
-    if (context.deco.has(line)) {
-      context.deco.set(line, context.deco.get(line).concat(m.get(line)));
-    } else {
-      context.deco.set(line, m.get(line));
-    }
-    tmp = it.next();
-  }
+    const decorations = generateDecorations(colors, variables, new Map());
+
+    EditorManager.decorate(context.editor, decorations, context.currentSelection);
+    updateContextDecorations(decorations, context);
+  } catch (error) {}
   return cb();
 }
 
@@ -357,10 +357,7 @@ function handleCloseOpen(document) {
 }
 
 async function colorize(editor: TextEditor, cb) {
-  if (!editor) {
-    return cb();
-  }
-  if (!canColorize(editor.document)) {
+  if (!editor || !canColorize(editor.document)) {
     return cb();
   }
   extension.editor = editor;
@@ -370,16 +367,14 @@ async function colorize(editor: TextEditor, cb) {
     extension.deco = deco;
     extension.nbLine = editor.document.lineCount;
     EditorManager.decorate(extension.editor, extension.deco, extension.currentSelection);
-    return cb();
+  } else {
+    extension.deco = new Map();
+    extension.nbLine = editor.document.lineCount;
+    try {
+      await initDecorations(extension);
+    } catch (error) {}
+    CacheManager.saveDecorations(extension.editor.document, extension.deco);
   }
-  extension.deco = new Map();
-  extension.nbLine = editor.document.lineCount;
-  try {
-    await initDecorations(extension);
-  } catch (error) {
-    return cb();
-  }
-  CacheManager.saveDecorations(extension.editor.document, extension.deco);
   return cb();
 }
 
