@@ -1,5 +1,6 @@
 import Color from './../color';
 import ColorExtractor, { IColorExtractor } from '../color-extractor';
+import { LineExtraction, DocumentLine } from '../../color-util';
 
 export const COLORS = Object({
     'aliceblue': {
@@ -753,17 +754,19 @@ export const REGEXP_ONE = (() => RegExp(`^(?:^|,|\s|\\(|:)(${REGEXP_BASE})(?:$|,
 class BrowsersColorExtractor implements IColorExtractor {
   public name: string = 'BROWSERS_COLORS_EXTRACTOR';
 
-  public async extractColors(text: string): Promise<Color []> {
-    let match = null;
-    let colors: Color[] = [];
-    let position = 0;
-    while ((match = text.match(REGEXP)) !== null) {
-      position += match.index + 1;
-      colors.push(new Color(match[1], position, 1, COLORS[match[1]].rgb));
-      text = text.slice(match.index + 1 + match[1].length);
-      position += match[1].length;
-    }
-    return colors;
+  public async extractColors(fileLines: DocumentLine[]): Promise < LineExtraction[] > {
+    return fileLines.map(({line, text}) => {
+      let match = null;
+      let colors: Color[] = [];
+      let position = 0;
+      while ((match = text.match(REGEXP)) !== null) {
+        position += match.index + 1;
+        colors.push(new Color(match[1], position, 1, COLORS[match[1]].rgb));
+        text = text.slice(match.index + 1 + match[1].length);
+        position += match[1].length;
+      }
+      return {line, colors};
+    });
   }
 
   public extractColor(text: string): Color {
@@ -774,5 +777,6 @@ class BrowsersColorExtractor implements IColorExtractor {
     return null;
   }
 }
+
 ColorExtractor.registerExtractor(new BrowsersColorExtractor());
 export default BrowsersColorExtractor;
