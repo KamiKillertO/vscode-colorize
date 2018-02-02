@@ -7,7 +7,7 @@
   "license": "Apache-2.0",
   "icon": "assets/logo.png",
   "engines": {
-    "vscode": "^1.17.0"
+    "vscode": "^1.18.0"
   },
   "categories": [
     "Other"
@@ -95,7 +95,7 @@
     "@types/node": "8.5.2",
     "chai": "4.1.2",
     "mocha": "4.1.0",
-    "tslint": "5.8.0",
+    "tslint": "5.9.1",
     "typescript": "2.6.1",
     "vscode": "1.1.10"
   }

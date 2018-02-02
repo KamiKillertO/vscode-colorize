@@ -8,6 +8,18 @@ import ColorExtractor from './colors/color-extractor';
 import ColorDecoration from './colors/color-decoration';
 import { Range, TextEditorDecorationType } from 'vscode';
 
+interface DocumentLine {
+  line: number;
+  text: string;
+}
+
+interface LineExtraction {
+  line: number;
+  colors: IColor[];
+}
+
+const flattenLineExtractionsFlatten = arr => arr.reduce((a, b) => a.concat(Array.isArray(b) ? flattenLineExtractionsFlatten(b) : b), []).filter(_ => _.colors.length !== 0);
+
 const WHITE = '#FFFFFF',
       BLACK = '#000000';
 
@@ -41,8 +53,14 @@ interface IDecoration {
   generateRange(line: number): Range;
 }
 
-
 class ColorUtil {
+  public static textToFileLines(text: string): DocumentLine[] {
+    return text.split(/\n/)
+                .map((text, index) => Object({
+                  'text': text,
+                  'line': index
+                }));
+  }
   /**
    * Extract all colors from a text
    *
@@ -52,10 +70,9 @@ class ColorUtil {
    *
    * @memberOf ColorUtil
    */
-   public static async findColors(text, fileName = null): Promise < IColor[] > {
-    const colors = await ColorExtractor.extract(text);
-    return colors;
-   }
+  public static async findColors(fileContent: DocumentLine[], fileName = null): Promise < LineExtraction[] > {
+    return await ColorExtractor.extract(fileContent);
+  }
 
   public static generateDecoration(color: IColor): IDecoration {
     return new ColorDecoration(<Color>color);
@@ -199,4 +216,4 @@ function executeHSLProperFormula(tmp_1: number, tmp_2: number, value: number): n
 
 export default ColorUtil;
 
-export { IDecoration, convertHslaToRgba, colorLuminance, convertRgbaToHsla, generateOptimalTextColor };
+export { IDecoration, convertHslaToRgba, colorLuminance, convertRgbaToHsla, generateOptimalTextColor, flattenLineExtractionsFlatten, LineExtraction, DocumentLine };
