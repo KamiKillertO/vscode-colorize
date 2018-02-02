@@ -3,15 +3,10 @@ import VariableDecoration from './variable-decoration';
 import VariablesExtractor from './variables-extractor';
 import { workspace, window, StatusBarAlignment, StatusBarItem, Uri, TextDocument } from 'vscode';
 import { canColorize } from '../../extension';
-import { LineExtraction } from '../colors/color-extractor';
+import { DocumentLine, LineExtraction } from '../color-util';
 
 const INCLUDE_PATTERN = '{**/*.css,**/*.sass,**/*.scss,**/*.less,**/*.pcss,**/*.sss,**/*.stylus,**/*.styl}';
 const EXCLUDE_PATTERN = '{**/.git,**/.svn,**/.hg,**/CVS,**/.DS_Store,**/.git,**/node_modules,**/bower_components,**/tmp,**/dist,**/tests}';
-
-interface DocumentLine {
-  line: number;
-  text: string;
-}
 
 class VariablesManager {
 
@@ -73,4 +68,3 @@ class VariablesManager {
 }
 
 export default VariablesManager;
-export { DocumentLine };

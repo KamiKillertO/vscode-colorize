@@ -1,6 +1,6 @@
 import Color from './../color';
-import ColorExtractor, { IColorExtractor, LineExtraction } from '../color-extractor';
-import { DocumentLine } from '../../variables/variables-manager';
+import ColorExtractor, { IColorExtractor } from '../color-extractor';
+import { LineExtraction, DocumentLine } from '../../color-util';
 
 export const COLORS = Object({
     'aliceblue': {
@@ -755,25 +755,18 @@ class BrowsersColorExtractor implements IColorExtractor {
   public name: string = 'BROWSERS_COLORS_EXTRACTOR';
 
   public async extractColors(fileLines: DocumentLine[]): Promise < LineExtraction[] > {
-    const colors: LineExtraction[] = fileLines.map(({line, text}) => {
-      return {
-        line,
-        colors: this.__extractColors(text)
-      };
+    return fileLines.map(({line, text}) => {
+      let match = null;
+      let colors: Color[] = [];
+      let position = 0;
+      while ((match = text.match(REGEXP)) !== null) {
+        position += match.index + 1;
+        colors.push(new Color(match[1], position, 1, COLORS[match[1]].rgb));
+        text = text.slice(match.index + 1 + match[1].length);
+        position += match[1].length;
+      }
+      return {line, colors};
     });
-    return colors;
-  }
-  public __extractColors(text: string): Color[] {
-    let match = null;
-    let colors: Color[] = [];
-    let position = 0;
-    while ((match = text.match(REGEXP)) !== null) {
-      position += match.index + 1;
-      colors.push(new Color(match[1], position, 1, COLORS[match[1]].rgb));
-      text = text.slice(match.index + 1 + match[1].length);
-      position += match[1].length;
-    }
-    return colors;
   }
 
   public extractColor(text: string): Color {

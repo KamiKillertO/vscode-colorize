@@ -4,10 +4,21 @@ import './colors/extractors/hexa-extractor';
 import './colors/extractors/rgb-extractor';
 import './colors/extractors/browser-extractor';
 import './colors/extractors/hsl-extractor';
-import ColorExtractor, { LineExtraction } from './colors/color-extractor';
+import ColorExtractor from './colors/color-extractor';
 import ColorDecoration from './colors/color-decoration';
 import { Range, TextEditorDecorationType } from 'vscode';
-import { DocumentLine } from './variables/variables-manager';
+
+interface DocumentLine {
+  line: number;
+  text: string;
+}
+
+interface LineExtraction {
+  line: number;
+  colors: IColor[];
+}
+
+const flattenLineExtractionsFlatten = arr => arr.reduce((a, b) => a.concat(Array.isArray(b) ? flattenLineExtractionsFlatten(b) : b), []).filter(_ => _.colors.length !== 0);
 
 const WHITE = '#FFFFFF',
       BLACK = '#000000';
@@ -205,4 +216,4 @@ function executeHSLProperFormula(tmp_1: number, tmp_2: number, value: number): n
 
 export default ColorUtil;
 
-export { IDecoration, convertHslaToRgba, colorLuminance, convertRgbaToHsla, generateOptimalTextColor };
+export { IDecoration, convertHslaToRgba, colorLuminance, convertRgbaToHsla, generateOptimalTextColor, flattenLineExtractionsFlatten, LineExtraction, DocumentLine };

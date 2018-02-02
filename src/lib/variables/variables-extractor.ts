@@ -1,8 +1,8 @@
 import Variable from './variable';
 import Color from '../colors/color';
-import ColorExtractor, { LineExtraction } from '../colors/color-extractor';
+import ColorExtractor from '../colors/color-extractor';
 import { dirname } from 'path';
-import { DocumentLine } from './variables-manager';
+import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../color-util';
 
 // stylus no prefix needed and = instead of :
 export const DECLARATION_REGEXP = /(?:(?:((?:\$|@|--)(?:[a-z]+[\-_a-z\d]*)\s*):)|(\w(?:\w|-)*)\s*=)(?:$|"|'|,| |;|\)|\r|\n)/gi;
@@ -11,8 +11,6 @@ export const DECLARATION_REGEXP = /(?:(?:((?:\$|@|--)(?:[a-z]+[\-_a-z\d]*)\s*):)
 export const REGEXP = /(?:((?:(?:@|\s|\$)(?:[a-z]+[\-_a-z\d]*)+))|(var\((--\w+(?:-|\w)*)\)))(?:$|"|'|,| |;|\)|\r|\n)(?!\s*(?:=|:))/gi;
 
 export const REGEXP_ONE = /^(?:((?:(?:\$|@)(?:[a-z]+[\-_a-z\d]*)+))|(?:var\((--\w+(?:-|\w)*))\))(?:$|"|'|,| |;|\)|\r|\n)(?!\s*(?:=|:))/gi;
-
-const flatten = arr => arr.reduce((a, b) => a.concat(Array.isArray(b) ? flatten(b) : b), []).filter(_ => _.colors.length !== 0);
 
 class VariablesExtractor {
 
@@ -115,7 +113,7 @@ class VariablesExtractor {
         colors: this.__extractVariables(text, fileName)
       };
     });
-    return flatten(variables);
+    return flattenLineExtractionsFlatten(variables);
   }
   public __extractVariables(text: string, fileName: string): Variable[] {
     let match = null;

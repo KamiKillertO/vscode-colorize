@@ -25,12 +25,12 @@ import {
 } from 'vscode';
 import Color, { IColor } from './lib/colors/color';
 import Variable from './lib/variables/variable';
-import ColorUtil, { IDecoration } from './lib/color-util';
+import ColorUtil, { IDecoration, DocumentLine, LineExtraction } from './lib/color-util';
 import ColorDecoration from './lib/colors/color-decoration';
 import Queue from './lib/queue';
-import ColorExtractor, { LineExtraction } from './lib/colors/color-extractor';
+import ColorExtractor from './lib/colors/color-extractor';
 import VariableDecoration from './lib/variables/variable-decoration';
-import VariablesManager, { DocumentLine } from './lib/variables/variables-manager';
+import VariablesManager from './lib/variables/variables-manager';
 import CacheManager from './lib/cache-manager';
 import EditorManager from './lib/editor-manager';
 import color from './lib/colors/color';
