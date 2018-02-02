@@ -1,12 +1,17 @@
 import { IColor } from './color';
+import { DocumentLine } from '../variables/variables-manager';
 
 export interface IColorExtractor {
   name: string;
-  extractColors(text: string): Promise < IColor[] >;
+  extractColors(fileLines: DocumentLine[]): Promise < LineExtraction[] >;
   extractColor(text: string): IColor;
 }
+export interface LineExtraction {
+  line: number;
+  colors: IColor[];
+}
 
-const flatten = arr => arr.reduce((a, b) => a.concat(Array.isArray(b) ? flatten(b) : b), []);
+const flatten = arr => arr.reduce((a, b) => a.concat(Array.isArray(b) ? flatten(b) : b), []).filter(_ => _.colors.length !== 0);
 
 class ColorExtractor {
   public extractors: IColorExtractor[];
@@ -30,8 +35,9 @@ class ColorExtractor {
     }
     return this.extractors.find(_ => _.name === extractor);
   }
-  public async extract(text: string): Promise < IColor[] > {
-    const colors = await Promise.all(this.extractors.map(extractor => extractor.extractColors(text)));
+  public async extract(fileLines: DocumentLine[]): Promise < LineExtraction[] > {
+    const colors = await Promise.all(this.extractors.map(extractor => extractor.extractColors(fileLines)));
+
     return flatten(colors);
   }
   public extractOneColor(text: string): IColor {

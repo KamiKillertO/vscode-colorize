@@ -4,9 +4,10 @@ import './colors/extractors/hexa-extractor';
 import './colors/extractors/rgb-extractor';
 import './colors/extractors/browser-extractor';
 import './colors/extractors/hsl-extractor';
-import ColorExtractor from './colors/color-extractor';
+import ColorExtractor, { LineExtraction } from './colors/color-extractor';
 import ColorDecoration from './colors/color-decoration';
 import { Range, TextEditorDecorationType } from 'vscode';
+import { DocumentLine } from './variables/variables-manager';
 
 const WHITE = '#FFFFFF',
       BLACK = '#000000';
@@ -41,8 +42,14 @@ interface IDecoration {
   generateRange(line: number): Range;
 }
 
-
 class ColorUtil {
+  public static textToFileLines(text: string): DocumentLine[] {
+    return text.split(/\n/)
+                .map((text, index) => Object({
+                  'text': text,
+                  'line': index
+                }));
+  }
   /**
    * Extract all colors from a text
    *
@@ -52,10 +59,9 @@ class ColorUtil {
    *
    * @memberOf ColorUtil
    */
-   public static async findColors(text, fileName = null): Promise < IColor[] > {
-    const colors = await ColorExtractor.extract(text);
-    return colors;
-   }
+  public static async findColors(fileContent: DocumentLine[], fileName = null): Promise < LineExtraction[] > {
+    return await ColorExtractor.extract(fileContent);
+  }
 
   public static generateDecoration(color: IColor): IDecoration {
     return new ColorDecoration(<Color>color);

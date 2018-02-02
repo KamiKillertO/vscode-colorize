@@ -1,6 +1,8 @@
 import Color from './../color';
-import ColorExtractor, { IColorExtractor } from '../color-extractor';
+import ColorExtractor, { IColorExtractor, LineExtraction } from '../color-extractor';
 import { convertHslaToRgba } from '../../color-util';
+import { DocumentLine } from '../../variables/variables-manager';
+
 
 export const REGEXP = /((?:hsl\(\d*\s*,\s*\d{1,3}%\s*,\s*\d{1,3}%\))|(?:hsla\(\d*\s*,\s*(?:\d{1,3}%\s*,\s*){2}(?:[0-1]|1\.0|[0](?:\.\d+){0,1}|(?:\.\d+))\)))(?:$|"|'|,| |;|\)|\r|\n)/gi;
 export const REGEXP_ONE = /^((?:hsl\(\d*\s*,\s*\d{1,3}%\s*,\s*\d{1,3}%\))|(?:hsla\(\d*\s*,\s*(?:\d{1,3}%\s*,\s*){2}(?:[0-1]|1\.0|[0](?:\.\d+){0,1}|(?:\.\d+))\)))(?:$|"|'|,| |;|\)|\r|\n)/i;
@@ -29,7 +31,17 @@ class HSLColorExtractor implements IColorExtractor {
     return [h, s, l, a];
   }
 
-  public async extractColors(text: string): Promise < Color[] >  {
+  public async extractColors(fileLines: DocumentLine[]): Promise < LineExtraction[] > {
+    const colors: LineExtraction[] = fileLines.map(({line, text}) => {
+      return {
+        line,
+        colors: this.__extractColors(text)
+      };
+    });
+    return colors;
+  }
+
+  public __extractColors(text: string): Color[]  {
     let match = null;
     let colors: Color[] = [];
     while ((match = REGEXP.exec(text)) !== null) {
@@ -51,6 +63,6 @@ class HSLColorExtractor implements IColorExtractor {
     return null;
   }
 }
-ColorExtractor.registerExtractor(new HSLColorExtractor());
 
+ColorExtractor.registerExtractor(new HSLColorExtractor());
 export default HSLColorExtractor;
