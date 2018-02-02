@@ -37,7 +37,8 @@ import color from './lib/colors/color';
 
 let config = {
   languages: null,
-  filesExtensions: null
+  filesExtensions: null,
+  isVariablesEnable: false
 };
 
 interface ColorizeContext {
@@ -146,8 +147,10 @@ function updatePositionsDeletion(range, positions) {
 function handleLineRemoved(editedLine: TextDocumentContentChangeEvent[], positions) {
   editedLine.reverse();
   editedLine.forEach((line: TextDocumentContentChangeEvent) => {
-    for (let i = line.range.start.line; i <= line.range.end.line; i++) {
-      VariablesManager.deleteVariableInLine(extension.editor.document.fileName, i);
+    if (config.isVariablesEnable) {
+      for (let i = line.range.start.line; i <= line.range.end.line; i++) {
+        VariablesManager.deleteVariableInLine(extension.editor.document.fileName, i);
+      }
     }
     positions = updatePositionsDeletion(line.range, positions);
   });
@@ -239,12 +242,13 @@ async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEve
     return {line, text: text[line]};
   });
   try {
-    // should not run if variables support not activated
-    await VariablesManager.findVariablesDeclarations(context.editor.document.fileName, fileLines);
-
+    let variables = [];
+    if (config.isVariablesEnable) {
+      await VariablesManager.findVariablesDeclarations(context.editor.document.fileName, fileLines);
+      variables = await VariablesManager.findVariables(context.editor.document.fileName, fileLines);
+    }
     const colors: LineExtraction[] = await ColorUtil.findColors(fileLines, context.editor.document.fileName);
     // should not run if variables support not activated
-    const variables = await VariablesManager.findVariables(context.editor.document.fileName, fileLines);
 
     const decorations = generateDecorations(colors, variables, new Map());
 
@@ -265,9 +269,10 @@ async function initDecorations(context: ColorizeContext) {
   const fileLines: DocumentLine[] = ColorUtil.textToFileLines(context.editor.document.getText());
   const colors: LineExtraction[] = await ColorUtil.findColors(fileLines);
 
-  // should not run if variables support not activated
-  const variables = await VariablesManager.findVariables(context.editor.document.fileName, fileLines);
-
+  let variables = [];
+  if (config.isVariablesEnable) {
+    const variables = await VariablesManager.findVariables(context.editor.document.fileName, fileLines);
+  }
   generateDecorations(colors, variables, context.deco);
   return EditorManager.decorate(context.editor, context.deco, context.currentSelection);
 }
@@ -413,8 +418,9 @@ export function activate(context: ExtensionContext) {
   const configuration: WorkspaceConfiguration = workspace.getConfiguration('colorize');
   config.languages = configuration.get('languages', []);
   config.filesExtensions = configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`));
+  config.isVariablesEnable = configuration.get('activate_variables_support_beta');
 
-  if (configuration.get('activate_variables_support_beta') === true) {
+  if (config.isVariablesEnable === true) {
     q.push(async cb => {
       try {
         await VariablesManager.getWorkspaceVariables();
