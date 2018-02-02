@@ -28,11 +28,12 @@ import Variable from './lib/variables/variable';
 import ColorUtil, { IDecoration } from './lib/color-util';
 import ColorDecoration from './lib/colors/color-decoration';
 import Queue from './lib/queue';
-import ColorExtractor from './lib/colors/color-extractor';
+import ColorExtractor, { LineExtraction } from './lib/colors/color-extractor';
 import VariableDecoration from './lib/variables/variable-decoration';
-import VariablesManager from './lib/variables/variables-manager';
+import VariablesManager, { DocumentLine } from './lib/variables/variables-manager';
 import CacheManager from './lib/cache-manager';
 import EditorManager from './lib/editor-manager';
+import color from './lib/colors/color';
 
 let config = {
   languages: null,
@@ -214,28 +215,30 @@ function updateDecorations(editedLine: TextDocumentContentChangeEvent[], context
 
 async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, cb) {
   let m = new Map();
-  await Promise.all(
-    editedLine.map(async ({
-      range
-    }: TextDocumentContentChangeEvent) => {
-      if (context.deco.has(range.start.line)) {
-        context.deco.get(range.start.line).forEach(decoration => {
-          decoration.dispose();
-        });
-      }
-      context.deco.set(range.start.line, []);
-      // lineAt raise an exception if line does not exist
-      try {
-        const text = context.editor.document.lineAt(range.start.line).text;
-        await VariablesManager.findVariablesDeclarations(context.editor.document.fileName, text, range.start.line);
-        const colors = await ColorUtil.findColors(text, context.editor.document.fileName);
-        const variables = await VariablesManager.findVariables(text, context.editor.document.fileName);
-        return generateDecorations(colors, variables, range.start.line, m);
-      } catch (e) {
-        return context.deco;
-      }
-    })
-  );
+  const text = context.editor.document.getText().split(/\n/);
+  const fileLines: DocumentLine[] = editedLine.map(({range}: TextDocumentContentChangeEvent) => {
+    const line = range.start.line;
+    if (context.deco.has(line)) {
+      context.deco.get(line).forEach(decoration => {
+        decoration.dispose();
+      });
+    }
+    context.deco.set(line, []);
+    return {line, text: text[line]};
+  });
+
+  try {
+    // should not run if variables support not activated
+    await VariablesManager.findVariablesDeclarations(context.editor.document.fileName, fileLines);
+
+    const colors: LineExtraction[] = await ColorUtil.findColors(fileLines, context.editor.document.fileName);
+    // should not run if variables support not activated
+    const variables = await VariablesManager.findVariables(context.editor.document.fileName, fileLines);
+
+    generateDecorations(colors, variables, m);
+  } catch (e) {
+    return cb();
+  }
   EditorManager.decorate(context.editor, m, context.currentSelection);
   let it = m.entries();
   let tmp = it.next();
@@ -248,7 +251,7 @@ async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEve
     }
     tmp = it.next();
   }
-  cb();
+  return cb();
 }
 
 async function initDecorations(context: ColorizeContext) {
@@ -257,18 +260,15 @@ async function initDecorations(context: ColorizeContext) {
   }
   let text = context.editor.document.getText();
   let n: number = context.editor.document.lineCount;
-  const colors = await Promise.all(context.editor.document.getText()
-      .split(/\n/)
-      .map((text, index) => Object({
-        'text': text,
-        'line': index
-      }))
-      .map(async line =>  {
-        const colors = await ColorUtil.findColors(line.text, context.editor.document.fileName);
-        const variables = await VariablesManager.findVariables(line.text, context.editor.document.fileName);
-        // const variables = [];
-        return generateDecorations(colors, variables, line.line, context.deco);
-      }));
+  const start = Date.now();
+
+  const fileLines: DocumentLine[] = ColorUtil.textToFileLines(context.editor.document.getText());
+  const colors: LineExtraction[] = await ColorUtil.findColors(fileLines);
+
+  // should not run if variables support not activated
+  const variables = await VariablesManager.findVariables(context.editor.document.fileName, fileLines);
+
+  generateDecorations(colors, variables, context.deco);
   return EditorManager.decorate(context.editor, context.deco, context.currentSelection);
 }
 
@@ -279,16 +279,16 @@ function updateDecorationMap(map: Map<number, IDecoration[]>, line: number, deco
     map.set(line, [decoration]);
   }
 }
+function generateDecorations(colors: LineExtraction[], variables: LineExtraction[], decorations: Map<number, IDecoration[]>) {
 
-function generateDecorations(colors: IColor[], variables: Variable[], line: number, decorations: Map<number, IDecoration[]>) {
-  colors.forEach((color) => {
+  colors.map(({line, colors}) => colors.forEach((color) => {
     const decoration = ColorUtil.generateDecoration(color);
     updateDecorationMap(decorations, line, decoration);
-  });
-  variables.forEach((variable) => {
-    const decoration = VariablesManager.generateDecoration(variable);
+  }));
+  variables.map(({line, colors}) => colors.forEach((variable) => {
+    const decoration = VariablesManager.generateDecoration(<Variable>variable);
     updateDecorationMap(decorations, line, decoration);
-  });
+  }));
   return decorations;
 }
 
@@ -377,7 +377,7 @@ async function colorize(editor: TextEditor, cb) {
   try {
     await initDecorations(extension);
   } catch (error) {
-    // handle promise rejection
+    return cb();
   }
   CacheManager.saveDecorations(extension.editor.document, extension.deco);
   return cb();
