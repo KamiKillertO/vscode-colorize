@@ -7,12 +7,12 @@ import Color from '../src/lib/colors/color';
 
 describe('Test utility fonction', () => {
   it('Should not extract invalid colors from a text', async () => {
-    const colors = await ColorUtil.findColors('#ffg, rgb(323,123,123)');
-    assert.equal(0, colors.length, 'Should have found 0 colors');
+    const colors = await ColorUtil.findColors([{line: 1, text: '#ffg, rgb(323,123,123)'}]);
+    assert.equal(0, colors.reduce((acc, cv) => acc.concat(cv.colors), []).length, 'Should have found 0 colors');
   });
   it('Should extract Colors from a text', async () => {
-    const colors = await ColorUtil.findColors('#fff, rgb(123,123,123), #dccdcd, linear-gradient(to bottom right, #fff, #ccc), white, hsl(123,10%,1%)');
-    assert.equal(7, colors.length, 'Should have found 7 colors');
+    const colors = await ColorUtil.findColors([{line: 1, text: '#fff, rgb(123,123,123), #dccdcd, linear-gradient(to bottom right, #fff, #ccc), white, hsl(123,10%,1%)'}]);
+    assert.equal(7, colors.reduce((acc, cv) => acc.concat(cv.colors), []).length, 'Should have found 7 colors');
   });
   it('Should return the color luminance', () => {
     assert.equal(colorLuminance(new Color('#fff', 0, 1, [255, 255, 255])), 1, 'Should be "1" for #fff');
