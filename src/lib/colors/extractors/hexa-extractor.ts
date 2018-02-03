@@ -1,5 +1,7 @@
 import Color from './../color';
 import ColorExtractor, { IColorExtractor } from '../color-extractor';
+import color from './../color';
+import { LineExtraction, DocumentLine } from '../../color-util';
 
 export const REGEXP = /(#[\da-f]{3,4}|#[\da-f]{6}|#[\da-f]{8})(?:$|"|'|,| |;|\)|\r|\n)/gi;
 export const REGEXP_ONE = /^(#[\da-f]{3,4}|#[\da-f]{6}|#[\da-f]{8})(?:$|"|'|,| |;|\)|\r|\n)/i;
@@ -27,14 +29,19 @@ class HexaColorExtractor implements IColorExtractor {
     }
     return 1;
   }
-  public async extractColors(text: string): Promise < Color[] > {
-    let match = null;
-    let colors: Color[] = [];
+  public async extractColors(fileLines: DocumentLine[]): Promise < LineExtraction[] > {
+    return fileLines.map(({line, text}) => {
+      let match = null;
+      let colors: Color[] = [];
 
-    while ((match = REGEXP.exec(text)) !== null) {
-      colors.push(new Color(match[1], match.index, this.extractAlphaValue(match[1]), this.extractRGBValue(match[1])));
-    }
-    return colors;
+      while ((match = REGEXP.exec(text)) !== null) {
+        colors.push(new Color(match[1], match.index, this.extractAlphaValue(match[1]), this.extractRGBValue(match[1])));
+      }
+      return {
+        line,
+        colors
+      };
+    });
   }
   public extractColor(text: string, fileName = null): Color {
     let match: RegExpMatchArray = text.match(REGEXP_ONE);

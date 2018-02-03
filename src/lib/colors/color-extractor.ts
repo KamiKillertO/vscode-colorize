@@ -1,13 +1,11 @@
 import { IColor } from './color';
+import { LineExtraction, DocumentLine, flattenLineExtractionsFlatten } from '../color-util';
 
 export interface IColorExtractor {
   name: string;
-  extractColors(text: string): Promise < IColor[] >;
+  extractColors(fileLines: DocumentLine[]): Promise < LineExtraction[] >;
   extractColor(text: string): IColor;
 }
-
-const flatten = arr => arr.reduce((a, b) => a.concat(Array.isArray(b) ? flatten(b) : b), []);
-
 class ColorExtractor {
   public extractors: IColorExtractor[];
   constructor() {
@@ -30,9 +28,9 @@ class ColorExtractor {
     }
     return this.extractors.find(_ => _.name === extractor);
   }
-  public async extract(text: string): Promise < IColor[] > {
-    const colors = await Promise.all(this.extractors.map(extractor => extractor.extractColors(text)));
-    return flatten(colors);
+  public async extract(fileLines: DocumentLine[]): Promise < LineExtraction[] > {
+    const colors = await Promise.all(this.extractors.map(extractor => extractor.extractColors(fileLines)));
+    return flattenLineExtractionsFlatten(colors); // should regroup per lines?
   }
   public extractOneColor(text: string): IColor {
     let colors = this.extractors.map(extractor => extractor.extractColor(text));
