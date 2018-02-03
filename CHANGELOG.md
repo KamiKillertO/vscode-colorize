@@ -1,7 +1,15 @@
-## 0.6.11
+## 0.6.14
+
+- [IMPROVE] Reduce the number of promises created during colors/variables extractions. Now the extraction of colors and variables is more than 10 times faster.
+
+## 0.6.13
+
+- Improve decorations contrast for variables too
+
+## 0.6.12
 
 - [FIX] #106 - Decorations were not disable for a line accessed from a deletion. Also hide decorations on default selected line on file opening.
-- [FIX] #112 - Improve decorations contrast (between background and text) by following the WCAG guidelines ([Contrast (Enhanced)](https://www.w3.org/WAI/WCAG20/quickref/#qr-visual-audio-contrast7) and [Contrast (Minimum)](https://www.w3.org/WAI/WCAG20/quickref/#visual-audio-contrast-contrast)) 
+- [FIX] #112 - Improve decorations contrast (between background and text) by following the WCAG guidelines ([Contrast (Enhanced)](https://www.w3.org/WAI/WCAG20/quickref/#qr-visual-audio-contrast7) and [Contrast (Minimum)](https://www.w3.org/WAI/WCAG20/quickref/#visual-audio-contrast-contrast))
 - [FIX] #113 - SASS and LESS variables like `$var_1A`, $var_A` and `$var-1` were extracted but not colorized.
 
 ## 0.6.11
