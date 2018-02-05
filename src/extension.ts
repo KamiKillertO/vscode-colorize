@@ -271,7 +271,7 @@ async function initDecorations(context: ColorizeContext) {
 
   let variables = [];
   if (config.isVariablesEnable) {
-    const variables = await VariablesManager.findVariables(context.editor.document.fileName, fileLines);
+    variables = await VariablesManager.findVariables(context.editor.document.fileName, fileLines);
   }
   generateDecorations(colors, variables, context.deco);
   return EditorManager.decorate(context.editor, context.deco, context.currentSelection);
