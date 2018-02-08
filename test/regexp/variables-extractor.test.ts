@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { REGEXP, DECLARATION_REGEXP } from '../../src/lib/variables/variables-extractor';
+import { CSS_VARIABLES, SASS_LESS_VARIABLES, STYLUS_VARIABLES, DECLARATION_REGEXP } from '../../src/lib/variables/variables-extractor';
 // Defines a Mocha test suite to group tests of similar kind together
 describe('Test variables declaration Regex', () => {
   // Sass
@@ -80,70 +80,78 @@ describe('Test variables use regexp', function() {
 
   // Sass
   it('Should match (sass variables)', function () {
-    assert.ok('$var'.match(REGEXP));
-    assert.ok('$var-two'.match(REGEXP));
+    assert.ok('$var'.match(SASS_LESS_VARIABLES));
+    assert.ok('$var-two'.match(SASS_LESS_VARIABLES));
 
-    assert.ok('$normal-var'.match(REGEXP));
-    assert.ok('$with-number1'.match(REGEXP));
-    assert.ok('$with-letterA'.match(REGEXP));
-    assert.ok('$with-dash-1'.match(REGEXP));
-    assert.ok('$with-dash-A'.match(REGEXP));
-    assert.ok('$with-underscore_2'.match(REGEXP));
-    assert.ok('$with-underscore_B'.match(REGEXP));
-    assert.ok('$a1'.match(REGEXP));
+    assert.ok('$normal-var'.match(SASS_LESS_VARIABLES));
+    assert.ok('$with-number1'.match(SASS_LESS_VARIABLES));
+    assert.ok('$with-letterA'.match(SASS_LESS_VARIABLES));
+    assert.ok('$with-dash-1'.match(SASS_LESS_VARIABLES));
+    assert.ok('$with-dash-A'.match(SASS_LESS_VARIABLES));
+    assert.ok('$with-underscore_2'.match(SASS_LESS_VARIABLES));
+    assert.ok('$with-underscore_B'.match(SASS_LESS_VARIABLES));
+    assert.ok('$a1'.match(SASS_LESS_VARIABLES));
   });
   it('Should not match (sass variables)', function () {
-    assert.notOk('$ '.match(REGEXP));
-    assert.notOk('$'.match(REGEXP));
-    assert.notOk('$1a'.match(REGEXP));
+    assert.notOk('$ '.match(SASS_LESS_VARIABLES));
+    assert.notOk('$'.match(SASS_LESS_VARIABLES));
+    assert.notOk('$1a'.match(SASS_LESS_VARIABLES));
   });
 
   // less
   it('Should match (less variables)', function () {
-    assert.ok('@var'.match(REGEXP));
-    assert.ok('@var-two'.match(REGEXP));
+    assert.ok('@var'.match(SASS_LESS_VARIABLES));
+    assert.ok('@var-two'.match(SASS_LESS_VARIABLES));
 
-    assert.ok('@normal-var'.match(REGEXP));
-    assert.ok('@with-number1'.match(REGEXP));
-    assert.ok('@with-letterA'.match(REGEXP));
-    assert.ok('@with-dash-1'.match(REGEXP));
-    assert.ok('@with-dash-A'.match(REGEXP));
-    assert.ok('@with-underscore_2'.match(REGEXP));
-    assert.ok('@with-underscore_B'.match(REGEXP));
-    assert.ok('@a1'.match(REGEXP));
+    assert.ok('@normal-var'.match(SASS_LESS_VARIABLES));
+    assert.ok('@with-number1'.match(SASS_LESS_VARIABLES));
+    assert.ok('@with-letterA'.match(SASS_LESS_VARIABLES));
+    assert.ok('@with-dash-1'.match(SASS_LESS_VARIABLES));
+    assert.ok('@with-dash-A'.match(SASS_LESS_VARIABLES));
+    assert.ok('@with-underscore_2'.match(SASS_LESS_VARIABLES));
+    assert.ok('@with-underscore_B'.match(SASS_LESS_VARIABLES));
+    assert.ok('@a1'.match(SASS_LESS_VARIABLES));
   });
   it('Should not match (less variables)', function () {
-    assert.notOk('@'.match(REGEXP));
-    assert.notOk('@ '.match(REGEXP));
-    assert.notOk('@1a '.match(REGEXP));
+    assert.notOk('@'.match(SASS_LESS_VARIABLES));
+    assert.notOk('@ '.match(SASS_LESS_VARIABLES));
+    assert.notOk('@1a '.match(SASS_LESS_VARIABLES));
   });
 
   // css variables (works for postcss too)
   it('Should match (css variables)', function () {
-    assert.ok('var(--var)'.match(REGEXP));
-    assert.ok('var(--var-two)'.match(REGEXP));
-    assert.ok('var(--var-)'.match(REGEXP));
-    assert.ok('var(--var--two)'.match(REGEXP));
-    assert.ok('var(--varTwo)'.match(REGEXP));
+    assert.ok('var(--var)'.match(CSS_VARIABLES));
+    assert.ok('var(--var-two)'.match(CSS_VARIABLES));
+    assert.ok('var(--var-)'.match(CSS_VARIABLES));
+    assert.ok('var(--var--two)'.match(CSS_VARIABLES));
+    assert.ok('var(--varTwo)'.match(CSS_VARIABLES));
   });
   it('Should not match (css variables)', function () {
-    assert.notOk('--var'.match(REGEXP));
-    assert.notOk('-- '.match(REGEXP));
-    assert.notOk('--'.match(REGEXP));
-    assert.notOk('var(--)'.match(REGEXP));
-    assert.notOk('var(-var)'.match(REGEXP));
-    assert.notOk('var(var)'.match(REGEXP));
-    assert.notOk('var()'.match(REGEXP));
+    assert.notOk('--var'.match(CSS_VARIABLES));
+    assert.notOk('-- '.match(CSS_VARIABLES));
+    assert.notOk('--'.match(CSS_VARIABLES));
+    assert.notOk('var(--)'.match(CSS_VARIABLES));
+    assert.notOk('var(-var)'.match(CSS_VARIABLES));
+    assert.notOk('var(var)'.match(CSS_VARIABLES));
+    assert.notOk('var()'.match(CSS_VARIABLES));
   });
 
   // stylus variables
   it('Should match (stylus variables)', function () {
-    assert.ok(' var'.match(REGEXP));
-    assert.ok(' var-two'.match(REGEXP));
+    assert.ok('var'.match(STYLUS_VARIABLES));
+    assert.ok('var-two'.match(STYLUS_VARIABLES));
+    assert.ok('a'.match(STYLUS_VARIABLES));
+    assert.ok('--a'.match(STYLUS_VARIABLES));
+    assert.ok('-a'.match(STYLUS_VARIABLES));
+    assert.ok('_a'.match(STYLUS_VARIABLES));
+    assert.ok('$a'.match(STYLUS_VARIABLES));
+    assert.ok('$'.match(STYLUS_VARIABLES));
   });
   it('Should not match (stylus variables)', function () {
-    assert.notOk('var'.match(REGEXP));
-    assert.notOk('--'.match(REGEXP));
-    assert.notOk(' 120'.match(REGEXP));
+    assert.notOk('--'.match(STYLUS_VARIABLES));
+    assert.notOk('__'.match(STYLUS_VARIABLES));
+    assert.notOk('120'.match(STYLUS_VARIABLES));
+    assert.notOk('@'.match(STYLUS_VARIABLES));
+    assert.notOk('1a'.match(STYLUS_VARIABLES)); // match ><
   });
 });
