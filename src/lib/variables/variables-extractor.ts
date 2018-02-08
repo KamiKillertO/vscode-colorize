@@ -11,7 +11,7 @@ export const REGEXP = /(?:((?:(?:@|\s|\$)(?:[a-z]+[\-_a-z\d]*)+))|(var\((--\w+(?
 
 const CSS_VARIABLES_BASE = '(var\\((--\\w+(?:-|\\w)*)\\))(?!:)(?:$|\"|\'|,| |;|\\)|\\r|\\n)';
 const SASS_LESS_VARIABLES_BASE = '((?:@|\\$)(?:[a-z]+[\\-_a-z\\d]*)(?!:))(?:$|\\"|\'|,| |;|\\)|\\r|\\n)';
-const STYLUS_VARIABLES_BASE = '([a-z]+[\\-_a-z\\d]*)(?!=)(?:$|\"|\'|,| |;|\\)|\\r|\\n)';
+const STYLUS_VARIABLES_BASE = '(^|(?::|=)\\s*)((?:-|_)*[$a-z]+[\\-_\\d]*)+(?!=)(?:$|\"|\'|,| |;|\\)|\\r|\\n)';
 
 export const CSS_VARIABLES = new RegExp(CSS_VARIABLES_BASE, 'gi');
 export const SASS_LESS_VARIABLES = new RegExp(SASS_LESS_VARIABLES_BASE, 'gi');
@@ -161,8 +161,9 @@ class VariablesExtractor {
       colors.push(deco);
     }
     while ((match = STYLUS_VARIABLES.exec(text)) !== null) {
-      let varName =  match[1];
+      let varName =  match[2];
       varName = varName.trim();
+      let spaces = (match[1] || '').length;
       if (!this.has(varName)) {
         continue;
       }
@@ -172,7 +173,7 @@ class VariablesExtractor {
         continue;
       }
       let deco = Object.create(decorations.pop());
-      deco.color = new Color(varName, match.index, deco.color.alpha, deco.color.rgb);
+      deco.color = new Color(varName, match.index + spaces, deco.color.alpha, deco.color.rgb);
       colors.push(deco);
     }
     return colors;
@@ -263,7 +264,19 @@ export default instance;
 // @styleset
 // @character-variant)
 
-
+// stylus
+//
+// valid
+//
+// var= #111;
+// --a= #fff
+// -a=#fff
+// _a= #fff
+// $a= #fff
+//
+// not valid
+//
+// 1a= #fff
 
 
 // in sass order matter
