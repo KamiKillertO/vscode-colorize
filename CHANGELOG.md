@@ -1,3 +1,11 @@
+## 0.6.16
+
+- [FIX] Split the regexp extracting variables in three to prevent a crash (the previous one was too complex).
+
+## 0.6.15
+
+- [FIX] Remove trailing `const` preventing variables to be decorated.
+
 ## 0.6.14
 
 - [IMPROVE] Reduce the number of promises created during colors/variables extractions. Now the extraction of colors and variables is more than 10 times faster.
