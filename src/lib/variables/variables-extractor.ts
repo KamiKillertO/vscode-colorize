@@ -6,11 +6,20 @@ import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../
 
 // stylus no prefix needed and = instead of :
 export const DECLARATION_REGEXP = /(?:(?:((?:\$|@|--)(?:[a-z]+[\-_a-z\d]*)\s*):)|(\w(?:\w|-)*)\s*=)(?:$|"|'|,| |;|\)|\r|\n)/gi;
-//  \b allow to catch stylus variables names
-// export const REGEXP = /(?:((?:(?:\s|\$|@)(?:\w|-)+))|(var\((--\w+(?:-|\w)*)\)))(?:$|"|'|,| |;|\)|\r|\n)/gi;
+
 export const REGEXP = /(?:((?:(?:@|\s|\$)(?:[a-z]+[\-_a-z\d]*)+))|(var\((--\w+(?:-|\w)*)\)))(?:$|"|'|,| |;|\)|\r|\n)(?!\s*(?:=|:))/gi;
 
-export const REGEXP_ONE = /^(?:((?:(?:\$|@)(?:[a-z]+[\-_a-z\d]*)+))|(?:var\((--\w+(?:-|\w)*))\))(?:$|"|'|,| |;|\)|\r|\n)(?!\s*(?:=|:))/gi;
+const CSS_VARIABLES_BASE = '(var\\((--\\w+(?:-|\\w)*)\\))(?!:)(?:$|\"|\'|,| |;|\\)|\\r|\\n)';
+const SASS_LESS_VARIABLES_BASE = '((?:@|\\$)(?:[a-z]+[\\-_a-z\\d]*)(?!:))(?:$|\\"|\'|,| |;|\\)|\\r|\\n)';
+const STYLUS_VARIABLES_BASE = '(^|(?::|=)\\s*)((?:-|_)*[$a-z]+[\\-_\\d]*)+(?!=)(?:$|\"|\'|,| |;|\\)|\\r|\\n)';
+
+export const CSS_VARIABLES = new RegExp(CSS_VARIABLES_BASE, 'gi');
+export const SASS_LESS_VARIABLES = new RegExp(SASS_LESS_VARIABLES_BASE, 'gi');
+export const STYLUS_VARIABLES = new RegExp(STYLUS_VARIABLES_BASE, 'gi');
+
+export const ONE_CSS_VARIABLES = new RegExp(`^${CSS_VARIABLES_BASE}`, 'i');
+export const ONE_SASS_LESS_VARIABLES = new RegExp(`^${SASS_LESS_VARIABLES_BASE}`, 'i');
+export const ONE_STYLUS_VARIABLES = new RegExp(`^${STYLUS_VARIABLES_BASE}`, 'i');
 
 class VariablesExtractor {
 
@@ -118,12 +127,10 @@ class VariablesExtractor {
   public __extractVariables(text: string, fileName: string): Variable[] {
     let match = null;
     let colors: Variable[] = [];
-    while ((match = REGEXP.exec(text)) !== null) {
-      // match[3] for css variables
-      let varName =  match[1] || match[3];
+    while ((match = CSS_VARIABLES.exec(text)) !== null) {
+      let varName =  match[2];
       varName = varName.trim();
-      // match[2] for css variables
-      let value =  match[1] || match[2];
+      let value = match[1];
       let spaces = (value.match(/\s/g) || []).length;
       value = value.trim();
       if (!this.has(varName)) {
@@ -138,16 +145,48 @@ class VariablesExtractor {
       deco.color = new Color(value, match.index + spaces, deco.color.alpha, deco.color.rgb);
       colors.push(deco);
     }
+    while ((match = SASS_LESS_VARIABLES.exec(text)) !== null) {
+      let varName =  match[1];
+      varName = varName.trim();
+      if (!this.has(varName)) {
+        continue;
+      }
+      let decorations = this.findClosestDeclaration(varName, fileName);
+      if (decorations.length === 0) {
+        this.variablesDeclarations_2.delete(varName);
+        continue;
+      }
+      let deco = Object.create(decorations.pop());
+      deco.color = new Color(varName, match.index, deco.color.alpha, deco.color.rgb);
+      colors.push(deco);
+    }
+    while ((match = STYLUS_VARIABLES.exec(text)) !== null) {
+      let varName =  match[2];
+      varName = varName.trim();
+      let spaces = (match[1] || '').length;
+      if (!this.has(varName)) {
+        continue;
+      }
+      let decorations = this.findClosestDeclaration(varName, fileName);
+      if (decorations.length === 0) {
+        this.variablesDeclarations_2.delete(varName);
+        continue;
+      }
+      let deco = Object.create(decorations.pop());
+      deco.color = new Color(varName, match.index + spaces, deco.color.alpha, deco.color.rgb);
+      colors.push(deco);
+    }
     return colors;
   }
   // Need to be updated
   public extractOneColor(text: string, fileName, line): Color {
-    let match: RegExpExecArray = REGEXP_ONE.exec(text);
-    REGEXP_ONE.exec(text); // prevent null return for later calls
+    // need to select the regexp
+    let match: RegExpExecArray = ONE_SASS_LESS_VARIABLES.exec(text) || ONE_CSS_VARIABLES.exec(text) || ONE_STYLUS_VARIABLES.exec(text);
+    ONE_SASS_LESS_VARIABLES.exec(text) || ONE_CSS_VARIABLES.exec(text) || ONE_STYLUS_VARIABLES.exec(text); // prevent null return for later calls
 
-    if (match && this.has(match[0])) {
+    if (match && (this.has(match[0]) || this.has(match[2]))) {
       // // match[2] for css variables
-      let varName =  match[1] || match[2];
+      let varName =  match[2] || match[1];
       let variables: Variable[] = [].concat(this.get(varName, fileName, line));
       if (variables.length === 0) {
         variables = [].concat(this.get(varName));
@@ -225,7 +264,19 @@ export default instance;
 // @styleset
 // @character-variant)
 
-
+// stylus
+//
+// valid
+//
+// var= #111;
+// --a= #fff
+// -a=#fff
+// _a= #fff
+// $a= #fff
+//
+// not valid
+//
+// 1a= #fff
 
 
 // in sass order matter
