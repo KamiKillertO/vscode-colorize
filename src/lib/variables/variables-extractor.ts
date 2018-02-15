@@ -4,6 +4,14 @@ import ColorExtractor from '../colors/color-extractor';
 import { dirname } from 'path';
 import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../color-util';
 
+
+export interface IVariableExtractor {
+  name: string;
+  extractDeclarations(fileName: string, fileLines: DocumentLine[]): Promise<void>;
+  extractVariables(fileName: string, fileLines: DocumentLine[]): Promise <LineExtraction[]>;
+  extractVariable(fileName: string, text: string): Color;
+  variablesCount(): number;
+}
 // stylus no prefix needed and = instead of :
 export const DECLARATION_REGEXP = /(?:(?:((?:\$|@|--)(?:[a-z]+[\-_a-z\d]*)\s*):)|(\w(?:\w|-)*)\s*=)(?:$|"|'|,| |;|\)|\r|\n)/gi;
 
