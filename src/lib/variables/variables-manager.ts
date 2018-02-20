@@ -1,6 +1,12 @@
 import Variable from './variable';
 import VariableDecoration from './variable-decoration';
 import VariablesExtractor from './variables-extractor';
+
+import './extractors/css-extractor';
+import './extractors/less-extractor';
+import './extractors/sass-extractor';
+import './extractors/stylus-extractor';
+
 import { workspace, window, StatusBarAlignment, StatusBarItem, Uri, TextDocument } from 'vscode';
 import { canColorize } from '../../extension';
 import { DocumentLine, LineExtraction } from '../color-util';
