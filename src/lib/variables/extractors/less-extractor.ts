@@ -15,9 +15,8 @@ class LessExtractor implements IVariableExtractor {
   name: string = 'LESS_EXTRACTOR';
   private store: VariablesStore = new VariablesStore();
 
-  public async extractDeclarations(fileName: string, fileLines: DocumentLine[]): Promise<void> {
-    fileLines.map(({text, line}) => this.__extractDeclarations(fileName, text, line));
-    return;
+  public async extractDeclarations(fileName: string, fileLines: DocumentLine[]): Promise<number> {
+    return fileLines.map(({text, line}) => this.__extractDeclarations(fileName, text, line)).length;
   }
   public __extractDeclarations(fileName: string, text: string, line: number) {
     let match = null;
