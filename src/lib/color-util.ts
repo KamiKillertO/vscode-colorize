@@ -70,8 +70,8 @@ class ColorUtil {
    *
    * @memberOf ColorUtil
    */
-  public static async findColors(fileContent: DocumentLine[], fileName = null): Promise < LineExtraction[] > {
-    return await ColorExtractor.extract(fileContent);
+  public static findColors(fileContent: DocumentLine[], fileName = null): Promise < LineExtraction[] > {
+    return ColorExtractor.extract(fileContent);
   }
 
   public static generateDecoration(color: IColor): IDecoration {
