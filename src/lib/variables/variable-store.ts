@@ -9,7 +9,6 @@ class VariablesStore {
     const declarations = this.get(variable, fileName, line);
     return declarations && declarations.length > 0;
   }
-
   public get(variable: string, fileName: string = null, line: number = null): Variable[] {
     let decorations = this.entries.get(variable) || [];
     if (fileName !== null) {
@@ -20,29 +19,33 @@ class VariablesStore {
     }
     return decorations;
   }
-  public delete(variable: string, fileName: string = null, line: number = null) {
+  private __delete(variable: string, fileName: string, line: number) {
     let decorations = this.get(variable);
-    if (decorations === undefined) { // cannot be undefined??
-      return;
-    }
+
     if (fileName === null) {
       decorations.forEach(_ => _.dispose());
-      this.entries.delete(variable);
-      return;
     }
     if (line !== null) {
       decorations.filter(_ => _.declaration.fileName === fileName && _.declaration.line === line).forEach(_ => _.dispose());
       decorations = decorations.filter(_ => _.declaration.fileName !== fileName || (_.declaration.fileName === fileName && _.declaration.line !== line));
-    } else {
+    } else if (fileName !== null) {
       decorations.filter(_ => _.declaration.fileName === fileName).forEach(_ => _.dispose());
       decorations = decorations.filter(_ => _.declaration.fileName !== fileName);
     }
-    if (decorations.length === 0) {
-      this.entries.delete(variable);
-      return;
-    }
     this.entries.set(variable, decorations);
     return;
+  }
+  public delete(variable: string = null, fileName: string = null, line: number = null) {
+    if (variable !== null) {
+      return this.__delete(variable, fileName, line);
+    }
+    const IT: IterableIterator<[string, Variable[]]> = this.entries.entries();
+    let tmp: IteratorResult<[string, Variable[]]> = IT.next();
+    while (tmp.done === false) {
+      const varName: string = tmp.value[0];
+      this.__delete(varName, fileName, line);
+      tmp = IT.next();
+    }
   }
 
   // not sure it should be here ><

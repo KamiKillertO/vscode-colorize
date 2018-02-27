@@ -75,6 +75,9 @@ class CssExtractor implements IVariableExtractor {
   variablesCount(): number {
     return this.store.count;
   }
+  deleteVariable(fileName: string, line: number) {
+    return this.store.delete(null, fileName, line);
+  }
 }
 VariablesExtractor.registerExtractor(new CssExtractor());
 export default CssExtractor;

@@ -4,16 +4,18 @@ import ColorExtractor from '../colors/color-extractor';
 import { dirname } from 'path';
 import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../color-util';
 
-
+// export class IVariableExtractor { // class instead? // avoid duplication (variablesCount/deleteVariable same code for all extractors)
 export interface IVariableExtractor {
-  name: string;
+  name: string; // necessary?
+
   extractDeclarations(fileName: string, fileLines: DocumentLine[]): Promise<number>;
+
   extractVariables(fileName: string, fileLines: DocumentLine[]): Promise <LineExtraction[]>;
   extractVariable(fileName: string, text: string): Color;
   variablesCount(): number;
+  deleteVariable(fileName: string, line: number);
 }
 
-// stylus no prefix needed and = instead of :
 class VariablesExtractor {
 
   public extractors: IVariableExtractor[];
@@ -44,13 +46,7 @@ class VariablesExtractor {
   }
 
   public deleteVariableInLine(fileName: string, line: number) {
-    // const IT: IterableIterator<[string, Variable[]]> = this.variablesDeclarations_2.entries();
-    // let tmp: IteratorResult<[string, Variable[]]> = IT.next();
-    // while (tmp.done === false) {
-    //   const varName: string = tmp.value[0];
-    //   this.delete(varName, fileName, line);
-    //   tmp = IT.next();
-    // }
+    this.extractors.forEach(extractor => extractor.deleteVariable(fileName, line));
   }
   public async extractDeclarations(fileName: string, fileLines: DocumentLine[]): Promise<number[]> {
     return Promise.all(this.extractors.map(extractor => extractor.extractDeclarations(fileName, fileLines)));
