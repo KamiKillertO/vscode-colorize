@@ -1,11 +1,11 @@
-import ColorExtractor, { IColorExtractor } from '../color-extractor';
+import ColorExtractor, { IColorStrategy } from '../color-extractor';
 import Color from '../color';
 import { LineExtraction, DocumentLine } from '../../color-util';
 
 export const REGEXP = /((?:rgb\((?:\d{1,3}\s*,\s*){2}\d{1,3}\))|(?:rgba\((?:\d{1,3}\s*,\s*){3}(?:[0-1]|1\.0|[0](?:\.\d+){0,1}|(?:\.\d+))\)))(?:$|"|'|,| |;|\)|\r|\n)/gi;
 export const REGEXP_ONE = /^((?:rgb\((?:\d{1,3}\s*,\s*){2}\d{1,3}\))|(?:rgba\((?:\d{1,3}\s*,\s*){3}(?:[0-1]|1\.0|[0](?:\.\d+){0,1}|(?:\.\d+))\)))(?:$|"|'|,| |;|\)|\r|\n)/i;
 
-class RgbExtractor implements IColorExtractor {
+class RgbExtractor implements IColorStrategy {
   public name: string = 'RGB_EXTRACTOR';
 
   private extractRGBAValue(value): number[] {
@@ -43,5 +43,5 @@ class RgbExtractor implements IColorExtractor {
   }
 }
 
-ColorExtractor.registerExtractor(new RgbExtractor());
+ColorExtractor.registerStrategy(new RgbExtractor());
 export default RgbExtractor;

@@ -1,5 +1,5 @@
 import Color from './../color';
-import ColorExtractor, { IColorExtractor } from '../color-extractor';
+import ColorExtractor, { IColorStrategy } from '../color-extractor';
 import { convertHslaToRgba } from '../../color-util';
 import { LineExtraction, DocumentLine } from '../../color-util';
 
@@ -7,7 +7,7 @@ import { LineExtraction, DocumentLine } from '../../color-util';
 export const REGEXP = /((?:hsl\(\d*\s*,\s*\d{1,3}%\s*,\s*\d{1,3}%\))|(?:hsla\(\d*\s*,\s*(?:\d{1,3}%\s*,\s*){2}(?:[0-1]|1\.0|[0](?:\.\d+){0,1}|(?:\.\d+))\)))(?:$|"|'|,| |;|\)|\r|\n)/gi;
 export const REGEXP_ONE = /^((?:hsl\(\d*\s*,\s*\d{1,3}%\s*,\s*\d{1,3}%\))|(?:hsla\(\d*\s*,\s*(?:\d{1,3}%\s*,\s*){2}(?:[0-1]|1\.0|[0](?:\.\d+){0,1}|(?:\.\d+))\)))(?:$|"|'|,| |;|\)|\r|\n)/i;
 
-class HSLColorExtractor implements IColorExtractor {
+class HSLColorExtractor implements IColorStrategy {
   public name: string = 'HSL_EXTRACTOR';
 
   private generateColorFromMatch(match: RegExpMatchArray): Color {
@@ -59,5 +59,5 @@ class HSLColorExtractor implements IColorExtractor {
   }
 }
 
-ColorExtractor.registerExtractor(new HSLColorExtractor());
+ColorExtractor.registerStrategy(new HSLColorExtractor());
 export default HSLColorExtractor;

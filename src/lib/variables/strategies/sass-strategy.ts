@@ -1,4 +1,4 @@
-import VariablesExtractor, { IVariableExtractor } from '../variables-extractor';
+import VariablesExtractor, { IVariableStrategy } from '../variables-extractor';
 import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../../color-util';
 import Variable from '../variable';
 import Color, { IColor } from '../../colors/color';
@@ -11,7 +11,7 @@ export const REGEXP = new RegExp(`(\\$(?:[a-z]+[\\-_a-z\\d]*)(?!:))${REGEXP_END}
 export const REGEXP_ONE = new RegExp(`^(\\$(?:[a-z]+[\\-_a-z\\d]*)(?!:))${REGEXP_END}`, 'i');
 export const DECLARATION_REGEXP = new RegExp(`(?:(\\$(?:[a-z]+[\\-_a-z\\d]*)\\s*):)${REGEXP_END}`, 'gi');
 
-class SassExtractor implements IVariableExtractor {
+class SassExtractor implements IVariableStrategy {
   name: string = 'SASS_EXTRACTOR';
   private store: VariablesStore = new VariablesStore();
 
@@ -78,5 +78,5 @@ class SassExtractor implements IVariableExtractor {
   }
 }
 
-VariablesExtractor.registerExtractor(new SassExtractor());
+VariablesExtractor.registerStrategy(new SassExtractor());
 export default SassExtractor;

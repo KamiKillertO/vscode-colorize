@@ -1,5 +1,5 @@
 import Color from './../color';
-import ColorExtractor, { IColorExtractor } from '../color-extractor';
+import ColorExtractor, { IColorStrategy } from '../color-extractor';
 import { LineExtraction, DocumentLine } from '../../color-util';
 
 export const COLORS = Object({
@@ -751,7 +751,7 @@ export const REGEXP = (() => RegExp(`(?:,| |\\(|:)(${REGEXP_BASE})(?:$|,| |;|\\)
 // Checking for beginning beginning allow to catch stylus var value
 export const REGEXP_ONE = (() => RegExp(`^(?:^|,|\s|\\(|:)(${REGEXP_BASE})(?:$|,| |;|\\)|\\r|\\n)`, 'i'))();
 
-class BrowsersColorExtractor implements IColorExtractor {
+class BrowsersColorExtractor implements IColorStrategy {
   public name: string = 'BROWSERS_COLORS_EXTRACTOR';
 
   public async extractColors(fileLines: DocumentLine[]): Promise < LineExtraction[] > {
@@ -778,5 +778,5 @@ class BrowsersColorExtractor implements IColorExtractor {
   }
 }
 
-ColorExtractor.registerExtractor(new BrowsersColorExtractor());
+ColorExtractor.registerStrategy(new BrowsersColorExtractor());
 export default BrowsersColorExtractor;

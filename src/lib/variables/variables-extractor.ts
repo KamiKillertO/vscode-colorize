@@ -3,11 +3,10 @@ import Color, { IColor } from '../colors/color';
 import ColorExtractor from '../colors/color-extractor';
 import { dirname } from 'path';
 import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../color-util';
+import { IStrategy, Extractor } from '../extractor-mixin';
 
-// export class IVariableExtractor { // class instead? // avoid duplication (variablesCount/deleteVariable same code for all extractors)
-export interface IVariableExtractor {
-  name: string; // necessary?
-
+// export class IVariableStrategy { // class instead? // avoid duplication (variablesCount/deleteVariable same code for all extractors)
+export interface IVariableStrategy extends IStrategy {
   extractDeclarations(fileName: string, fileLines: DocumentLine[]): Promise<number>;
 
   extractVariables(fileName: string, fileLines: DocumentLine[]): Promise <LineExtraction[]>;
@@ -18,21 +17,21 @@ export interface IVariableExtractor {
 
 class VariablesExtractor extends Extractor {
 
-  public extractors: IVariableExtractor[];
+  public strategies: IVariableStrategy[];
 
   public async extractVariables(fileName: string, fileLines: DocumentLine[]): Promise < LineExtraction[] > {
-    const colors = await Promise.all(this.extractors.map(extractor => extractor.extractVariables(fileName, fileLines)));
+    const colors = await Promise.all(this.strategies.map(strategy => strategy.extractVariables(fileName, fileLines)));
     return flattenLineExtractionsFlatten(colors); // should regroup per lines?
   }
 
   public deleteVariableInLine(fileName: string, line: number) {
-    this.extractors.forEach(extractor => extractor.deleteVariable(fileName, line));
+    this.strategies.forEach(strategy => strategy.deleteVariable(fileName, line));
   }
   public async extractDeclarations(fileName: string, fileLines: DocumentLine[]): Promise<number[]> {
-    return Promise.all(this.extractors.map(extractor => extractor.extractDeclarations(fileName, fileLines)));
+    return Promise.all(this.strategies.map(strategy => strategy.extractDeclarations(fileName, fileLines)));
   }
   public getVariablesCount(): number {
-    return this.extractors.reduce((cv, extractor) => cv + extractor.variablesCount(), 0);
+    return this.strategies.reduce((cv, strategy) => cv + strategy.variablesCount(), 0);
   }
 }
 const instance = new VariablesExtractor();

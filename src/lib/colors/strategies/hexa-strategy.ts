@@ -1,12 +1,12 @@
 import Color from './../color';
-import ColorExtractor, { IColorExtractor } from '../color-extractor';
+import ColorExtractor, { IColorStrategy } from '../color-extractor';
 import color from './../color';
 import { LineExtraction, DocumentLine } from '../../color-util';
 
 export const REGEXP = /(#[\da-f]{3,4}|#[\da-f]{6}|#[\da-f]{8})(?:$|"|'|,| |;|\)|\r|\n)/gi;
 export const REGEXP_ONE = /^(#[\da-f]{3,4}|#[\da-f]{6}|#[\da-f]{8})(?:$|"|'|,| |;|\)|\r|\n)/i;
 
-class HexaColorExtractor implements IColorExtractor {
+class HexaColorExtractor implements IColorStrategy {
   public name: string = 'HEXA_EXTRACTOR';
 
   private extractRGBValue(value): number[] {
@@ -51,6 +51,6 @@ class HexaColorExtractor implements IColorExtractor {
     return null;
   }
 }
-ColorExtractor.registerExtractor(new HexaColorExtractor());
 
+ColorExtractor.registerStrategy(new HexaColorExtractor());
 export default HexaColorExtractor;
