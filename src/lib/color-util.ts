@@ -1,9 +1,9 @@
 import Color, {IColor} from './colors/color';
 import Variable from './variables/variable';
-import './colors/extractors/hexa-extractor';
-import './colors/extractors/rgb-extractor';
-import './colors/extractors/browser-extractor';
-import './colors/extractors/hsl-extractor';
+import './colors/strategies/hexa-strategy';
+import './colors/strategies/rgb-strategy';
+import './colors/strategies/browser-strategy';
+import './colors/strategies/hsl-strategy';
 import ColorExtractor from './colors/color-extractor';
 import ColorDecoration from './colors/color-decoration';
 import { Range, TextEditorDecorationType } from 'vscode';
@@ -70,8 +70,8 @@ class ColorUtil {
    *
    * @memberOf ColorUtil
    */
-  public static async findColors(fileContent: DocumentLine[], fileName = null): Promise < LineExtraction[] > {
-    return await ColorExtractor.extract(fileContent);
+  public static findColors(fileContent: DocumentLine[], fileName = null): Promise < LineExtraction[] > {
+    return ColorExtractor.extract(fileContent);
   }
 
   public static generateDecoration(color: IColor): IDecoration {
