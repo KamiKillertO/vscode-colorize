@@ -8,3 +8,4 @@
   Last release, we deprecated the ${workspaceRoot} variable in favor of ${workspaceFolder} to make this consistent with multi-root workspace support. For the same reason, we are deprecating ${workspaceRootFolderName}. Please use ${workspaceFolderBasename} instead. This deprecation applies to debug launch configurations as well._
 
 
+- Create/use mixins to reuse code duplications?? (https://blog.mariusschulz.com/2017/05/26/typescript-2-2-mixin-classes)
