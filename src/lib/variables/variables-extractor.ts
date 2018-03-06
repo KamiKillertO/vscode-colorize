@@ -16,30 +16,10 @@ export interface IVariableExtractor {
   deleteVariable(fileName: string, line: number);
 }
 
-class VariablesExtractor {
+class VariablesExtractor extends Extractor {
 
   public extractors: IVariableExtractor[];
-  constructor() {
-    this.extractors = [];
-  }
-  public registerExtractor(extractor: IVariableExtractor) {
-    if (!this.has(extractor)) {
-      this.extractors.push(extractor);
-    }
-  }
-  public has(extractor: string | IVariableExtractor): boolean {
-    if (typeof extractor === 'string') {
-      return this.extractors.some(_ => _.name === extractor);
-    }
-    return this.extractors.some(_ => _.name === extractor.name);
-  }
 
-  public get(extractor: string | IVariableExtractor): IVariableExtractor {
-    if (this.has(extractor) === false) {
-      return null;
-    }
-    return this.extractors.find(_ => _.name === extractor);
-  }
   public async extractVariables(fileName: string, fileLines: DocumentLine[]): Promise < LineExtraction[] > {
     const colors = await Promise.all(this.extractors.map(extractor => extractor.extractVariables(fileName, fileLines)));
     return flattenLineExtractionsFlatten(colors); // should regroup per lines?

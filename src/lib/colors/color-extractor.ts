@@ -6,28 +6,8 @@ export interface IColorExtractor {
   extractColors(fileLines: DocumentLine[]): Promise < LineExtraction[] >;
   extractColor(text: string): IColor;
 }
-class ColorExtractor {
   public extractors: IColorExtractor[];
-  constructor() {
-    this.extractors = [];
-  }
-  public registerExtractor(extractor: IColorExtractor) {
-    if (!this.has(extractor)) {
-      this.extractors.push(extractor);
-    }
-  }
-  public has(extractor: string | IColorExtractor): boolean {
-    if (typeof extractor === 'string') {
-      return this.extractors.some(_ => _.name === extractor);
-    }
-    return this.extractors.some(_ => _.name === extractor.name);
-  }
-  public get(extractor: string | IColorExtractor): IColorExtractor {
-    if (this.has(extractor) === false) {
-      return null;
-    }
-    return this.extractors.find(_ => _.name === extractor);
-  }
+class ColorExtractor extends Extractor {
   public async extract(fileLines: DocumentLine[]): Promise < LineExtraction[] > {
     const colors = await Promise.all(this.extractors.map(extractor => extractor.extractColors(fileLines)));
     return flattenLineExtractionsFlatten(colors); // should regroup per lines?
