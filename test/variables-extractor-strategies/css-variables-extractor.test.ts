@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { REGEXP, DECLARATION_REGEXP } from '../../src/lib/variables/extractors/css-extractor';
+import { REGEXP, DECLARATION_REGEXP } from '../../src/lib/variables/strategies/css-strategy';
 // Defines a Mocha test suite to group tests of similar kind together
 describe('Test variables declaration Regex', () => {
   // css variables (works for postcss too)

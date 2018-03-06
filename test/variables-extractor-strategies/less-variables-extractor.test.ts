@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { REGEXP, DECLARATION_REGEXP } from '../../src/lib/variables/extractors/less-extractor';
+import { REGEXP, DECLARATION_REGEXP } from '../../src/lib/variables/strategies/less-strategy';
 // Defines a Mocha test suite to group tests of similar kind together
 describe('Test variables declaration Regex', () => {
   // less

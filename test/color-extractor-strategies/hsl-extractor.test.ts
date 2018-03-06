@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { REGEXP } from '../../src/lib/colors/extractors/hsl-extractor';
+import { REGEXP } from '../../src/lib/colors/strategies/hsl-strategy';
 
 describe('Test hsl(a) color Regex', () => {
   it('Should match a simple hsl color', function () {

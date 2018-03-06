@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { REGEXP } from '../../src/lib/colors/extractors/rgb-extractor';
+import { REGEXP } from '../../src/lib/colors/strategies/rgb-strategy';
 
 describe('Test rgb(a) color Regex', () => {
   it('Should match a simple rgb color', function () {

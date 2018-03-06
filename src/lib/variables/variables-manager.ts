@@ -2,10 +2,10 @@ import Variable from './variable';
 import VariableDecoration from './variable-decoration';
 import VariablesExtractor from './variables-extractor';
 
-import './extractors/css-extractor';
-import './extractors/less-extractor';
-import './extractors/sass-extractor';
-import './extractors/stylus-extractor';
+import './strategies/css-strategy';
+import './strategies/less-strategy';
+import './strategies/sass-strategy';
+import './strategies/stylus-strategy';
 
 import { workspace, window, StatusBarAlignment, StatusBarItem, Uri, TextDocument } from 'vscode';
 import { canColorize } from '../../extension';

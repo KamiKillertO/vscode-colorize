@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { REGEXP } from '../../src/lib/colors/extractors/browser-extractor';
+import { REGEXP } from '../../src/lib/colors/strategies/browser-strategy';
 
 // Defines a Mocha test suite to group tests of similar kind together
 describe('Test browser predefined color Regex', () => {
