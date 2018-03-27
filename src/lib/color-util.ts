@@ -1,15 +1,29 @@
 import Color, {IColor} from './colors/color';
 import Variable from './variables/variable';
-import './colors/extractors/hexa-extractor';
-import './colors/extractors/rgb-extractor';
-import './colors/extractors/browser-extractor';
-import './colors/extractors/hsl-extractor';
+import './colors/strategies/hexa-strategy';
+import './colors/strategies/rgb-strategy';
+import './colors/strategies/browser-strategy';
+import './colors/strategies/hsl-strategy';
 import ColorExtractor from './colors/color-extractor';
 import ColorDecoration from './colors/color-decoration';
 import { Range, TextEditorDecorationType } from 'vscode';
 
-interface IDecoration {
+interface DocumentLine {
+  line: number;
+  text: string;
+}
 
+interface LineExtraction {
+  line: number;
+  colors: IColor[];
+}
+
+const flattenLineExtractionsFlatten = arr => arr.reduce((a, b) => a.concat(Array.isArray(b) ? flattenLineExtractionsFlatten(b) : b), []).filter(_ => _.colors.length !== 0);
+
+const WHITE = '#FFFFFF',
+      BLACK = '#000000';
+
+interface IDecoration {
   decoration: TextEditorDecorationType;
   /**
    * Disposed the TextEditorDecorationType
@@ -39,8 +53,14 @@ interface IDecoration {
   generateRange(line: number): Range;
 }
 
-
 class ColorUtil {
+  public static textToFileLines(text: string): DocumentLine[] {
+    return text.split(/\n/)
+                .map((text, index) => Object({
+                  'text': text,
+                  'line': index
+                }));
+  }
   /**
    * Extract all colors from a text
    *
@@ -50,10 +70,9 @@ class ColorUtil {
    *
    * @memberOf ColorUtil
    */
-   public static async findColors(text, fileName = null): Promise < IColor[] > {
-    const colors = await ColorExtractor.extract(text);
-    return colors;
-   }
+  public static findColors(fileContent: DocumentLine[], fileName = null): Promise < LineExtraction[] > {
+    return ColorExtractor.extract(fileContent);
+  }
 
   public static generateDecoration(color: IColor): IDecoration {
     return new ColorDecoration(<Color>color);
@@ -72,19 +91,35 @@ class ColorUtil {
    * @returns {number}
    */
 function colorLuminance(color: Color): number {
-    let rgb = color.rgb;
-    rgb = rgb.map(c => {
-      c = c / 255;
-      if (c < 0.03928) {
-        c = c / 12.92;
-      } else {
-        c = (c + .055) / 1.055;
-        c = Math.pow(c, 2.4);
-      }
-      return c;
-    });
-    return (0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]);
+  let rgb = color.rgb;
+  rgb = rgb.map(c => {
+    c = c / 255;
+    if (c < 0.03928) {
+      c = c / 12.92;
+    } else {
+      c = (c + .055) / 1.055;
+      c = Math.pow(c, 2.4);
+    }
+    return c;
+  });
+  return (0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]);
+}
+
+function generateOptimalTextColor(color: Color): string {
+  const luminance: number = colorLuminance(color);
+  const contrastRatioBlack: number = (luminance + 0.05) / 0.05;
+  if (contrastRatioBlack > 7) {
+    return BLACK;
   }
+  const contrastRatioWhite: number = 1.05 / (luminance + 0.05);
+  if (contrastRatioWhite > 7) {
+    return WHITE;
+  }
+  if (contrastRatioBlack > contrastRatioWhite) {
+    return BLACK;
+  }
+  return WHITE;
+}
   /**
  * Converts an RGB color value to HSL. Conversion formula
  * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
@@ -181,4 +216,4 @@ function executeHSLProperFormula(tmp_1: number, tmp_2: number, value: number): n
 
 export default ColorUtil;
 
-export { IDecoration, convertHslaToRgba, colorLuminance, convertRgbaToHsla };
+export { IDecoration, convertHslaToRgba, colorLuminance, convertRgbaToHsla, generateOptimalTextColor, flattenLineExtractionsFlatten, LineExtraction, DocumentLine };

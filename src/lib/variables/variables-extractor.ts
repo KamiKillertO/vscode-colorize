@@ -1,171 +1,37 @@
 import Variable from './variable';
-import Color from '../colors/color';
+import Color, { IColor } from '../colors/color';
 import ColorExtractor from '../colors/color-extractor';
 import { dirname } from 'path';
-// stylus no prefix needed and = instead of :
-export const DECLARATION_REGEXP = /(?:(?:((?:\$|@|--)(?:\w|-)+\s*):)|(\w(?:\w|-)*)\s*=)(?:$|"|'|,| |;|\)|\r|\n)/gi;
-//  \b allow to catch stylus variables names
-// export const REGEXP = /(?:((?:(?:\s|\$|@)(?:\w|-)+))|(var\((--\w+(?:-|\w)*)\)))(?:$|"|'|,| |;|\)|\r|\n)/gi;
-export const REGEXP = /(?:((?:(?:@|\s|\$)(?:(?:[a-z]|\d+[a-z])[a-z\d]*|-)+))|(var\((--\w+(?:-|\w)*)\)))(?:$|"|'|,| |;|\)|\r|\n)(?!\s*(?:=|:))/gi;
+import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../color-util';
+import { IStrategy, Extractor } from '../extractor-mixin';
 
-export const REGEXP_ONE = /^(?:((?:(?:\$|@)(?:(?:[a-z]|\d+[a-z])[a-z\d]*|-)+))|(?:var\((--\w+(?:-|\w)*))\))(?:$|"|'|,| |;|\)|\r|\n)(?!\s*(?:=|:))/gi;
+// export class IVariableStrategy { // class instead? // avoid duplication (variablesCount/deleteVariable same code for all extractors)
+export interface IVariableStrategy extends IStrategy {
+  extractDeclarations(fileName: string, fileLines: DocumentLine[]): Promise<number>;
 
-class VariablesExtractor {
+  extractVariables(fileName: string, fileLines: DocumentLine[]): Promise <LineExtraction[]>;
+  extractVariable(fileName: string, text: string): Color;
+  variablesCount(): number;
+  deleteVariable(fileName: string, line: number);
+}
 
-  public variablesDeclarations_2: Map<string, Variable[]> = new Map(); // use a map insteag (colorName: color)
+class VariablesExtractor extends Extractor {
 
-  public name: string = 'VARIABLE_EXTRACTOR';
+  public strategies: IVariableStrategy[];
 
-  private _add(varName: string, variable: Variable) {
-    if (this.has(varName)) {
-      const decorations = this.get(varName);
-      this.variablesDeclarations_2.set(varName, decorations.concat([variable]));
-    } else {
-      this.variablesDeclarations_2.set(varName, [variable]);
-    }
-    return;
-  }
-
-  public has(variable: string = null, fileName: string = null, line: number = null) {
-    const declarations = this.get(variable, fileName, line);
-    return declarations && declarations.length > 0;
-  }
-
-  public get(variable: string, fileName: string  = null, line: number = null): Variable[] {
-    let decorations = this.variablesDeclarations_2.get(variable) || [];
-    if (fileName === null) {
-      return decorations;
-    }
-    decorations = decorations.filter(_ => _.declaration.fileName === fileName);
-    if (line !== null) {
-      decorations = decorations.filter(_ => _.declaration.line === line);
-    }
-    return decorations;
-  }
-
-  public findClosestDeclaration(variable, file) {
-    let decorations = this.get(variable, file);
-    decorations = decorations.sort((a, b) => a.declaration.line - b.declaration.line);
-    if (decorations.length !== 0) {
-      return decorations;
-    }
-    decorations = this.get(variable);
-    if (decorations.length === 0) {
-      return;
-    }
-    decorations = this.filterDecorations(decorations, file);
-    decorations = decorations.sort((a, b) => a.declaration.line - b.declaration.line);
-    return decorations;
-    // here should check all declaration file to find the closest (parent folder)
-  }
-  private filterDecorations(decorations, file) {
-    file = dirname(file);
-    let r = new RegExp(`^${encodeURI(file)}`);
-    let decorationsFound = decorations.filter((deco: Variable) => r.test(encodeURI(deco.declaration.fileName)));
-    if (decorationsFound.length !== 0) {
-      return decorationsFound;
-    }
-    return this.filterDecorations(decorations, file);
-  }
-
-  public delete(variable: string, fileName: string, line: number) {
-    let decorations = this.get(variable);
-    if (decorations === undefined) {
-      return;
-    }
-    if (fileName === null) {
-      decorations.forEach(_ => _.dispose());
-      this.variablesDeclarations_2.delete(variable);
-      return;
-    }
-    if (line !== null) {
-      decorations.filter(_ => _.declaration.fileName === fileName && _.declaration.line === line).forEach(_ => _.dispose());
-      decorations = decorations.filter(_ => _.declaration.fileName !== fileName || (_.declaration.fileName === fileName && _.declaration.line !== line));
-    } else {
-      decorations.filter(_ => _.declaration.fileName === fileName).forEach(_ => _.dispose());
-      decorations = decorations.filter(_ => _.declaration.fileName !== fileName);
-    }
-    if (decorations.length === 0) {
-      this.variablesDeclarations_2.delete(variable);
-      return;
-    }
-    this.variablesDeclarations_2.set(variable, decorations);
-    return;
+  public async extractVariables(fileName: string, fileLines: DocumentLine[]): Promise < LineExtraction[] > {
+    const colors = await Promise.all(this.strategies.map(strategy => strategy.extractVariables(fileName, fileLines)));
+    return flattenLineExtractionsFlatten(colors); // should regroup per lines?
   }
 
   public deleteVariableInLine(fileName: string, line: number) {
-    const IT: IterableIterator<[string, Variable[]]> = this.variablesDeclarations_2.entries();
-    let tmp: IteratorResult<[string, Variable[]]> = IT.next();
-    while (tmp.done === false) {
-      const varName: string = tmp.value[0];
-      this.delete(varName, fileName, line);
-      tmp = IT.next();
-    }
+    this.strategies.forEach(strategy => strategy.deleteVariable(fileName, line));
   }
-
-  public async extractVariables(text: string, fileName: string): Promise<Variable[]> {
-    let match = null;
-    let colors: Variable[] = [];
-    while ((match = REGEXP.exec(text)) !== null) {
-      // match[3] for css variables
-      let varName =  match[1] || match[3];
-      varName = varName.trim();
-      // match[2] for css variables
-      let value =  match[1] || match[2];
-      let spaces = (value.match(/\s/g) || []).length;
-      value = value.trim();
-      if (!this.has(varName)) {
-        continue;
-      }
-      let decorations = this.findClosestDeclaration(varName, fileName);
-      if (decorations.length === 0) {
-        this.variablesDeclarations_2.delete(varName);
-        continue;
-      }
-      let deco = Object.create(decorations.pop());
-      deco.color = new Color(value, match.index + spaces, deco.color.alpha, deco.color.rgb);
-      colors.push(deco);
-    }
-    return colors;
+  public async extractDeclarations(fileName: string, fileLines: DocumentLine[]): Promise<number[]> {
+    return Promise.all(this.strategies.map(strategy => strategy.extractDeclarations(fileName, fileLines)));
   }
-  // Need to be updated
-  public extractOneColor(text: string, fileName, line): Color {
-    let match: RegExpExecArray = REGEXP_ONE.exec(text);
-    REGEXP_ONE.exec(text); // prevent null return for later calls
-
-    if (match && this.has(match[0])) {
-      // // match[2] for css variables
-      let varName =  match[1] || match[2];
-      let variables: Variable[] = [].concat(this.get(varName, fileName, line));
-      if (variables.length === 0) {
-        variables = [].concat(this.get(varName));
-      }
-      return new Color(varName, match.index, 1, variables.pop().color.rgb);
-    }
-    return null;
-  }
-
-  public async extractDeclarations(fileName: string, text: string, line: number): Promise<Map<string, Variable[]>> {
-    let match = null;
-    while ((match = DECLARATION_REGEXP.exec(text)) !== null) {
-      const varName = (match[1] || match[2]).trim();
-      let color = ColorExtractor.extractOneColor(text.slice(match.index + match[0].length).trim()) || this.extractOneColor(text.slice(match.index + match[0].length).trim(), fileName, line);
-      if (this.has(varName, fileName, line)) {
-        const decoration = this.get(varName, fileName, line);
-        if (color === undefined) {
-          this.delete(varName, fileName, line);
-        } else {
-          decoration[0].update(<Color>color);
-        }
-        continue;
-      }
-      if (color === undefined || color === null) {
-        continue;
-      }
-      const variable = new Variable(varName, <Color> color, {fileName, line});
-      this._add(varName, variable);
-    }
-    return this.variablesDeclarations_2;
+  public getVariablesCount(): number {
+    return this.strategies.reduce((cv, strategy) => cv + strategy.variablesCount(), 0);
   }
 }
 const instance = new VariablesExtractor();
@@ -211,7 +77,19 @@ export default instance;
 // @styleset
 // @character-variant)
 
-
+// stylus
+//
+// valid
+//
+// var= #111;
+// --a= #fff
+// -a=#fff
+// _a= #fff
+// $a= #fff
+//
+// not valid
+//
+// 1a= #fff
 
 
 // in sass order matter

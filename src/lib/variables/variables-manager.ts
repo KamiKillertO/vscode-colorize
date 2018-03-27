@@ -1,16 +1,18 @@
 import Variable from './variable';
 import VariableDecoration from './variable-decoration';
 import VariablesExtractor from './variables-extractor';
+
+import './strategies/css-strategy';
+import './strategies/less-strategy';
+import './strategies/sass-strategy';
+import './strategies/stylus-strategy';
+
 import { workspace, window, StatusBarAlignment, StatusBarItem, Uri, TextDocument } from 'vscode';
 import { canColorize } from '../../extension';
+import { DocumentLine, LineExtraction } from '../color-util';
 
 const INCLUDE_PATTERN = '{**/*.css,**/*.sass,**/*.scss,**/*.less,**/*.pcss,**/*.sss,**/*.stylus,**/*.styl}';
 const EXCLUDE_PATTERN = '{**/.git,**/.svn,**/.hg,**/CVS,**/.DS_Store,**/.git,**/node_modules,**/bower_components,**/tmp,**/dist,**/tests}';
-
-interface DocumentLine {
-  line: number;
-  text: string;
-}
 
 class VariablesManager {
 
@@ -23,8 +25,9 @@ class VariablesManager {
       const files: Uri[] = await workspace.findFiles(INCLUDE_PATTERN, EXCLUDE_PATTERN);
       statusBar.text = `Found ${files.length} files`;
 
-    let variables: Map<String, Variable[]> = (await Promise.all(this.extractFilesVariable(files))).pop(); // pop ><
-    statusBar.text = `Found ${variables.size} variables`;
+      await Promise.all(this.extractFilesVariable(files));
+      let variablesCount: number = VariablesExtractor.getVariablesCount();
+      statusBar.text = `Found ${variablesCount} variables`;
     } catch (error) {
       statusBar.text = 'Variables extraction fail';
     }
@@ -47,17 +50,16 @@ class VariablesManager {
     return files.map(async(file) => {
       const document: TextDocument =  await workspace.openTextDocument(file.path);
       const content: DocumentLine[] = this.getFileContent(document);
-      const variables = await Promise.all(content.map(line => this.findVariablesDeclarations(document.fileName, line.text, line.line)));
-      return variables[variables.length - 1 ];
+      return VariablesExtractor.extractDeclarations(document.fileName, content);
     });
   }
 
-  public static findVariablesDeclarations(fileName, text, line): Promise <Map<String, Variable[]>> {
-    return VariablesExtractor.extractDeclarations(fileName, text, line);
+  public static findVariablesDeclarations(fileName, fileLines: DocumentLine[]): Promise <number[]> {
+    return VariablesExtractor.extractDeclarations(fileName, fileLines);
   }
 
-  public static findVariables(fileName, text): Promise <Variable[]> {
-    return VariablesExtractor.extractVariables(fileName, text);
+  public static findVariables(fileName, fileLines: DocumentLine[]): Promise <LineExtraction[]> {
+    return VariablesExtractor.extractVariables(fileName, fileLines);
   }
 
   public static generateDecoration(Variable: Variable): VariableDecoration {
