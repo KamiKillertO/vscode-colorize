@@ -14,7 +14,7 @@ class HSLColorExtractor implements IColorStrategy {
     const [h, s, l, a] = this.extractHSLValue(match[1]);
     if (s <= 100 && l <= 100) {
       let [r, g, b] = convertHslaToRgba(h, s, l, a);
-      return new Color(match[1], match.index, 1, [r, g, b]);
+      return new Color(match[1], match.index, [r, g, b]);
     }
     return null;
   }

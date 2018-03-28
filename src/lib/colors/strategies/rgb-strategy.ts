@@ -21,7 +21,7 @@ class RgbExtractor implements IColorStrategy {
         let rgba = match[1].replace(/rgb(a){0,1}\(/, '').replace(/\)/, '').split(/,/gi).map(c => parseFloat(c));
         // Check if it's a valid rgb(a) color
         if (rgba.slice(0, 3).every(c => c <= 255)) {
-          colors.push(new Color(match[1], match.index, 1, this.extractRGBAValue(match[1])));
+          colors.push(new Color(match[1], match.index, this.extractRGBAValue(match[1])));
         }
       }
       return {
@@ -36,7 +36,7 @@ class RgbExtractor implements IColorStrategy {
       let rgba = match[1].replace(/rgb(a){0,1}\(/, '').replace(/\)/, '').split(/,/gi).map(c => parseFloat(c));
       // Check if it's a valid rgb(a) color
       if (rgba.slice(0, 3).every(c => c <= 255)) {
-        return new Color(match[1], match.index, 1, this.extractRGBAValue(match[1]));
+        return new Color(match[1], match.index, this.extractRGBAValue(match[1]));
       }
     }
     return null;
