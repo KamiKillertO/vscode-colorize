@@ -57,7 +57,7 @@ class CssExtractor implements IVariableStrategy {
         //   continue;
         // }
         let deco = Object.create(decorations);
-        deco.color = new Color(value, match.index + spaces, deco.color.alpha, deco.color.rgb);
+        deco.color = new Color(value, match.index + spaces, deco.color.rgb, deco.color.alpha);
         colors.push(deco);
       }
       return {line, colors};
