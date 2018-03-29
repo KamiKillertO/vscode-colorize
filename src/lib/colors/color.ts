@@ -46,10 +46,10 @@ class Color implements IColor {
    *
    * @memberOf Color
    */
-  public constructor(value: string, positionInText: number = 0, alpha: number = 1, rgb: number[]) {
+  public constructor(value: string, positionInText: number = 0, rgb: number[], alpha?: number) {
     this.value = value;
     this.positionInText = positionInText;
-    this.alpha = alpha;
+    this.alpha = alpha || 1;
     this.rgb = rgb;
   }
   /**

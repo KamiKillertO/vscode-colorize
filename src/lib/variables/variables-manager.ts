@@ -1,6 +1,12 @@
 import Variable from './variable';
 import VariableDecoration from './variable-decoration';
 import VariablesExtractor from './variables-extractor';
+
+import './strategies/css-strategy';
+import './strategies/less-strategy';
+import './strategies/sass-strategy';
+import './strategies/stylus-strategy';
+
 import { workspace, window, StatusBarAlignment, StatusBarItem, Uri, TextDocument } from 'vscode';
 import { canColorize } from '../../extension';
 import { DocumentLine, LineExtraction } from '../color-util';
@@ -19,8 +25,9 @@ class VariablesManager {
       const files: Uri[] = await workspace.findFiles(INCLUDE_PATTERN, EXCLUDE_PATTERN);
       statusBar.text = `Found ${files.length} files`;
 
-      let variables: Map<String, Variable[]> = (await Promise.all(this.extractFilesVariable(files))).pop(); // pop ><
-      statusBar.text = `Found ${variables.size} variables`;
+      await Promise.all(this.extractFilesVariable(files));
+      let variablesCount: number = VariablesExtractor.getVariablesCount();
+      statusBar.text = `Found ${variablesCount} variables`;
     } catch (error) {
       statusBar.text = 'Variables extraction fail';
     }
@@ -43,12 +50,11 @@ class VariablesManager {
     return files.map(async(file) => {
       const document: TextDocument =  await workspace.openTextDocument(file.path);
       const content: DocumentLine[] = this.getFileContent(document);
-      const variables = await this.findVariablesDeclarations(document.fileName, content);
-      return variables;
+      return VariablesExtractor.extractDeclarations(document.fileName, content);
     });
   }
 
-  public static findVariablesDeclarations(fileName, fileLines: DocumentLine[]): Promise <Map<String, Variable[]>> {
+  public static findVariablesDeclarations(fileName, fileLines: DocumentLine[]): Promise <number[]> {
     return VariablesExtractor.extractDeclarations(fileName, fileLines);
   }
 
