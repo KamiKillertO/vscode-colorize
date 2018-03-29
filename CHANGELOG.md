@@ -1,3 +1,8 @@
+## 0.6.17
+
+- [FIX] Colorize uppercased browsers colors (red, blue...)
+- [IMPROVE] Colorize hexa colors with 0x prefix
+
 ## 0.6.16
 
 - [FIX] Split the regexp extracting variables in three to prevent a crash (the previous one was too complex).
