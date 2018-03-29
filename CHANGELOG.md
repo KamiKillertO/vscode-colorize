@@ -2,6 +2,7 @@
 
 - [FIX] Colorize uppercased browsers colors (red, blue...)
 - [IMPROVE] Colorize hexa colors with 0x prefix
+- [IMPROVE] Update variables extractions. Split the variable extractions in specialized strategies (one for sass, css, less ...).
 
 ## 0.6.16
 
