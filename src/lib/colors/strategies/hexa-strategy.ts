@@ -3,8 +3,8 @@ import ColorExtractor, { IColorStrategy } from '../color-extractor';
 import color from './../color';
 import { LineExtraction, DocumentLine } from '../../color-util';
 
-export const REGEXP = /(#[\da-f]{3,4}|#[\da-f]{6}|#[\da-f]{8})(?:$|"|'|,| |;|\)|\r|\n)/gi;
-export const REGEXP_ONE = /^(#[\da-f]{3,4}|#[\da-f]{6}|#[\da-f]{8})(?:$|"|'|,| |;|\)|\r|\n)/i;
+export const REGEXP = /((?:#|0x)[\da-f]{3,4}|(?:#|0x)[\da-f]{6}|(?:#|0x)[\da-f]{8})(?:$|"|'|,| |;|\)|\r|\n)/gi;
+export const REGEXP_ONE = /^((?:#|0x)[\da-f]{3,4}|(?:#|0x)[\da-f]{6}|(?:#|0x)[\da-f]{8})(?:$|"|'|,| |;|\)|\r|\n)/i;
 
 class HexaColorExtractor implements IColorStrategy {
   public name: string = 'HEXA_EXTRACTOR';
