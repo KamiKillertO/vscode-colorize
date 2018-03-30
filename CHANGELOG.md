@@ -1,3 +1,7 @@
+## 0.6.18
+
+- [FIX] Sass variables extraction
+
 ## 0.6.17
 
 - [FIX] Colorize uppercased browsers colors (red, blue...)
