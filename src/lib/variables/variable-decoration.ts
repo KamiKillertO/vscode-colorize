@@ -70,6 +70,14 @@ class VariableDecoration implements Observer {
     } catch (error) {}
     this.disposed = true;
   }
+  public hide(): void {
+    // this.color = null;
+    try {
+      this._decoration.dispose();
+    } catch (error) {}
+    this.disposed = true;
+  }
+
   /**
    * Generate the decoration Range (start and end position in line)
    *

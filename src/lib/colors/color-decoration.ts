@@ -64,6 +64,15 @@ class ColorDecoration {
     this.disposed = true;
   }
   /**
+   * Hide the TextEditorDecorationType.
+   *
+   * @public
+   * @memberOf ColorDecoration
+   */
+  public hide() {
+    return this.dispose();
+  }
+  /**
    * Generate the decoration Range (start and end position in line)
    *
    * @param {number} line
