@@ -24,11 +24,11 @@ class SassExtractor implements IVariableStrategy {
       const varName = (match[1] || match[2]).trim();
       let color = ColorExtractor.extractOneColor(text.slice(match.index + match[0].length).trim()) || this.extractVariable(fileName, text.slice(match.index + match[0].length).trim());
       if (this.store.has(varName, fileName, line)) {
-        const decoration = this.store.get(varName, fileName, line);
+        const decoration = this.store.findDeclaration(varName, fileName, line);
         if (color === undefined) { // null?
           this.store.delete(varName, fileName, line); // handle by store?? when update (add the same)
         } else {
-          decoration[0].update(<Color>color);
+          decoration.update(<Color>color);
         }
         continue;
       }
@@ -46,8 +46,14 @@ class SassExtractor implements IVariableStrategy {
       while ((match = REGEXP.exec(text)) !== null) {
         let varName =  match[1];
         varName = varName.trim();
-        if (!this.store.has(varName)) {
-          continue;
+        if (this.store.has(varName)) {
+          let decoration = this.store.findClosestDeclaration(varName, fileName);
+          if (decoration.color) {
+            decoration.color = Object.create(new Color(varName, match.index, decoration.color.rgb, decoration.color.alpha));
+          } else {
+            decoration.color = Object.create(new Color(varName, match.index, null));
+          }
+          colors.push(decoration);
         }
         let decorations = this.store.findClosestDeclaration(varName, fileName);
         // if (decorations.length === 0) { // if no declarations add all
