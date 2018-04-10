@@ -77,7 +77,7 @@ class Variable extends Observable implements IColor {
   }
 
   public update(color: Color) {
-    if (color === null) {
+    if (color === undefined) {
       return this.notify(['dispose']);
     }
     this.color.rgb = color.rgb;

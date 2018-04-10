@@ -50,14 +50,6 @@ class CssExtractor implements IVariableStrategy {
           }
           colors.push(decoration);
         }
-        let decorations = this.store.findClosestDeclaration(varName, fileName);
-        // if (decorations.length === 0) { // if no declarations add all
-        //   this.variablesDeclarations_2.delete(varName);
-        //   continue;
-        // }
-        let deco = Object.create(decorations);
-        deco.color = new Color(value, match.index + spaces, deco.color.rgb, deco.color.alpha);
-        colors.push(deco);
       }
       return {line, colors};
     });
