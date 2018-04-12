@@ -343,7 +343,7 @@ function handleTextSelectionChange(event: TextEditorSelectionChangeEvent) {
     event.selections.forEach((selection: Selection) => {
       let decorations = extension.deco.get(selection.active.line);
       if (decorations) {
-        decorations.forEach(_ => _.dispose());
+        decorations.forEach(_ => _.hide());
       }
     });
     extension.currentSelection = event.selections.map((selection: Selection) => selection.active.line);
