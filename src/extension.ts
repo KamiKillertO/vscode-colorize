@@ -21,7 +21,8 @@ import {
   Selection,
   StatusBarAlignment,
   Uri,
-  WorkspaceConfiguration
+  WorkspaceConfiguration,
+  ConfigurationChangeEvent
 } from 'vscode';
 import Color, { IColor } from './lib/colors/color';
 import Variable from './lib/variables/variable';
@@ -38,7 +39,9 @@ import color from './lib/colors/color';
 let config = {
   languages: null,
   filesExtensions: null,
-  isVariablesEnable: false
+  isVariablesEnable: false,
+  isHideCurrentLineDecorations: true,
+  isBrowserColorNamesEnabled: true
 };
 
 interface ColorizeContext {
@@ -326,8 +329,17 @@ function canColorize(document: TextDocument) {
   return isLanguageSupported(document.languageId) || isFileExtensionSupported(document.fileName);
 }
 
+/**
+ * Check if colorization is enabled for HTML color names
+ *
+ * @returns {boolean}
+ */
+function isBrowserColorNamesEnabled(): boolean {
+  return config.isBrowserColorNamesEnabled;
+}
+
 function handleTextSelectionChange(event: TextEditorSelectionChangeEvent) {
-  if (event.textEditor !== extension.editor) {
+  if (!config.isHideCurrentLineDecorations || event.textEditor !== extension.editor) {
     return;
   }
   q.push(cb => {
@@ -400,43 +412,58 @@ function handleChangeTextDocument(event: TextDocumentChangeEvent) {
   }
 }
 
-function initEventListeners(context: ExtensionContext, configuration: WorkspaceConfiguration) {
-
-  if (configuration.get('hide_current_line_decorations') === true) {
-    window.onDidChangeTextEditorSelection(handleTextSelectionChange, null, context.subscriptions);
-  }
-  workspace.onDidCloseTextDocument(handleCloseOpen, null, context.subscriptions);
-
-  workspace.onDidSaveTextDocument(handleCloseOpen, null, context.subscriptions);
-
-  window.onDidChangeActiveTextEditor(handleChangeActiveTextEditor, null, context.subscriptions);
-
-  workspace.onDidChangeTextDocument(handleChangeTextDocument, null, context.subscriptions);
+function clearCache() {
+  extension.deco.clear();
+  extension.deco = null;
+  CacheManager.clearCache();
 }
 
-export function activate(context: ExtensionContext) {
+function handleConfigurationChanged(event: ConfigurationChangeEvent) {
+  readConfiguration();
+  clearCache();
+  colorizeVisibleTextEditors();
+}
+
+function initEventListeners(context: ExtensionContext) {
+  window.onDidChangeTextEditorSelection(handleTextSelectionChange, null, context.subscriptions);
+  workspace.onDidCloseTextDocument(handleCloseOpen, null, context.subscriptions);
+  workspace.onDidSaveTextDocument(handleCloseOpen, null, context.subscriptions);
+  window.onDidChangeActiveTextEditor(handleChangeActiveTextEditor, null, context.subscriptions);
+  workspace.onDidChangeTextDocument(handleChangeTextDocument, null, context.subscriptions);
+  workspace.onDidChangeConfiguration(handleConfigurationChanged, null, context.subscriptions);
+}
+
+function readConfiguration() {
   const configuration: WorkspaceConfiguration = workspace.getConfiguration('colorize');
   config.languages = configuration.get('languages', []);
   config.filesExtensions = configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`));
   config.isVariablesEnable = configuration.get('activate_variables_support_beta');
+  config.isHideCurrentLineDecorations = configuration.get('hide_current_line_decorations');
+  config.isBrowserColorNamesEnabled = configuration.get('browser_color_names');
+}
 
+function colorizeVisibleTextEditors() {
+  window.visibleTextEditors.forEach(editor => {
+    q.push(cb => colorize(editor, cb));
+  });
+}
+
+export function activate(context: ExtensionContext) {
+  readConfiguration();
   if (config.isVariablesEnable === true) {
     q.push(async cb => {
       try {
         await VariablesManager.getWorkspaceVariables();
-        initEventListeners(context, configuration);
+        initEventListeners(context);
       } catch (error) {
         // handle promise rejection
       }
       return cb();
     });
   } else {
-    initEventListeners(context, configuration);
+    initEventListeners(context);
   }
-
-  window.visibleTextEditors.forEach(editor => {
-    q.push(cb => colorize(editor, cb));
-  });
+  colorizeVisibleTextEditors();
 }
 
 // this method is called when your extension is deactivated
@@ -448,4 +475,4 @@ export function deactivate() {
   CacheManager.clearCache();
 }
 
-export { canColorize };
+export { canColorize, isBrowserColorNamesEnabled };

@@ -1,6 +1,7 @@
-import Color from './../color';
+import Color from '../color';
 import ColorExtractor, { IColorStrategy } from '../color-extractor';
 import { LineExtraction, DocumentLine } from '../../color-util';
+import { isBrowserColorNamesEnabled } from '../../../extension';
 
 export const COLORS = Object({
     'aliceblue': {
@@ -759,18 +760,23 @@ class BrowsersColorExtractor implements IColorStrategy {
       let match = null;
       let colors: Color[] = [];
       let position = 0;
-      while ((match = text.match(REGEXP)) !== null) {
-        position += match.index + 1;
-        const browserColor: string = match[1];
-        colors.push(new Color(match[1], position, COLORS[browserColor.toLowerCase()].rgb));
-        text = text.slice(match.index + 1 + match[1].length);
-        position += match[1].length;
+      if (isBrowserColorNamesEnabled()) {
+        while ((match = text.match(REGEXP)) !== null) {
+          position += match.index + 1;
+          const browserColor: string = match[1];
+          colors.push(new Color(match[1], position, COLORS[browserColor.toLowerCase()].rgb));
+          text = text.slice(match.index + 1 + match[1].length);
+          position += match[1].length;
+        }
       }
       return {line, colors};
     });
   }
 
   public extractColor(text: string): Color {
+    if (!isBrowserColorNamesEnabled()) {
+      return null;
+    }
     let match = text.match(REGEXP_ONE);
     if (match) {
         const browserColor: string = match[1];

@@ -49,11 +49,10 @@ These can be set in user preferences `(cmd+,)` or workspace settings `(.vscode/s
             "svg"
     ],
     "colorize.files_extensions": [],
-    "colorire.hide_current_line_decorations": true
+    "colorize.hide_current_line_decorations": true,
+    "colorize.browser_color_names": true
 }
 ```
-
-⚠️ Changes to any of this settings will require a VSCode restart ️️️️⚠️
 
 ### colorize.languages _ARRAY_
 
@@ -91,6 +90,11 @@ For example if you want to colorize `.diff` files:
 ### colorize.hide_current_line_decorations _BOOLEAN_ _default: true_
 
 By default decorations for the current line are hidden. Set this setting to false to deactivate this behavior.
+
+### colorize.browser_color_names _BOOLEAN_ _default: true_
+
+By default the color names recognized by most browsers within HTML and CSS documents will be colorized.
+Set this property to false to not colorize these names.
 
 ### colorize.activate_variables_support_beta _BOOLEAN_ _default: false_
 

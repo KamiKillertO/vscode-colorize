@@ -78,7 +78,13 @@
           "default": false,
           "type": "boolean",
           "description": "Activate the variables extractions/decorations feature (beta)"
-        }
+        },
+				"colorize.browser_color_names": {
+					"title": "Colorize browser color names",
+					"default": true,
+					"type": "boolean",
+					"description": "Colorize the names of HTML and CSS colors"
+				}
       }
     }
   },
