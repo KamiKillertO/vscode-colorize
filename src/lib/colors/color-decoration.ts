@@ -52,7 +52,7 @@ class ColorDecoration {
     this._generateDecorator();
   }
   /**
-   * Disposed the TextEditorDecorationType
+   * Dispose the TextEditorDecorationType
    * (destroy the colored background)
    *
    * @public
@@ -60,8 +60,17 @@ class ColorDecoration {
    */
   public dispose(): void {
     // this.color = null;
-    this.decoration.dispose();
+    this._decoration.dispose();
     this.disposed = true;
+  }
+  /**
+   * Hide the TextEditorDecorationType.
+   *
+   * @public
+   * @memberOf ColorDecoration
+   */
+  public hide() {
+    return this.dispose();
   }
   /**
    * Generate the decoration Range (start and end position in line)
@@ -83,7 +92,7 @@ class ColorDecoration {
       backgroundColor: this.color.toRgbString(),
       color: generateOptimalTextColor(this.color)
     });
-    this.decoration = backgroundDecorationType;
+    this._decoration = backgroundDecorationType;
   }
 }
 export default ColorDecoration;

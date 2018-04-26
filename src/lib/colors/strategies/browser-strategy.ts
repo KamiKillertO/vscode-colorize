@@ -761,7 +761,8 @@ class BrowsersColorExtractor implements IColorStrategy {
       let position = 0;
       while ((match = text.match(REGEXP)) !== null) {
         position += match.index + 1;
-        colors.push(new Color(match[1], position, 1, COLORS[match[1]].rgb));
+        const browserColor: string = match[1];
+        colors.push(new Color(match[1], position, COLORS[browserColor.toLowerCase()].rgb));
         text = text.slice(match.index + 1 + match[1].length);
         position += match[1].length;
       }
@@ -772,7 +773,8 @@ class BrowsersColorExtractor implements IColorStrategy {
   public extractColor(text: string): Color {
     let match = text.match(REGEXP_ONE);
     if (match) {
-      return new Color(match[1], match.index, 1, COLORS[match[1]].rgb);
+        const browserColor: string = match[1];
+        return new Color(match[1], match.index, COLORS[browserColor.toLowerCase()].rgb);
     }
     return null;
   }

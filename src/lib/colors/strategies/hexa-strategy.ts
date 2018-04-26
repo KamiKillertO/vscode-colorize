@@ -3,8 +3,8 @@ import ColorExtractor, { IColorStrategy } from '../color-extractor';
 import color from './../color';
 import { LineExtraction, DocumentLine } from '../../color-util';
 
-export const REGEXP = /(#[\da-f]{3,4}|#[\da-f]{6}|#[\da-f]{8})(?:$|"|'|,| |;|\)|\r|\n)/gi;
-export const REGEXP_ONE = /^(#[\da-f]{3,4}|#[\da-f]{6}|#[\da-f]{8})(?:$|"|'|,| |;|\)|\r|\n)/i;
+export const REGEXP = /((?:#|0x)[\da-f]{3,4}|(?:#|0x)[\da-f]{6}|(?:#|0x)[\da-f]{8})(?:$|"|'|,| |;|\)|\r|\n)/gi;
+export const REGEXP_ONE = /^((?:#|0x)[\da-f]{3,4}|(?:#|0x)[\da-f]{6}|(?:#|0x)[\da-f]{8})(?:$|"|'|,| |;|\)|\r|\n)/i;
 
 class HexaColorExtractor implements IColorStrategy {
   public name: string = 'HEXA_EXTRACTOR';
@@ -35,7 +35,8 @@ class HexaColorExtractor implements IColorStrategy {
       let colors: Color[] = [];
 
       while ((match = REGEXP.exec(text)) !== null) {
-        colors.push(new Color(match[1], match.index, this.extractAlphaValue(match[1]), this.extractRGBValue(match[1])));
+        const m = match[1];
+        colors.push(new Color(m, match.index, this.extractRGBValue(m), this.extractAlphaValue(m)));
       }
       return {
         line,
@@ -46,7 +47,7 @@ class HexaColorExtractor implements IColorStrategy {
   public extractColor(text: string, fileName = null): Color {
     let match: RegExpMatchArray = text.match(REGEXP_ONE);
     if (match) {
-      return new Color(match[1], match.index, 1, this.extractRGBValue(match[1]));
+      return new Color(match[1], match.index, this.extractRGBValue(match[1]));
     }
     return null;
   }
