@@ -3,7 +3,7 @@ import { TextDocument } from 'vscode';
 
 class CacheManager {
   private _dirtyCache: Map < string, Map < number, IDecoration[] > >;
-  private _decorationsCache: Map < string, Map < number, IDecoration[] > > = new Map();
+  private _decorationsCache: Map < string, Map < number, IDecoration[] > >;
 
   constructor() {
     this._dirtyCache = new Map();
