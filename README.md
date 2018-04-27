@@ -81,7 +81,7 @@ Modified this option to activate colorize for files with the matching extension.
 For example if you want to colorize `.diff` files:
 
 ```json
-  "colorize.languages": [
+  "colorize.files_extensions": [
             ".diff"
     ]
 ```

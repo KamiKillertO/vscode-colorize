@@ -41,12 +41,16 @@ class StylusExtractor implements IVariableStrategy {
         let spaces = (match[1] || '').length;
         if (this.store.has(varName)) {
           let decoration = this.store.findClosestDeclaration(varName, fileName);
+          let variable;
+          // const declaration = { fileName, line }; //or null
+          const declaration = null;
           if (decoration.color) {
-            decoration.color = Object.create(new Color(varName, match.index + spaces, decoration.color.rgb, decoration.color.alpha));
+            variable = new Variable(varName, new Color(varName, match.index, decoration.color.rgb, decoration.color.alpha), declaration);
           } else {
-            decoration.color = Object.create(new Color(varName, match.index + spaces, null));
+            variable = new Variable(varName, new Color(varName, match.index, null), declaration);
           }
-          colors.push(decoration);
+          variable.base = decoration; // TODO: This is temp, I need to rethink the variables declaration/usage thing
+          colors.push(variable);
         }
       }
       return {line, colors};
