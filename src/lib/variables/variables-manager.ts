@@ -2,10 +2,10 @@ import Variable from './variable';
 import VariableDecoration from './variable-decoration';
 import VariablesExtractor from './variables-extractor';
 
-// import './strategies/css-strategy';
+import './strategies/css-strategy';
 import './strategies/less-strategy';
-// import './strategies/sass-strategy';
-// import './strategies/stylus-strategy';
+import './strategies/sass-strategy';
+import './strategies/stylus-strategy';
 
 import { workspace, window, StatusBarAlignment, StatusBarItem, Uri, TextDocument } from 'vscode';
 import { canColorize } from '../../extension';
@@ -62,8 +62,8 @@ class VariablesManager {
     return VariablesExtractor.extractVariables(fileName, fileLines);
   }
 
-  public static generateDecoration(variable: Variable): VariableDecoration {
-    const deco = new VariableDecoration(variable);
+  public static generateDecoration(variable: Variable, line: number): VariableDecoration {
+    const deco = new VariableDecoration(variable, line);
     // @ts-ignore
     variable.base.registerObserver(deco); // tslint:disable-line
     return deco;
