@@ -49,9 +49,14 @@ class VariableDecoration implements Observer {
   set decoration(deco: TextEditorDecorationType) {
     this._decoration = deco;
   }
-  public constructor(variable: Variable) {
+  public constructor(variable: Variable, line: number) {
     this.variable = variable;
     this._generateDecorator();
+    if (this.variable.color) {
+      this.generateRange(line);
+    } else {
+      this.currentRange = new Range(new Position(line, 0), new Position(line, 0));
+    }
   }
   /**
    * Disposed the TextEditorDecorationType
@@ -91,24 +96,33 @@ class VariableDecoration implements Observer {
   }
 
   private _generateDecorator() {
-    let backgroundDecorationType = window.createTextEditorDecorationType({
-      borderWidth: '1px',
-      borderStyle: 'solid',
-      borderColor: this.variable.color.toRgbString(),
-      backgroundColor: this.variable.color.toRgbString(),
-      color: generateOptimalTextColor(this.variable.color)
-    });
-    this._decoration = backgroundDecorationType;
+    if (this.variable.color.rgb) {
+      this.deleted = false;
+      let backgroundDecorationType = window.createTextEditorDecorationType({
+        borderWidth: '1px',
+        borderStyle: 'solid',
+        borderColor: this.variable.color.toRgbString(),
+        backgroundColor: this.variable.color.toRgbString(),
+        color: generateOptimalTextColor(this.variable.color)
+      });
+      this._decoration = backgroundDecorationType;
+    } else {
+      this.deleted = true;
+    }
   }
   addUpdateCallback(callback) {
     this._updateCallback = callback;
   }
   updateDecoration(color: Color) {
     this.deleted = false;
-    this._decoration.dispose();
+    try {
+      this._decoration.dispose();
+    } catch (error) {}
     this.variable.color.rgb = color.rgb;
     this._generateDecorator();
-    return this._updateCallback(this);
+    try {
+      this._updateCallback(this);
+    } catch (error) {}
   }
   disposeDecoration() {
     this.dispose(); // should trigger new search for this variable?

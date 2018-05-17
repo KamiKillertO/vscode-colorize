@@ -293,7 +293,7 @@ function generateDecorations(colors: LineExtraction[], variables: LineExtraction
     updateDecorationMap(decorations, line, decoration);
   }));
   variables.map(({line, colors}) => colors.forEach((variable) => {
-    const decoration = VariablesManager.generateDecoration(<Variable>variable);
+    const decoration = VariablesManager.generateDecoration(<Variable>variable, line);
     updateDecorationMap(decorations, line, decoration);
   }));
   return decorations;
