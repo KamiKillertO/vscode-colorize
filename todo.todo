@@ -12,3 +12,5 @@
 - Checkout vscode Editor visible ranges (only decorate whats visible?)
 
 - Checkout vscode Custom Activity Bar views
+
+- Fix background update for variables uses after position change (line added/removed before)
