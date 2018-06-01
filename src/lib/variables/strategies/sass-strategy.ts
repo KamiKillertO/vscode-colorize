@@ -24,19 +24,12 @@ class SassExtractor implements IVariableStrategy {
       const varName = (match[1] || match[2]).trim();
       let color = ColorExtractor.extractOneColor(text.slice(match.index + match[0].length).trim()) || this.extractVariable(fileName, text.slice(match.index + match[0].length).trim());
       if (this.store.has(varName, fileName, line)) {
-        const decoration = this.store.get(varName, fileName, line);
-        if (color === undefined) { // null?
-          this.store.delete(varName, fileName, line); // handle by store?? when update (add the same)
-        } else {
-          decoration[0].update(<Color>color);
-        }
-        continue;
+        const decoration = this.store.findDeclaration(varName, fileName, line);
+        decoration.update(<Color>color);
+      } else {
+        const variable = new Variable(varName, <Color> color, {fileName, line});
+        this.store.addEntry(varName, variable); // update entry??
       }
-      if (color === undefined || color === null) {
-        continue;
-      }
-      const variable = new Variable(varName, <Color> color, {fileName, line});
-      this.store.addEntry(varName, variable); // update entry??
     }
   }
   extractVariables(fileName: string, fileLines: DocumentLine[]): Promise<LineExtraction[]> {
@@ -46,17 +39,19 @@ class SassExtractor implements IVariableStrategy {
       while ((match = REGEXP.exec(text)) !== null) {
         let varName =  match[1];
         varName = varName.trim();
-        if (!this.store.has(varName)) {
-          continue;
+        if (this.store.has(varName)) {
+          let decoration = this.store.findClosestDeclaration(varName, fileName);
+          let variable;
+          // const declaration = { fileName, line }; //or null
+          const declaration = null;
+          if (decoration.color) {
+            variable = new Variable(varName, new Color(varName, match.index, decoration.color.rgb, decoration.color.alpha), declaration);
+          } else {
+            variable = new Variable(varName, new Color(varName, match.index, null), declaration);
+          }
+          variable.base = decoration; // TODO: This is temp, I need to rethink the variables declaration/usage thing
+          colors.push(variable);
         }
-        let decorations = this.store.findClosestDeclaration(varName, fileName);
-        // if (decorations.length === 0) { // if no declarations add all
-        //   this.variablesDeclarations_2.delete(varName);
-        //   continue;
-        // }
-        let deco = Object.create(decorations);
-        deco.color = new Color(varName, match.index, deco.color.rgb, deco.color.alpha);
-        colors.push(deco);
       }
       return {line, colors};
     });

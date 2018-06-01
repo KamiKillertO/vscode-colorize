@@ -49,11 +49,9 @@ These can be set in user preferences `(cmd+,)` or workspace settings `(.vscode/s
             "svg"
     ],
     "colorize.files_extensions": [],
-    "colorire.hide_current_line_decorations": true
+    "colorize.hide_current_line_decorations": true
 }
 ```
-
-⚠️ Changes to any of this settings will require a VSCode restart ️️️️⚠️
 
 ### colorize.languages _ARRAY_
 
@@ -83,7 +81,7 @@ Modified this option to activate colorize for files with the matching extension.
 For example if you want to colorize `.diff` files:
 
 ```json
-  "colorize.languages": [
+  "colorize.files_extensions": [
             ".diff"
     ]
 ```

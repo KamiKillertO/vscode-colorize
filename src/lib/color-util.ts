@@ -26,13 +26,21 @@ const WHITE = '#FFFFFF',
 interface IDecoration {
   decoration: TextEditorDecorationType;
   /**
-   * Disposed the TextEditorDecorationType
+   * Dispose the TextEditorDecorationType
    * (destroy the colored background)
    *
    * @public
    * @memberOf IDecoration
    */
   dispose(): void;
+
+  /**
+   * Hide the TextEditorDecorationType
+   *
+   * @public
+   * @memberOf IDecoration
+   */
+  hide(): void;
 
   /**
    * Is `true` when the decoration has been destroyed, `false` otherwise.

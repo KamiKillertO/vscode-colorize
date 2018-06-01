@@ -1,4 +1,3 @@
-- check ConfigurationChangeEvent
 - check :
   _Tasks
   Schema improvements
@@ -9,3 +8,9 @@
 
 
 - Create/use mixins to reuse code duplications?? (https://blog.mariusschulz.com/2017/05/26/typescript-2-2-mixin-classes)
+
+- Checkout vscode Editor visible ranges (only decorate whats visible?)
+
+- Checkout vscode Custom Activity Bar views
+
+- Fix background update for variables uses after position change (line added/removed before)

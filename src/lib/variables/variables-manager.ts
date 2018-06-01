@@ -16,7 +16,7 @@ const EXCLUDE_PATTERN = '{**/.git,**/.svn,**/.hg,**/CVS,**/.DS_Store,**/.git,**/
 
 class VariablesManager {
 
-  public static async getWorkspaceVariables() {
+  public async getWorkspaceVariables() {
     const statusBar: StatusBarItem = window.createStatusBarItem(StatusBarAlignment.Right);
 
     statusBar.text = 'Fetching files...';
@@ -34,7 +34,7 @@ class VariablesManager {
     return;
   }
 
-  private static getFileContent(file: TextDocument): DocumentLine[] {
+  private getFileContent(file: TextDocument): DocumentLine[] {
     if (canColorize(file) === false) {
       return;
     }
@@ -46,7 +46,7 @@ class VariablesManager {
       }));
   }
 
-  private static extractFilesVariable(files: Uri[]) {
+  private extractFilesVariable(files: Uri[]) {
     return files.map(async(file) => {
       const document: TextDocument =  await workspace.openTextDocument(file.path);
       const content: DocumentLine[] = this.getFileContent(document);
@@ -54,23 +54,26 @@ class VariablesManager {
     });
   }
 
-  public static findVariablesDeclarations(fileName, fileLines: DocumentLine[]): Promise <number[]> {
+  public findVariablesDeclarations(fileName, fileLines: DocumentLine[]): Promise <number[]> {
     return VariablesExtractor.extractDeclarations(fileName, fileLines);
   }
 
-  public static findVariables(fileName, fileLines: DocumentLine[]): Promise <LineExtraction[]> {
+  public findVariables(fileName, fileLines: DocumentLine[]): Promise <LineExtraction[]> {
     return VariablesExtractor.extractVariables(fileName, fileLines);
   }
 
-  public static generateDecoration(Variable: Variable): VariableDecoration {
-    const deco = new VariableDecoration(Variable);
-    Variable.registerObserver(deco);
+  public generateDecoration(variable: Variable, line: number): VariableDecoration {
+    const deco = new VariableDecoration(variable, line);
+    // @ts-ignore
+    variable.base.registerObserver(deco); // tslint:disable-line
     return deco;
   }
 
-  public static deleteVariableInLine(fileName: string, line: number) {
+  public deleteVariableInLine(fileName: string, line: number) {
     VariablesExtractor.deleteVariableInLine(fileName, line);
   }
 }
 
-export default VariablesManager;
+const instance = new VariablesManager();
+
+export default instance;

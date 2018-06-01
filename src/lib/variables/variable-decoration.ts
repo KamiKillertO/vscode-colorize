@@ -7,13 +7,10 @@ import {
 } from 'vscode';
 import { generateOptimalTextColor } from '../color-util';
 import Color from '../colors/color';
-import Variable from './variable';
-
-interface Observer {
-  update(args: any);
-}
+import Variable, { Observer } from './variable';
 
 class VariableDecoration implements Observer {
+  public observerId: number = null;
   private _updateCallback: Function;
   /**
    * The color variable used to generate the TextEditorDecorationType
@@ -52,9 +49,14 @@ class VariableDecoration implements Observer {
   set decoration(deco: TextEditorDecorationType) {
     this._decoration = deco;
   }
-  public constructor(variable: Variable) {
+  public constructor(variable: Variable, line: number) {
     this.variable = variable;
     this._generateDecorator();
+    if (this.variable.color) {
+      this.generateRange(line);
+    } else {
+      this.currentRange = new Range(new Position(line, 0), new Position(line, 0));
+    }
   }
   /**
    * Disposed the TextEditorDecorationType
@@ -66,10 +68,19 @@ class VariableDecoration implements Observer {
   public dispose(): void {
     // this.color = null;
     try {
+      this.variable.removerObserver(this);
       this._decoration.dispose();
     } catch (error) {}
     this.disposed = true;
   }
+  public hide(): void {
+    // this.color = null;
+    try {
+      this._decoration.dispose();
+    } catch (error) {}
+    this.disposed = true;
+  }
+
   /**
    * Generate the decoration Range (start and end position in line)
    *
@@ -79,30 +90,39 @@ class VariableDecoration implements Observer {
    * @memberOf ColorDecoration
    */
   public generateRange(line: number): Range {
-    const range = new Range(new Position(line, this.variable.color.positionInText), new Position(line, this.variable.color.positionInText + this.variable.color.value.length));
+    const range = new Range(new Position(line, this.variable.color.positionInText), new Position(line, this.variable.color.positionInText + this.variable.name.length));
     this.currentRange = range;
     return range;
   }
 
   private _generateDecorator() {
-    let backgroundDecorationType = window.createTextEditorDecorationType({
-      borderWidth: '1px',
-      borderStyle: 'solid',
-      borderColor: this.variable.color.toRgbString(),
-      backgroundColor: this.variable.color.toRgbString(),
-      color: generateOptimalTextColor(this.variable.color)
-    });
-    this._decoration = backgroundDecorationType;
+    if (this.variable.color.rgb) {
+      this.deleted = false;
+      let backgroundDecorationType = window.createTextEditorDecorationType({
+        borderWidth: '1px',
+        borderStyle: 'solid',
+        borderColor: this.variable.color.toRgbString(),
+        backgroundColor: this.variable.color.toRgbString(),
+        color: generateOptimalTextColor(this.variable.color)
+      });
+      this._decoration = backgroundDecorationType;
+    } else {
+      this.deleted = true;
+    }
   }
   addUpdateCallback(callback) {
     this._updateCallback = callback;
   }
   updateDecoration(color: Color) {
     this.deleted = false;
-    this._decoration.dispose();
+    try {
+      this._decoration.dispose();
+    } catch (error) {}
     this.variable.color.rgb = color.rgb;
     this._generateDecorator();
-    return this._updateCallback(this);
+    try {
+      this._updateCallback(this);
+    } catch (error) {}
   }
   disposeDecoration() {
     this.dispose(); // should trigger new search for this variable?

@@ -6,19 +6,26 @@ interface FileDeclaration {
 }
 
 interface Observer {
+  observerId: number;
   update(args: any);
 }
 
 class Observable {
-  private observers: Observer [];
+  public observers: Observer [];
+  private lastObserverId: number;
   constructor () {
     this.observers = [];
+    this.lastObserverId = 0;
   }
-  registerObserver (observer: Observer) {
-    this.observers.push(observer);
+  registerObserver (observer: Observer): number {
+    const id = ++this.lastObserverId;
+    observer.observerId = id;
+    this.observers = this.observers.concat(observer);
+    return id;
   }
+  // not working properly
   removerObserver (observer: Observer) {
-    this.observers.slice(this.observers.indexOf(observer), 1);
+    this.observers = this.observers.filter(_ => _.observerId !== observer.observerId);
   }
 
   notify (args: any) {
@@ -33,6 +40,8 @@ class Variable extends Observable implements IColor {
   public color: Color;
 
   public declaration: FileDeclaration;
+
+  public id: number;
 
   public constructor(name: string, color: Color, declaration: FileDeclaration) {
     super();
@@ -68,7 +77,7 @@ class Variable extends Observable implements IColor {
   }
 
   public update(color: Color) {
-    if (color === null) {
+    if (color === undefined) {
       return this.notify(['dispose']);
     }
     this.color.rgb = color.rgb;
@@ -76,3 +85,4 @@ class Variable extends Observable implements IColor {
   }
 }
 export default Variable;
+export { Observer };
