@@ -1,3 +1,8 @@
+## 0.6.19
+
+- [IMPROVE] Settings HOT Reload.
+- [IMPROVE] Variables usage live update
+
 ## 0.6.18
 
 - [FIX] Sass variables extraction
