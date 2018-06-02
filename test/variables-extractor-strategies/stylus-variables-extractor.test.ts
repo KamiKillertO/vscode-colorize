@@ -5,15 +5,15 @@ import { REGEXP, DECLARATION_REGEXP } from '../../src/lib/variables/strategies/s
 describe('Test variables declaration Regex', () => {
   // stylus variables
   it('Should match (stylus variables)', function () {
-    assert.ok('var='.match(DECLARATION_REGEXP));
-    assert.ok('var-two='.match(DECLARATION_REGEXP));
-    assert.ok('var-two      ='.match(DECLARATION_REGEXP));
-    assert.ok('--a='.match(DECLARATION_REGEXP));
-    assert.ok('--a1='.match(DECLARATION_REGEXP));
-    assert.ok('-a='.match(DECLARATION_REGEXP));
-    assert.ok('_a='.match(DECLARATION_REGEXP));
-    assert.ok('$a='.match(DECLARATION_REGEXP));
-    assert.ok('$='.match(DECLARATION_REGEXP));
+    assert.ok('var='.match(DECLARATION_REGEXP), '"var=" should match');
+    assert.ok('var-two='.match(DECLARATION_REGEXP), '"var-two=" should match');
+    assert.ok('var-two      ='.match(DECLARATION_REGEXP), '"var-two      var-two=" should match');
+    assert.ok('--a='.match(DECLARATION_REGEXP), '"--a==" should match');
+    assert.ok('--a1='.match(DECLARATION_REGEXP), '"--a1=" should match');
+    assert.ok('-a='.match(DECLARATION_REGEXP), '"-a=" should match');
+    assert.ok('_a='.match(DECLARATION_REGEXP), '"_a=" should match');
+    assert.ok('$a='.match(DECLARATION_REGEXP), '"$a=" should match');
+    assert.ok('$='.match(DECLARATION_REGEXP), '"$=" should match');
   });
   it('Should not match (stylus variables)', function () {
     assert.notOk('var'.match(DECLARATION_REGEXP));
@@ -28,14 +28,17 @@ describe('Test variables declaration Regex', () => {
 describe('Test variables use regexp', function() {
   // stylus variables
   it('Should match (stylus variables)', function () {
-    assert.ok('var'.match(REGEXP));
-    assert.ok('var-two'.match(REGEXP));
-    assert.ok('a'.match(REGEXP));
-    assert.ok('--a'.match(REGEXP));
-    assert.ok('-a'.match(REGEXP));
-    assert.ok('_a'.match(REGEXP));
-    assert.ok('$a'.match(REGEXP));
-    assert.ok('$'.match(REGEXP));
+    assert.ok('var'.match(REGEXP), '"var" should match');
+    assert.ok('var-two'.match(REGEXP), '"var-two" should match');
+    assert.ok('var--two'.match(REGEXP), '"var--two" should match');
+    assert.ok('var-one-two'.match(REGEXP), '"var-one-two" should match');
+    assert.ok('var--one--two'.match(REGEXP), '"var--one--two" should match');
+    assert.ok('a'.match(REGEXP), '"a" should match');
+    assert.ok('--a'.match(REGEXP), '"--a" should match');
+    assert.ok('-a'.match(REGEXP), '"-a" should match');
+    assert.ok('_a'.match(REGEXP), '"_a" should match');
+    assert.ok('$a'.match(REGEXP), '"$a" should match');
+    assert.ok('$'.match(REGEXP), '"$" should match');
   });
   it('Should not match (stylus variables)', function () {
     assert.notOk('--'.match(REGEXP));

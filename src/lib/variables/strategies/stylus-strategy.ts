@@ -7,7 +7,7 @@ import ColorExtractor from '../../colors/color-extractor';
 
 const REGEXP_END = '(?:$|\"|\'|,| |;|\\)|\\r|\\n)';
 
-export const REGEXP = new RegExp(`(^|(?::|=)\\s*)((?:-|_)*[$a-z]+[\\-_\\d]*)+(?!=)${REGEXP_END}`, 'gi');
+export const REGEXP = new RegExp(`(^|(?::|=)\\s*)((?:-|_)*[$a-z][\\-_\\d]*)+(?!=)${REGEXP_END}`, 'gi');
 export const DECLARATION_REGEXP = new RegExp(`(?:((?:[\\$a-z]+[\\-_a-z\\d]*)\\s*)=)${REGEXP_END}`, 'gi');
 
 class StylusExtractor implements IVariableStrategy {
