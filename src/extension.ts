@@ -265,10 +265,8 @@ async function initDecorations(context: ColorizeContext) {
     return;
   }
   let text = context.editor.document.getText();
-  let n: number = context.editor.document.lineCount;
-  const start = Date.now();
 
-  const fileLines: DocumentLine[] = ColorUtil.textToFileLines(context.editor.document.getText());
+  const fileLines: DocumentLine[] = ColorUtil.textToFileLines(text);
   const colors: LineExtraction[] = await ColorUtil.findColors(fileLines);
 
   let variables = [];
