@@ -1,3 +1,7 @@
+## 0.6.20
+
+- [FIX] Fix perfs issue with stylus variables extraction
+
 ## 0.6.19
 
 - [IMPROVE] Settings HOT Reload.
