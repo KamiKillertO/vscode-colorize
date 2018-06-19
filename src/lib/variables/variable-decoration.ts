@@ -90,7 +90,7 @@ class VariableDecoration implements Observer {
    * @memberOf ColorDecoration
    */
   public generateRange(line: number): Range {
-    const range = new Range(new Position(line, this.variable.color.positionInText), new Position(line, this.variable.color.positionInText + this.variable.name.length));
+    const range = new Range(new Position(line, this.variable.color.positionInText), new Position(line, this.variable.color.positionInText + this.variable.color.value.length));
     this.currentRange = range;
     return range;
   }

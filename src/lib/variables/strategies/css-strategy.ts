@@ -47,9 +47,9 @@ class CssExtractor implements IVariableStrategy {
           // const declaration = { fileName, line }; //or null
           const declaration = null;
           if (decoration.color) {
-            variable = new Variable(varName, new Color(varName, match.index, decoration.color.rgb, decoration.color.alpha), declaration);
+            variable = new Variable(varName, new Color(value, match.index, decoration.color.rgb, decoration.color.alpha), declaration);
           } else {
-            variable = new Variable(varName, new Color(varName, match.index, null), declaration);
+            variable = new Variable(varName, new Color(value, match.index, null), declaration);
           }
           variable.base = decoration; // TODO: This is temp, I need to rethink the variables declaration/usage thing
           colors.push(variable);

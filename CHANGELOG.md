@@ -1,3 +1,7 @@
+## 0.6.21
+
+- [FIX] Fix css variables decoration
+
 ## 0.6.20
 
 - [FIX] Fix perfs issue with stylus variables extraction
