@@ -22,14 +22,9 @@ class VariablesStore {
   private __delete(variable: string, fileName: string, line: number) {
     let decorations = this.get(variable);
 
-    if (fileName === null) {
-      decorations.forEach(_ => _.dispose());
-    }
     if (line !== null) {
-      decorations.filter(_ => _.declaration.fileName === fileName && _.declaration.line === line).forEach(_ => _.dispose());
       decorations = decorations.filter(_ => _.declaration.fileName !== fileName || (_.declaration.fileName === fileName && _.declaration.line !== line));
     } else if (fileName !== null) {
-      decorations.filter(_ => _.declaration.fileName === fileName).forEach(_ => _.dispose());
       decorations = decorations.filter(_ => _.declaration.fileName !== fileName);
     }
     this.entries.set(variable, decorations);
