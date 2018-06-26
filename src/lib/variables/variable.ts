@@ -36,7 +36,7 @@ class Variable implements IColor {
   }
 
   public update(color: Color) {
-    this.color.rgb = color.rgb;
+    this.color = color;
   }
 }
 export default Variable;
