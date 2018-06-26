@@ -113,7 +113,12 @@ class VariablesStore {
       decorations = decorations.sort((a, b) => a.declaration.line - b.declaration.line);
     }
 
-    return decorations.pop();
+    const _closest = decorations[decorations.length - 1];
+    let closest = decorations.pop();
+    while (closest && closest.color === undefined) {
+      closest = decorations.pop();
+    }
+    return closest || _closest;
   }
 
   private filterDecorations(decorations, dir) {
