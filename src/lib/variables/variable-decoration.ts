@@ -10,7 +10,6 @@ import Color from '../colors/color';
 import Variable from './variable';
 
 class VariableDecoration {
-  private _updateCallback: Function;
   /**
    * The color variable used to generate the TextEditorDecorationType
    *
@@ -107,28 +106,6 @@ class VariableDecoration {
     } else {
       this.deleted = true;
     }
-  }
-  addUpdateCallback(callback) {
-    this._updateCallback = callback;
-  }
-  updateDecoration(color: Color) {
-    this.deleted = false;
-    try {
-      this._decoration.dispose();
-    } catch (error) {}
-    this.variable.color.rgb = color.rgb;
-    this._generateDecorator();
-    try {
-      this._updateCallback(this);
-    } catch (error) {}
-  }
-  disposeDecoration() {
-    this.dispose(); // should trigger new search for this variable?
-    this.deleted = true;
-  }
-  update(args: Object[]) {
-    const action = args[0];
-    this[`${action}Decoration`](...args.slice(1));
   }
 }
 export default VariableDecoration;

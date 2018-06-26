@@ -20,13 +20,6 @@ class EditorManager {
     while (!tmp.done) {
       const line = tmp.value[0];
       const deco: IDecoration[] = tmp.value[1];
-      deco.forEach(_ => {
-        if (_ instanceof VariableDecoration) {
-          _.addUpdateCallback((decoration: VariableDecoration) => {
-            return this.decorateOneLine(editor, [decoration], decoration.currentRange.start.line);
-          });
-        }
-      });
       if (skipLines.indexOf(line) === -1) {
         this.decorateOneLine(editor, tmp.value[1], line);
       }
