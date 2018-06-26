@@ -49,7 +49,6 @@ class SassExtractor implements IVariableStrategy {
           } else {
             variable = new Variable(varName, new Color(varName, match.index, null), declaration);
           }
-          variable.base = decoration; // TODO: This is temp, I need to rethink the variables declaration/usage thing
           colors.push(variable);
         }
       }

@@ -12,7 +12,6 @@ import color from './color';
 
 
 class ColorDecoration {
-  private _updateCallback: Function;
   /**
    * The color used to generate the TextEditorDecorationType
    *
