@@ -40,7 +40,7 @@ class EditorManager {
    */
   public static decorateOneLine(editor: TextEditor, decorations: IDecoration[], line: number) {
     decorations.forEach((decoration: IDecoration) => {
-      if (!(<VariableDecoration>decoration).deleted) { // deleted decorations need to be removed from the deco list
+      if (!(<VariableDecoration>decoration).disposed) {
         editor.setDecorations(decoration.decoration, [decoration.generateRange(line)]);
       }
     });

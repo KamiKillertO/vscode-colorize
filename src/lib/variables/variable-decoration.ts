@@ -27,7 +27,7 @@ class VariableDecoration {
    */
   public disposed: boolean = false;
 
-  public deleted: boolean = false;
+  private hidden: boolean = false;
 
   public currentRange: Range;
   private _decoration: TextEditorDecorationType;
@@ -38,8 +38,8 @@ class VariableDecoration {
    * @memberOf ColorDecoration
    */
   get decoration(): TextEditorDecorationType {
-    if (this.disposed) {
-      this.disposed = false;
+    if (this.hidden) {
+      this.hidden = false;
       this._generateDecorator();
     }
     return this._decoration;
@@ -64,9 +64,9 @@ class VariableDecoration {
    * @memberOf ColorDecoration
    */
   public dispose(): void {
-    // this.color = null;
     try {
       this._decoration.dispose();
+      this.variable.color.rgb = null;
     } catch (error) {}
     this.disposed = true;
   }
@@ -75,7 +75,7 @@ class VariableDecoration {
     try {
       this._decoration.dispose();
     } catch (error) {}
-    this.disposed = true;
+    this.hidden = true;
   }
 
   /**
@@ -94,7 +94,6 @@ class VariableDecoration {
 
   private _generateDecorator() {
     if (this.variable.color.rgb) {
-      this.deleted = false;
       let backgroundDecorationType = window.createTextEditorDecorationType({
         borderWidth: '1px',
         borderStyle: 'solid',
@@ -103,8 +102,6 @@ class VariableDecoration {
         color: generateOptimalTextColor(this.variable.color)
       });
       this._decoration = backgroundDecorationType;
-    } else {
-      this.deleted = true;
     }
   }
 }

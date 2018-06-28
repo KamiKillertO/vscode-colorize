@@ -43,6 +43,9 @@ class CssExtractor implements IVariableStrategy {
         value = value.trim();
         if (this.store.has(varName)) {
           let decoration = this.store.findClosestDeclaration(varName, fileName);
+          if (decoration.color === undefined) {
+            decoration = this.store.findClosestDeclaration(varName, '.');
+          }
           let variable;
           // const declaration = { fileName, line }; //or null
           const declaration = null;

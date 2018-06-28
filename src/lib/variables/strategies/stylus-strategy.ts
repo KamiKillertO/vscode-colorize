@@ -41,6 +41,9 @@ class StylusExtractor implements IVariableStrategy {
         let spaces = (match[1] || '').length;
         if (this.store.has(varName)) {
           let decoration = this.store.findClosestDeclaration(varName, fileName);
+          if (decoration.color === undefined) {
+            decoration = this.store.findClosestDeclaration(varName, '.');
+          }
           let variable;
           // const declaration = { fileName, line }; //or null
           const declaration = null;
