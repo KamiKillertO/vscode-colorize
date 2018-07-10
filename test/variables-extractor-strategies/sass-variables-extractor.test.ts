@@ -7,6 +7,7 @@ describe('Test variables declaration Regex', () => {
   // Sass
   it('Should match (sass variables)', function () {
     assert.equal(regex_exec('$_:', DECLARATION_REGEXP)[1], '$_');
+    assert.equal(regex_exec('$_a:', DECLARATION_REGEXP)[1], '$_a');
     assert.equal(regex_exec('$var:', DECLARATION_REGEXP)[1], '$var');
     assert.equal(regex_exec('$var-two:', DECLARATION_REGEXP)[1], '$var-two');
     assert.equal(regex_exec('$var--two:', DECLARATION_REGEXP)[1], '$var--two');
