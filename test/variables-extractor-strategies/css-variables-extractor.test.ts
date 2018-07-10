@@ -4,22 +4,28 @@ import { REGEXP, DECLARATION_REGEXP } from '../../src/lib/variables/strategies/c
 import CssExtractor from  '../../src/lib/variables/strategies/css-strategy';
 import VariablesManager from  '../../src/lib/variables/variables-manager';
 import Variable from '../../src/lib/variables/variable';
+import { regex_exec } from '../test-util';
 // Defines a Mocha test suite to group tests of similar kind together
 describe('Test variables declaration Regex', () => {
   // css variables (works for postcss too)
   it('Should match (css variables)', function () {
-    assert.ok('--var:'.match(DECLARATION_REGEXP));
-    assert.ok('--var-two:'.match(DECLARATION_REGEXP));
-    assert.ok('--var-:'.match(DECLARATION_REGEXP));
-    assert.ok('--var--two:'.match(DECLARATION_REGEXP));
-    assert.ok('--varTwo:'.match(DECLARATION_REGEXP));
-    assert.ok('--varTwo       :'.match(DECLARATION_REGEXP)); // fail
+    assert.equal(regex_exec('--var:', DECLARATION_REGEXP)[1], '--var');
+    assert.equal(regex_exec('--var-two:', DECLARATION_REGEXP)[1], '--var-two');
+    assert.equal(regex_exec('--var--two:', DECLARATION_REGEXP)[1], '--var--two');
+    assert.equal(regex_exec('--var-two-three:', DECLARATION_REGEXP)[1], '--var-two-three');
+    assert.equal(regex_exec('--var--two--three:', DECLARATION_REGEXP)[1], '--var--two--three');
+    assert.equal(regex_exec('--var-:', DECLARATION_REGEXP)[1], '--var-');
+    assert.equal(regex_exec('--var--two:', DECLARATION_REGEXP)[1], '--var--two');
+    assert.equal(regex_exec('--varTwo:', DECLARATION_REGEXP)[1], '--varTwo');
+    assert.equal(regex_exec('--varTwo       :', DECLARATION_REGEXP)[1], '--varTwo       ');
   });
   it('Should not match (css variables)', function () {
-    assert.notMatch('--var', DECLARATION_REGEXP);
-    assert.notMatch('-- :', DECLARATION_REGEXP);
-    assert.notMatch('-var:', DECLARATION_REGEXP);
-    assert.notMatch(':', DECLARATION_REGEXP);
+    assert.isNull(regex_exec('--var', DECLARATION_REGEXP));
+    assert.isNull(regex_exec('--:', DECLARATION_REGEXP));
+    assert.isNull(regex_exec('-- :', DECLARATION_REGEXP));
+    assert.isNull(regex_exec('-var:', DECLARATION_REGEXP));
+    assert.isNull(regex_exec(':', DECLARATION_REGEXP));
+    assert.isNull(regex_exec('_a:', DECLARATION_REGEXP));
   });
 });
 
@@ -27,20 +33,22 @@ describe('Test variables use regexp', function() {
 
   // css variables (works for postcss too)
   it('Should match (css variables)', function () {
-    assert.ok('var(--var)'.match(REGEXP));
-    assert.ok('var(--var-two)'.match(REGEXP));
-    assert.ok('var(--var-)'.match(REGEXP));
-    assert.ok('var(--var--two)'.match(REGEXP));
-    assert.ok('var(--varTwo)'.match(REGEXP));
+    assert.equal(regex_exec('var(--var)', REGEXP)[2], '--var');
+    assert.equal(regex_exec('var(--var-two)', REGEXP)[2], '--var-two');
+    assert.equal(regex_exec('var(--var-)', REGEXP)[2], '--var-');
+    assert.equal(regex_exec('var(--var--two)', REGEXP)[2], '--var--two');
+    assert.equal(regex_exec('var(--var--two--three)', REGEXP)[2], '--var--two--three');
+    assert.equal(regex_exec('var(--var-two-three)', REGEXP)[2], '--var-two-three');
+    assert.equal(regex_exec('var(--varTwo)', REGEXP)[2], '--varTwo');
   });
   it('Should not match (css variables)', function () {
-    assert.notOk('--var'.match(REGEXP));
-    assert.notOk('-- '.match(REGEXP));
-    assert.notOk('--'.match(REGEXP));
-    assert.notOk('var(--)'.match(REGEXP));
-    assert.notOk('var(-var)'.match(REGEXP));
-    assert.notOk('var(var)'.match(REGEXP));
-    assert.notOk('var()'.match(REGEXP));
+    assert.isNull(regex_exec('--var', REGEXP));
+    assert.isNull(regex_exec('-- ', REGEXP));
+    assert.isNull(regex_exec('--', REGEXP));
+    assert.isNull(regex_exec('var(--)', REGEXP));
+    assert.isNull(regex_exec('var(-a)', REGEXP));
+    assert.isNull(regex_exec('var(a)', REGEXP));
+    assert.isNull(regex_exec('var()', REGEXP));
   });
 });
 describe('Test decoration generation', () => {

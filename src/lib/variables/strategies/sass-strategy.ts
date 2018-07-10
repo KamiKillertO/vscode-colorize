@@ -7,9 +7,9 @@ import ColorExtractor from '../../colors/color-extractor';
 
 const REGEXP_END = '(?:$|\"|\'|,| |;|\\)|\\r|\\n)';
 
-export const REGEXP = new RegExp(`(\\$(?:[a-z]+[\\-_a-z\\d]*)(?!:))${REGEXP_END}`, 'gi');
-export const REGEXP_ONE = new RegExp(`^(\\$(?:[a-z]+[\\-_a-z\\d]*)(?!:))${REGEXP_END}`, 'i');
-export const DECLARATION_REGEXP = new RegExp(`(?:(\\$(?:[a-z]+[\\-_a-z\\d]*)\\s*):)${REGEXP_END}`, 'gi');
+export const REGEXP = new RegExp(`(\\$(?:[_a-z]+[\\-_a-z\\d]*)(?!:))${REGEXP_END}`, 'gi');
+export const REGEXP_ONE = new RegExp(`^(\\$(?:[_a-z]+[\\-_a-z\\d]*)(?!:))${REGEXP_END}`, 'i');
+export const DECLARATION_REGEXP = new RegExp(`(?:(\\$(?:[_a-z]+[\\-_a-z\\d]*)\\s*):)${REGEXP_END}`, 'gi');
 
 class SassExtractor implements IVariableStrategy {
   name: string = 'SASS_EXTRACTOR';
