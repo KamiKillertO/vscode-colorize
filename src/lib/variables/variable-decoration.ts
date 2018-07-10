@@ -7,11 +7,9 @@ import {
 } from 'vscode';
 import { generateOptimalTextColor } from '../color-util';
 import Color from '../colors/color';
-import Variable, { Observer } from './variable';
+import Variable from './variable';
 
-class VariableDecoration implements Observer {
-  public observerId: number = null;
-  private _updateCallback: Function;
+class VariableDecoration {
   /**
    * The color variable used to generate the TextEditorDecorationType
    *
@@ -29,7 +27,7 @@ class VariableDecoration implements Observer {
    */
   public disposed: boolean = false;
 
-  public deleted: boolean = false;
+  private hidden: boolean = false;
 
   public currentRange: Range;
   private _decoration: TextEditorDecorationType;
@@ -40,8 +38,8 @@ class VariableDecoration implements Observer {
    * @memberOf ColorDecoration
    */
   get decoration(): TextEditorDecorationType {
-    if (this.disposed) {
-      this.disposed = false;
+    if (this.hidden) {
+      this.hidden = false;
       this._generateDecorator();
     }
     return this._decoration;
@@ -66,10 +64,9 @@ class VariableDecoration implements Observer {
    * @memberOf ColorDecoration
    */
   public dispose(): void {
-    // this.color = null;
     try {
-      this.variable.removerObserver(this);
       this._decoration.dispose();
+      this.variable.color.rgb = null;
     } catch (error) {}
     this.disposed = true;
   }
@@ -78,7 +75,7 @@ class VariableDecoration implements Observer {
     try {
       this._decoration.dispose();
     } catch (error) {}
-    this.disposed = true;
+    this.hidden = true;
   }
 
   /**
@@ -97,7 +94,6 @@ class VariableDecoration implements Observer {
 
   private _generateDecorator() {
     if (this.variable.color.rgb) {
-      this.deleted = false;
       let backgroundDecorationType = window.createTextEditorDecorationType({
         borderWidth: '1px',
         borderStyle: 'solid',
@@ -106,31 +102,7 @@ class VariableDecoration implements Observer {
         color: generateOptimalTextColor(this.variable.color)
       });
       this._decoration = backgroundDecorationType;
-    } else {
-      this.deleted = true;
     }
-  }
-  addUpdateCallback(callback) {
-    this._updateCallback = callback;
-  }
-  updateDecoration(color: Color) {
-    this.deleted = false;
-    try {
-      this._decoration.dispose();
-    } catch (error) {}
-    this.variable.color.rgb = color.rgb;
-    this._generateDecorator();
-    try {
-      this._updateCallback(this);
-    } catch (error) {}
-  }
-  disposeDecoration() {
-    this.dispose(); // should trigger new search for this variable?
-    this.deleted = true;
-  }
-  update(args: Object[]) {
-    const action = args[0];
-    this[`${action}Decoration`](...args.slice(1));
   }
 }
 export default VariableDecoration;

@@ -49,6 +49,9 @@ class StylusExtractor implements IVariableStrategy {
         let spaces = (match[1] || '').length;
         if (this.store.has(varName)) {
           let decoration = this.store.findClosestDeclaration(varName, fileName);
+          if (decoration.color === undefined) {
+            decoration = this.store.findClosestDeclaration(varName, '.');
+          }
           let variable;
           const declaration = null;
           if (decoration.color) {
@@ -56,7 +59,6 @@ class StylusExtractor implements IVariableStrategy {
           } else {
             variable = new Variable(varName, new Color(varName, match.index, null), declaration);
           }
-          variable.base = decoration; // TODO: This is temp, I need to rethink the variables declaration/usage thing
           colors.push(variable);
         }
       }

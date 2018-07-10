@@ -146,11 +146,13 @@ function updatePositionsDeletion(range, positions) {
   return positions;
 }
 
-function handleLineRemoved(editedLine: TextDocumentContentChangeEvent[], positions) {
+function handleLineRemoved(editedLine: TextDocumentContentChangeEvent[], positions, context: ColorizeContext) {
   editedLine.reverse();
   editedLine.forEach((line: TextDocumentContentChangeEvent) => {
     if (config.isVariablesEnable) {
       for (let i = line.range.start.line; i <= line.range.end.line; i++) {
+      // ?
+      // for (let i = line.range.start.line; i <= context.editor.document.lineCount; i++) {
         VariablesManager.deleteVariableInLine(extension.editor.document.fileName, i);
       }
     }
@@ -159,7 +161,7 @@ function handleLineRemoved(editedLine: TextDocumentContentChangeEvent[], positio
   return editedLine;
 }
 
-function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position) {
+function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position, context: ColorizeContext) {
   editedLine = mutEditedLIne(editedLine);
   editedLine.forEach((line) => {
     position.forEach(position => {
@@ -167,6 +169,12 @@ function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position)
         position.newPosition = position.newPosition + 1;
       }
     });
+    // ?
+    // if (config.isVariablesEnable) {
+    //   for (let i = line.range.start.line; i <= context.editor.document.lineCount; i++) {
+    //     VariablesManager.deleteVariableInLine(extension.editor.document.fileName, i);
+    //   }
+    // }
   });
 
   return editedLine;
@@ -194,9 +202,9 @@ function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context: C
   }));
 
   if (diffLine < 0) {
-    editedLine = handleLineRemoved(editedLine, positions);
+    editedLine = handleLineRemoved(editedLine, positions, context);
   } else {
-    editedLine = handleLineAdded(editedLine, positions);
+    editedLine = handleLineAdded(editedLine, positions, context);
   }
   positions = positions.filter(position => filterPositions(position, context.deco, diffLine));
   context.deco = positions.reduce((decorations, position) => {
@@ -240,17 +248,24 @@ async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEve
         decoration.dispose();
       });
     }
-    context.deco.set(line, []);
     return {line, text: text[line]};
   });
   try {
     let variables = [];
-    if (config.isVariablesEnable) {
-      await VariablesManager.findVariablesDeclarations(context.editor.document.fileName, fileLines);
-      variables = await VariablesManager.findVariables(context.editor.document.fileName, fileLines);
-    }
+    const lines: DocumentLine[] = ColorUtil.textToFileLines(context.editor.document.getText());
+    lines.forEach(({line}) => {
+      if (context.deco.has(line)) {
+        context.deco.get(line).forEach(decoration => {
+           // @ts-ignore
+          if (decoration.variable) {
+            decoration.dispose();
+          }
+        });
+      }
+    });
+    await VariablesManager.findVariablesDeclarations(context.editor.document.fileName, lines);
+    variables = await VariablesManager.findVariables(context.editor.document.fileName, lines);
     const colors: LineExtraction[] = await ColorUtil.findColors(fileLines, context.editor.document.fileName);
-    // should not run if variables support not activated
 
     const decorations = generateDecorations(colors, variables, new Map());
 
@@ -325,7 +340,6 @@ function isFileExtensionSupported(fileName: string): boolean {
 function canColorize(document: TextDocument) {
   return isLanguageSupported(document.languageId) || isFileExtensionSupported(document.fileName);
 }
-
 function handleTextSelectionChange(event: TextEditorSelectionChangeEvent) {
   if (!config.isHideCurrentLineDecorations || event.textEditor !== extension.editor) {
     return;
@@ -393,10 +407,23 @@ function handleChangeActiveTextEditor(editor: TextEditor) {
   q.push(cb => colorize(editor, cb));
 }
 
+function cleanDecorationList(context: ColorizeContext, cb) {
+  let it = context.deco.entries();
+  let tmp = it.next();
+  while (!tmp.done) {
+    let line = tmp.value[0];
+    let decorations = tmp.value[1];
+    context.deco.set(line, decorations.filter(decoration => !decoration.disposed));
+    tmp = it.next();
+  }
+  return cb();
+}
+
 function handleChangeTextDocument(event: TextDocumentChangeEvent) {
   if (extension.editor && event.document.fileName === extension.editor.document.fileName) {
     extension.editor = window.activeTextEditor;
     q.push((cb) => updateDecorations(event.contentChanges, extension, cb));
+    q.push((cb) => cleanDecorationList(extension, cb));
   }
 }
 

@@ -64,8 +64,6 @@ class VariablesManager {
 
   public generateDecoration(variable: Variable, line: number): VariableDecoration {
     const deco = new VariableDecoration(variable, line);
-    // @ts-ignore
-    variable.base.registerObserver(deco); // tslint:disable-line
     return deco;
   }
 
