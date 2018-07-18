@@ -2,39 +2,26 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import {
-  commands,
   window,
   workspace,
   ExtensionContext,
-  OverviewRulerLane,
   TextEditor,
-  DecorationOptions,
   Range,
-  TextEditorDecorationType,
   TextDocument,
-  TextLine,
   Position,
   TextDocumentChangeEvent,
   TextDocumentContentChangeEvent,
   TextEditorSelectionChangeEvent,
-  // TextEditorSelectionChangeKind,
   Selection,
-  StatusBarAlignment,
-  Uri,
   WorkspaceConfiguration,
   ConfigurationChangeEvent
 } from 'vscode';
-import Color, { IColor } from './lib/colors/color';
 import Variable from './lib/variables/variable';
 import ColorUtil, { IDecoration, DocumentLine, LineExtraction } from './lib/color-util';
-import ColorDecoration from './lib/colors/color-decoration';
 import Queue from './lib/queue';
-import ColorExtractor from './lib/colors/color-extractor';
-import VariableDecoration from './lib/variables/variable-decoration';
 import VariablesManager from './lib/variables/variables-manager';
 import CacheManager from './lib/cache-manager';
 import EditorManager from './lib/editor-manager';
-import color from './lib/colors/color';
 
 let config = {
   languages: null,
@@ -239,6 +226,21 @@ function updateContextDecorations(decorations: Map<number, IDecoration[]>, conte
   }
 
 }
+
+function disposeAllVariablesUseDecorations(context: ColorizeContext) {
+  const lines: DocumentLine[] = ColorUtil.textToFileLines(context.editor.document.getText());
+  lines.forEach(({line}) => {
+    if (context.deco.has(line)) {
+      context.deco.get(line).forEach(decoration => {
+         // @ts-ignore
+        if (decoration.variable) {
+          decoration.dispose();
+        }
+      });
+    }
+  });
+}
+
 async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, cb) {
   const text = context.editor.document.getText().split(/\n/);
   const fileLines: DocumentLine[] = editedLine.map(({range}: TextDocumentContentChangeEvent) => {
@@ -253,16 +255,7 @@ async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEve
   try {
     let variables = [];
     const lines: DocumentLine[] = ColorUtil.textToFileLines(context.editor.document.getText());
-    lines.forEach(({line}) => {
-      if (context.deco.has(line)) {
-        context.deco.get(line).forEach(decoration => {
-           // @ts-ignore
-          if (decoration.variable) {
-            decoration.dispose();
-          }
-        });
-      }
-    });
+    disposeAllVariablesUseDecorations(context);
     await VariablesManager.findVariablesDeclarations(context.editor.document.fileName, lines);
     variables = await VariablesManager.findVariables(context.editor.document.fileName, lines);
     const colors: LineExtraction[] = await ColorUtil.findColors(fileLines, context.editor.document.fileName);
@@ -340,29 +333,27 @@ function isFileExtensionSupported(fileName: string): boolean {
 function canColorize(document: TextDocument) {
   return isLanguageSupported(document.languageId) || isFileExtensionSupported(document.fileName);
 }
-function handleTextSelectionChange(event: TextEditorSelectionChangeEvent) {
+function handleTextSelectionChange(event: TextEditorSelectionChangeEvent, cb: Function) {
   if (!config.isHideCurrentLineDecorations || event.textEditor !== extension.editor) {
-    return;
+    return cb();
   }
-  q.push(cb => {
-    if (extension.currentSelection.length !== 0) {
-      extension.currentSelection.forEach(line => {
-        const decorations = extension.deco.get(line);
-        if (decorations !== undefined) {
-          EditorManager.decorateOneLine(extension.editor, decorations, line);
-        }
-      });
-    }
-    extension.currentSelection =  [];
-    event.selections.forEach((selection: Selection) => {
-      let decorations = extension.deco.get(selection.active.line);
-      if (decorations) {
-        decorations.forEach(_ => _.hide());
+  if (extension.currentSelection.length !== 0) {
+    extension.currentSelection.forEach(line => {
+      const decorations = extension.deco.get(line);
+      if (decorations !== undefined) {
+        EditorManager.decorateOneLine(extension.editor, decorations, line);
       }
     });
-    extension.currentSelection = event.selections.map((selection: Selection) => selection.active.line);
-    return cb();
+  }
+  extension.currentSelection =  [];
+  event.selections.forEach((selection: Selection) => {
+    let decorations = extension.deco.get(selection.active.line);
+    if (decorations) {
+      decorations.forEach(_ => _.hide());
+    }
   });
+  extension.currentSelection = event.selections.map((selection: Selection) => selection.active.line);
+  return cb();
 }
 
 function handleCloseOpen(document) {
@@ -440,7 +431,7 @@ function handleConfigurationChanged(event: ConfigurationChangeEvent) {
 }
 
 function initEventListeners(context: ExtensionContext) {
-  window.onDidChangeTextEditorSelection(handleTextSelectionChange, null, context.subscriptions);
+  window.onDidChangeTextEditorSelection((event) => q.push((cb) => handleTextSelectionChange(event, cb)), null, context.subscriptions);
   workspace.onDidCloseTextDocument(handleCloseOpen, null, context.subscriptions);
   workspace.onDidSaveTextDocument(handleCloseOpen, null, context.subscriptions);
   window.onDidChangeActiveTextEditor(handleChangeActiveTextEditor, null, context.subscriptions);
