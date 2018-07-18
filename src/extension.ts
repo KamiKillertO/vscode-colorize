@@ -2,39 +2,26 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import {
-  commands,
   window,
   workspace,
   ExtensionContext,
-  OverviewRulerLane,
   TextEditor,
-  DecorationOptions,
   Range,
-  TextEditorDecorationType,
   TextDocument,
-  TextLine,
   Position,
   TextDocumentChangeEvent,
   TextDocumentContentChangeEvent,
   TextEditorSelectionChangeEvent,
-  // TextEditorSelectionChangeKind,
   Selection,
-  StatusBarAlignment,
-  Uri,
   WorkspaceConfiguration,
   ConfigurationChangeEvent
 } from 'vscode';
-import Color, { IColor } from './lib/colors/color';
 import Variable from './lib/variables/variable';
 import ColorUtil, { IDecoration, DocumentLine, LineExtraction } from './lib/color-util';
-import ColorDecoration from './lib/colors/color-decoration';
 import Queue from './lib/queue';
-import ColorExtractor from './lib/colors/color-extractor';
-import VariableDecoration from './lib/variables/variable-decoration';
 import VariablesManager from './lib/variables/variables-manager';
 import CacheManager from './lib/cache-manager';
 import EditorManager from './lib/editor-manager';
-import color from './lib/colors/color';
 
 let config = {
   languages: null,
