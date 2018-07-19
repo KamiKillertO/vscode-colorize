@@ -18,20 +18,32 @@ export interface IVariableStrategy extends IStrategy {
 class VariablesExtractor extends Extractor {
 
   public strategies: IVariableStrategy[];
+  private enabledStrategies: IVariableStrategy[];
+
+  public enableStategies(strategiesToEnable: string[]) {
+    // remove duplicates (if duplicates)
+    strategiesToEnable = Array.from(new Set(strategiesToEnable)); // [...new Set(strategiesToEnable)] // works too
+    this.enabledStrategies = this.strategies.filter(strategy => {
+      if (strategiesToEnable.find(_ => _ === strategy.name)) {
+        let constructor: any = strategy.constructor;
+        return new constructor();
+      }
+    });
+  }
 
   public async extractVariables(fileName: string, fileLines: DocumentLine[]): Promise < LineExtraction[] > {
-    const colors = await Promise.all(this.strategies.map(strategy => strategy.extractVariables(fileName, fileLines)));
+    const colors = await Promise.all(this.enabledStrategies.map(strategy => strategy.extractVariables(fileName, fileLines)));
     return flattenLineExtractionsFlatten(colors); // should regroup per lines?
   }
 
   public deleteVariableInLine(fileName: string, line: number) {
-    this.strategies.forEach(strategy => strategy.deleteVariable(fileName, line));
+    this.enabledStrategies.forEach(strategy => strategy.deleteVariable(fileName, line));
   }
   public async extractDeclarations(fileName: string, fileLines: DocumentLine[]): Promise<number[]> {
-    return Promise.all(this.strategies.map(strategy => strategy.extractDeclarations(fileName, fileLines)));
+    return Promise.all(this.enabledStrategies.map(strategy => strategy.extractDeclarations(fileName, fileLines)));
   }
   public getVariablesCount(): number {
-    return this.strategies.reduce((cv, strategy) => cv + strategy.variablesCount(), 0);
+    return this.enabledStrategies.reduce((cv, strategy) => cv + strategy.variablesCount(), 0);
   }
 }
 const instance = new VariablesExtractor();

@@ -67,6 +67,10 @@ class VariablesManager {
     return deco;
   }
 
+  public setupVariablesExtractors(extractors: string[]) {
+    VariablesExtractor.enableStategies(extractors);
+  }
+
   public deleteVariableInLine(fileName: string, line: number) {
     VariablesExtractor.deleteVariableInLine(fileName, line);
   }

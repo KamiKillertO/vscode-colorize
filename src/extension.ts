@@ -41,7 +41,7 @@ interface ColorizeContext {
 let extension: ColorizeContext = {
   editor: window.activeTextEditor,
   nbLine: 0,
-  deco: null,
+  deco: new Map(),
   currentSelection: null
 };
 
@@ -421,14 +421,19 @@ function handleChangeTextDocument(event: TextDocumentChangeEvent) {
 
 function clearCache() {
   extension.deco.clear();
-  extension.deco = null;
+  extension.deco = new Map();
   CacheManager.clearCache();
 }
 
-function handleConfigurationChanged(event: ConfigurationChangeEvent) {
+function handleConfigurationChanged() {
   readConfiguration();
   clearCache();
-  colorizeVisibleTextEditors();
+  VariablesManager.setupVariablesExtractors(config.enabledVariablesExtractors);
+  q.push(async (cb) => {
+    await VariablesManager.getWorkspaceVariables();
+    colorizeVisibleTextEditors();
+    return cb();
+  });
 }
 
 function initEventListeners(context: ExtensionContext) {
@@ -458,6 +463,7 @@ function colorizeVisibleTextEditors() {
 export function activate(context: ExtensionContext) {
   readConfiguration();
   if (config.isVariablesEnable === true) {
+    VariablesManager.setupVariablesExtractors(config.enabledVariablesExtractors);
     q.push(async cb => {
       try {
         await VariablesManager.getWorkspaceVariables();
