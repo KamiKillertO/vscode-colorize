@@ -78,6 +78,28 @@
           "default": false,
           "type": "boolean",
           "description": "Activate the variables extractions/decorations feature (beta)"
+        },
+        "colorize.enabled_variables_extractors": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "default": [
+            "CSS",
+            "SASS",
+            "LESS",
+            "STYLUS"
+          ],
+          "items": {
+            "enum": [
+              "CSS",
+              "SASS",
+              "LESS",
+              "STYLUS"
+            ],
+            "description": "You should enter a valid extractor",
+            "uniqueItems": true
+          },
+          "title": "Extract these type of variables",
+          "type": "array",
+          "description": "Specified the type of variables that should be extracted"
         }
       }
     }

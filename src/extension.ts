@@ -27,7 +27,8 @@ let config = {
   languages: null,
   filesExtensions: null,
   isVariablesEnable: false,
-  isHideCurrentLineDecorations: true
+  isHideCurrentLineDecorations: true,
+  enabledVariablesExtractors: []
 };
 
 interface ColorizeContext {
@@ -445,6 +446,7 @@ function readConfiguration() {
   config.filesExtensions = configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`));
   config.isVariablesEnable = configuration.get('activate_variables_support_beta');
   config.isHideCurrentLineDecorations = configuration.get('hide_current_line_decorations');
+  config.enabledVariablesExtractors = configuration.get('enabled_variables_extractors');
 }
 
 function colorizeVisibleTextEditors() {
