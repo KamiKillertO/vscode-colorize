@@ -21,8 +21,6 @@ class VariablesExtractor extends Extractor {
   private enabledStrategies: IVariableStrategy[];
 
   public enableStategies(strategiesToEnable: string[]) {
-    // remove duplicates (if duplicates)
-    strategiesToEnable = Array.from(new Set(strategiesToEnable)); // [...new Set(strategiesToEnable)] // works too
     this.enabledStrategies = this.strategies.filter(strategy => {
       if (strategiesToEnable.find(_ => _ === strategy.name)) {
         let constructor: any = strategy.constructor;

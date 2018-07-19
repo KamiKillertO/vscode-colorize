@@ -23,13 +23,21 @@ import VariablesManager from './lib/variables/variables-manager';
 import CacheManager from './lib/cache-manager';
 import EditorManager from './lib/editor-manager';
 
-let config = {
-  languages: null,
-  filesExtensions: null,
+interface ColorizeConfig {
+  languages: string[];
+  filesExtensions: RegExp[];
+  isVariablesEnable: boolean;
+  isHideCurrentLineDecorations: boolean;
+  enabledVariablesExtractors: string[];
+}
+let config: ColorizeConfig = {
+  languages: [],
+  filesExtensions: [],
   isVariablesEnable: false,
   isHideCurrentLineDecorations: true,
   enabledVariablesExtractors: []
 };
+
 
 interface ColorizeContext {
   editor: TextEditor;
@@ -57,6 +65,19 @@ function mapKeysToArray(map: Map < number, any > ) {
     tmp = it.next();
   }
   return array;
+}
+
+// Check if two arrays are equals
+function arrayEquals(arr1: any[], arr2: any[]): boolean {
+  if (arr1.length !== arr2.length) {
+    return false;
+  }
+  for (let i in arr1) {
+    if (arr1[i] !== arr2[i]) {
+      return false;
+    }
+  }
+  return true;
 }
 
 // Generate a TextDocumentContentChangeEvent like object for one line
@@ -426,14 +447,19 @@ function clearCache() {
 }
 
 function handleConfigurationChanged() {
-  readConfiguration();
+  const newConfig = readConfiguration();
   clearCache();
-  VariablesManager.setupVariablesExtractors(config.enabledVariablesExtractors);
-  q.push(async (cb) => {
-    await VariablesManager.getWorkspaceVariables();
-    colorizeVisibleTextEditors();
-    return cb();
-  });
+
+  if (arrayEquals(config.enabledVariablesExtractors, newConfig.enabledVariablesExtractors) === false) {
+    q.push(async (cb) => {
+      // remove event listeners?
+      VariablesManager.setupVariablesExtractors(newConfig.enabledVariablesExtractors);
+      await VariablesManager.getWorkspaceVariables();
+      return cb();
+    });
+  }
+  config = newConfig;
+  colorizeVisibleTextEditors();
 }
 
 function initEventListeners(context: ExtensionContext) {
@@ -445,13 +471,18 @@ function initEventListeners(context: ExtensionContext) {
   workspace.onDidChangeConfiguration(handleConfigurationChanged, null, context.subscriptions);
 }
 
-function readConfiguration() {
+function readConfiguration(): ColorizeConfig {
   const configuration: WorkspaceConfiguration = workspace.getConfiguration('colorize');
-  config.languages = configuration.get('languages', []);
-  config.filesExtensions = configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`));
-  config.isVariablesEnable = configuration.get('activate_variables_support_beta');
-  config.isHideCurrentLineDecorations = configuration.get('hide_current_line_decorations');
-  config.enabledVariablesExtractors = configuration.get('enabled_variables_extractors');
+
+  // remove duplicates (if duplicates)
+  const enabledVariablesExtractors = Array.from(new Set(configuration.get('enabled_variables_extractors', []))); // [...new Set(array)] // works too
+  return {
+    languages: configuration.get('languages', []),
+    filesExtensions: configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`)),
+    isVariablesEnable: configuration.get('activate_variables_support_beta'),
+    isHideCurrentLineDecorations: configuration.get('hide_current_line_decorations'),
+    enabledVariablesExtractors
+  };
 }
 
 function colorizeVisibleTextEditors() {
@@ -461,7 +492,7 @@ function colorizeVisibleTextEditors() {
 }
 
 export function activate(context: ExtensionContext) {
-  readConfiguration();
+  config = readConfiguration();
   if (config.isVariablesEnable === true) {
     VariablesManager.setupVariablesExtractors(config.enabledVariablesExtractors);
     q.push(async cb => {
