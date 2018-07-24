@@ -82,6 +82,10 @@ class ColorUtil {
     return ColorExtractor.extract(fileContent);
   }
 
+  public static setupColorsExtractors(extractors: string[]) {
+    ColorExtractor.enableStategies(extractors);
+  }
+
   public static generateDecoration(color: IColor): IDecoration {
     return new ColorDecoration(<Color>color);
   }
