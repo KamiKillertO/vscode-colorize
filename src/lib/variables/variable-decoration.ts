@@ -38,7 +38,7 @@ class VariableDecoration {
    * @memberOf ColorDecoration
    */
   get decoration(): TextEditorDecorationType {
-    if (this.hidden) {
+    if (this.hidden || this._decoration === undefined) {
       this.hidden = false;
       this._generateDecorator();
     }

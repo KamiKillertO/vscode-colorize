@@ -56,13 +56,14 @@
           "description": "Languages that should be colorized"
         },
         "colorize.files_extensions": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$schema": "http://json-schema.org/draft-07/schema#",
           "default": [],
           "title": "Colorize files with these extensions",
           "type": "array",
           "items": {
             "type": "string",
             "pattern": "\\.\\w+$",
+            "uniqueItems": true,
             "description": "You should enter a valid file extension"
           },
           "description": "Specified files extension that should be colorized"
