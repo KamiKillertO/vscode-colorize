@@ -100,6 +100,28 @@
           "title": "Extract these type of variables",
           "type": "array",
           "description": "Specified the type of variables that should be extracted"
+        },
+        "colorize.enabled_colors_extractors": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "default": [
+            "BROWSERS_COLORS",
+            "HEXA",
+            "RGB",
+            "HSL"
+          ],
+          "items": {
+            "enum": [
+              "BROWSERS_COLORS",
+              "HEXA",
+              "RGB",
+              "HSL"
+            ],
+            "description": "You should enter a valid extractor",
+            "uniqueItems": true
+          },
+          "title": "Colorize these type of color",
+          "type": "array",
+          "description": "Specified the type of color that should be colorized"
         }
       }
     }

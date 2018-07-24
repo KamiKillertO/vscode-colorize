@@ -13,8 +13,7 @@ import {
   TextDocumentContentChangeEvent,
   TextEditorSelectionChangeEvent,
   Selection,
-  WorkspaceConfiguration,
-  ConfigurationChangeEvent
+  WorkspaceConfiguration
 } from 'vscode';
 import Variable from './lib/variables/variable';
 import ColorUtil, { IDecoration, DocumentLine, LineExtraction } from './lib/color-util';
@@ -29,13 +28,15 @@ interface ColorizeConfig {
   isVariablesEnable: boolean;
   isHideCurrentLineDecorations: boolean;
   enabledVariablesExtractors: string[];
+  enabledColorsExtractors: string[];
 }
 let config: ColorizeConfig = {
   languages: [],
   filesExtensions: [],
   isVariablesEnable: false,
   isHideCurrentLineDecorations: true,
-  enabledVariablesExtractors: []
+  enabledVariablesExtractors: [],
+  enabledColorsExtractors: []
 };
 
 
@@ -286,7 +287,8 @@ async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEve
 
     EditorManager.decorate(context.editor, decorations, context.currentSelection);
     updateContextDecorations(decorations, context);
-  } catch (error) {}
+  } catch (error) {
+  }
   return cb();
 }
 
@@ -344,7 +346,7 @@ function isLanguageSupported(languageId: string): boolean {
  * @returns {boolean}
  */
 function isFileExtensionSupported(fileName: string): boolean {
-  return config.filesExtensions.find((ext: RegExp) => ext.test(fileName));
+  return config.filesExtensions.some((ext: RegExp) => ext.test(fileName));
 }
 /**
  * Check if a file can be colorized by COLORIZE
@@ -389,6 +391,8 @@ function handleCloseOpen(document) {
 }
 
 async function colorize(editor: TextEditor, cb) {
+  extension.editor = null;
+  extension.deco = new Map();
   if (!editor || !canColorize(editor.document)) {
     return cb();
   }
@@ -400,12 +404,12 @@ async function colorize(editor: TextEditor, cb) {
     extension.nbLine = editor.document.lineCount;
     EditorManager.decorate(extension.editor, extension.deco, extension.currentSelection);
   } else {
-    extension.deco = new Map();
     extension.nbLine = editor.document.lineCount;
     try {
       await initDecorations(extension);
-    } catch (error) {}
-    CacheManager.saveDecorations(extension.editor.document, extension.deco);
+    } finally {
+      CacheManager.saveDecorations(extension.editor.document, extension.deco);
+    }
   }
   return cb();
 }
@@ -449,15 +453,15 @@ function clearCache() {
 function handleConfigurationChanged() {
   const newConfig = readConfiguration();
   clearCache();
+  // delete current decorations then regenerate decorations
+  ColorUtil.setupColorsExtractors(newConfig.enabledColorsExtractors);
 
-  if (arrayEquals(config.enabledVariablesExtractors, newConfig.enabledVariablesExtractors) === false) {
-    q.push(async (cb) => {
-      // remove event listeners?
-      VariablesManager.setupVariablesExtractors(newConfig.enabledVariablesExtractors);
-      await VariablesManager.getWorkspaceVariables();
-      return cb();
-    });
-  }
+  q.push(async (cb) => {
+    // remove event listeners?
+    VariablesManager.setupVariablesExtractors(newConfig.enabledVariablesExtractors);
+    await VariablesManager.getWorkspaceVariables();
+    return cb();
+  });
   config = newConfig;
   colorizeVisibleTextEditors();
 }
@@ -476,12 +480,14 @@ function readConfiguration(): ColorizeConfig {
 
   // remove duplicates (if duplicates)
   const enabledVariablesExtractors = Array.from(new Set(configuration.get('enabled_variables_extractors', []))); // [...new Set(array)] // works too
+  const enabledColorsExtractors = Array.from(new Set(configuration.get('enabled_colors_extractors', []))); // [...new Set(array)] // works too
   return {
     languages: configuration.get('languages', []),
     filesExtensions: configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`)),
     isVariablesEnable: configuration.get('activate_variables_support_beta'),
     isHideCurrentLineDecorations: configuration.get('hide_current_line_decorations'),
-    enabledVariablesExtractors
+    enabledVariablesExtractors,
+    enabledColorsExtractors
   };
 }
 
@@ -493,6 +499,7 @@ function colorizeVisibleTextEditors() {
 
 export function activate(context: ExtensionContext) {
   config = readConfiguration();
+  ColorUtil.setupColorsExtractors(config.enabledColorsExtractors);
   if (config.isVariablesEnable === true) {
     VariablesManager.setupVariablesExtractors(config.enabledVariablesExtractors);
     q.push(async cb => {
