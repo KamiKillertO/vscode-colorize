@@ -37,7 +37,7 @@
   "main": "./out/src/extension",
   "contributes": {
     "configuration": {
-      "title": "Colorize extension (reboot after any changes required)",
+      "title": "Colorize extension",
       "properties": {
         "colorize.languages": {
           "default": [
@@ -80,7 +80,7 @@
           "type": "boolean",
           "description": "Activate the variables extractions/decorations feature (beta)"
         },
-        "colorize.enabled_variables_extractors": {
+        "colorize.colorized_variables": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "default": [
             "CSS",
@@ -102,7 +102,7 @@
           "type": "array",
           "description": "Specified the type of variables that should be extracted"
         },
-        "colorize.enabled_colors_extractors": {
+        "colorize.colorized_colors": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "default": [
             "BROWSERS_COLORS",

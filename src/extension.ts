@@ -27,16 +27,16 @@ interface ColorizeConfig {
   filesExtensions: RegExp[];
   isVariablesEnable: boolean;
   isHideCurrentLineDecorations: boolean;
-  enabledVariablesExtractors: string[];
-  enabledColorsExtractors: string[];
+  colorizedVariables: string[];
+  colorizedColors: string[];
 }
 let config: ColorizeConfig = {
   languages: [],
   filesExtensions: [],
   isVariablesEnable: false,
   isHideCurrentLineDecorations: true,
-  enabledVariablesExtractors: [],
-  enabledColorsExtractors: []
+  colorizedVariables: [],
+  colorizedColors: []
 };
 
 
@@ -454,11 +454,11 @@ function handleConfigurationChanged() {
   const newConfig = readConfiguration();
   clearCache();
   // delete current decorations then regenerate decorations
-  ColorUtil.setupColorsExtractors(newConfig.enabledColorsExtractors);
+  ColorUtil.setupColorsExtractors(newConfig.colorizedColors);
 
   q.push(async (cb) => {
     // remove event listeners?
-    VariablesManager.setupVariablesExtractors(newConfig.enabledVariablesExtractors);
+    VariablesManager.setupVariablesExtractors(newConfig.colorizedVariables);
     await VariablesManager.getWorkspaceVariables();
     return cb();
   });
@@ -479,15 +479,15 @@ function readConfiguration(): ColorizeConfig {
   const configuration: WorkspaceConfiguration = workspace.getConfiguration('colorize');
 
   // remove duplicates (if duplicates)
-  const enabledVariablesExtractors = Array.from(new Set(configuration.get('enabled_variables_extractors', []))); // [...new Set(array)] // works too
-  const enabledColorsExtractors = Array.from(new Set(configuration.get('enabled_colors_extractors', []))); // [...new Set(array)] // works too
+  const colorizedVariables = Array.from(new Set(configuration.get('colorized_variables', []))); // [...new Set(array)] // works too
+  const colorizedColors = Array.from(new Set(configuration.get('colorized_colors', []))); // [...new Set(array)] // works too
   return {
     languages: configuration.get('languages', []),
     filesExtensions: configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`)),
     isVariablesEnable: configuration.get('activate_variables_support_beta'),
     isHideCurrentLineDecorations: configuration.get('hide_current_line_decorations'),
-    enabledVariablesExtractors,
-    enabledColorsExtractors
+    colorizedColors,
+    colorizedVariables
   };
 }
 
@@ -499,9 +499,9 @@ function colorizeVisibleTextEditors() {
 
 export function activate(context: ExtensionContext) {
   config = readConfiguration();
-  ColorUtil.setupColorsExtractors(config.enabledColorsExtractors);
+  ColorUtil.setupColorsExtractors(config.colorizedColors);
   if (config.isVariablesEnable === true) {
-    VariablesManager.setupVariablesExtractors(config.enabledVariablesExtractors);
+    VariablesManager.setupVariablesExtractors(config.colorizedVariables);
     q.push(async cb => {
       try {
         await VariablesManager.getWorkspaceVariables();
