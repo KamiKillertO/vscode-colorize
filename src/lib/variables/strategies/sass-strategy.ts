@@ -12,7 +12,7 @@ export const REGEXP_ONE = new RegExp(`^(\\$(?:[_a-z]+[\\-_a-z\\d]*)(?!:))${REGEX
 export const DECLARATION_REGEXP = new RegExp(`(?:(\\$(?:[_a-z]+[\\-_a-z\\d]*)\\s*):)${REGEXP_END}`, 'gi');
 
 class SassExtractor implements IVariableStrategy {
-  name: string = 'SASS_EXTRACTOR';
+  name: string = 'SASS';
   private store: VariablesStore = new VariablesStore();
 
   public async extractDeclarations(fileName: string, fileLines: DocumentLine[]): Promise<number> {

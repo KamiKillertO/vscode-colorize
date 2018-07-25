@@ -13,8 +13,7 @@ import {
   TextDocumentContentChangeEvent,
   TextEditorSelectionChangeEvent,
   Selection,
-  WorkspaceConfiguration,
-  ConfigurationChangeEvent
+  WorkspaceConfiguration
 } from 'vscode';
 import Variable from './lib/variables/variable';
 import ColorUtil, { IDecoration, DocumentLine, LineExtraction } from './lib/color-util';
@@ -23,12 +22,23 @@ import VariablesManager from './lib/variables/variables-manager';
 import CacheManager from './lib/cache-manager';
 import EditorManager from './lib/editor-manager';
 
-let config = {
-  languages: null,
-  filesExtensions: null,
+interface ColorizeConfig {
+  languages: string[];
+  filesExtensions: RegExp[];
+  isVariablesEnable: boolean;
+  isHideCurrentLineDecorations: boolean;
+  enabledVariablesExtractors: string[];
+  enabledColorsExtractors: string[];
+}
+let config: ColorizeConfig = {
+  languages: [],
+  filesExtensions: [],
   isVariablesEnable: false,
-  isHideCurrentLineDecorations: true
+  isHideCurrentLineDecorations: true,
+  enabledVariablesExtractors: [],
+  enabledColorsExtractors: []
 };
+
 
 interface ColorizeContext {
   editor: TextEditor;
@@ -40,7 +50,7 @@ interface ColorizeContext {
 let extension: ColorizeContext = {
   editor: window.activeTextEditor,
   nbLine: 0,
-  deco: null,
+  deco: new Map(),
   currentSelection: null
 };
 
@@ -56,6 +66,19 @@ function mapKeysToArray(map: Map < number, any > ) {
     tmp = it.next();
   }
   return array;
+}
+
+// Check if two arrays are equals
+function arrayEquals(arr1: any[], arr2: any[]): boolean {
+  if (arr1.length !== arr2.length) {
+    return false;
+  }
+  for (let i in arr1) {
+    if (arr1[i] !== arr2[i]) {
+      return false;
+    }
+  }
+  return true;
 }
 
 // Generate a TextDocumentContentChangeEvent like object for one line
@@ -264,7 +287,8 @@ async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEve
 
     EditorManager.decorate(context.editor, decorations, context.currentSelection);
     updateContextDecorations(decorations, context);
-  } catch (error) {}
+  } catch (error) {
+  }
   return cb();
 }
 
@@ -322,7 +346,7 @@ function isLanguageSupported(languageId: string): boolean {
  * @returns {boolean}
  */
 function isFileExtensionSupported(fileName: string): boolean {
-  return config.filesExtensions.find((ext: RegExp) => ext.test(fileName));
+  return config.filesExtensions.some((ext: RegExp) => ext.test(fileName));
 }
 /**
  * Check if a file can be colorized by COLORIZE
@@ -367,6 +391,8 @@ function handleCloseOpen(document) {
 }
 
 async function colorize(editor: TextEditor, cb) {
+  extension.editor = null;
+  extension.deco = new Map();
   if (!editor || !canColorize(editor.document)) {
     return cb();
   }
@@ -378,12 +404,12 @@ async function colorize(editor: TextEditor, cb) {
     extension.nbLine = editor.document.lineCount;
     EditorManager.decorate(extension.editor, extension.deco, extension.currentSelection);
   } else {
-    extension.deco = new Map();
     extension.nbLine = editor.document.lineCount;
     try {
       await initDecorations(extension);
-    } catch (error) {}
-    CacheManager.saveDecorations(extension.editor.document, extension.deco);
+    } finally {
+      CacheManager.saveDecorations(extension.editor.document, extension.deco);
+    }
   }
   return cb();
 }
@@ -420,13 +446,23 @@ function handleChangeTextDocument(event: TextDocumentChangeEvent) {
 
 function clearCache() {
   extension.deco.clear();
-  extension.deco = null;
+  extension.deco = new Map();
   CacheManager.clearCache();
 }
 
-function handleConfigurationChanged(event: ConfigurationChangeEvent) {
-  readConfiguration();
+function handleConfigurationChanged() {
+  const newConfig = readConfiguration();
   clearCache();
+  // delete current decorations then regenerate decorations
+  ColorUtil.setupColorsExtractors(newConfig.enabledColorsExtractors);
+
+  q.push(async (cb) => {
+    // remove event listeners?
+    VariablesManager.setupVariablesExtractors(newConfig.enabledVariablesExtractors);
+    await VariablesManager.getWorkspaceVariables();
+    return cb();
+  });
+  config = newConfig;
   colorizeVisibleTextEditors();
 }
 
@@ -439,12 +475,20 @@ function initEventListeners(context: ExtensionContext) {
   workspace.onDidChangeConfiguration(handleConfigurationChanged, null, context.subscriptions);
 }
 
-function readConfiguration() {
+function readConfiguration(): ColorizeConfig {
   const configuration: WorkspaceConfiguration = workspace.getConfiguration('colorize');
-  config.languages = configuration.get('languages', []);
-  config.filesExtensions = configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`));
-  config.isVariablesEnable = configuration.get('activate_variables_support_beta');
-  config.isHideCurrentLineDecorations = configuration.get('hide_current_line_decorations');
+
+  // remove duplicates (if duplicates)
+  const enabledVariablesExtractors = Array.from(new Set(configuration.get('enabled_variables_extractors', []))); // [...new Set(array)] // works too
+  const enabledColorsExtractors = Array.from(new Set(configuration.get('enabled_colors_extractors', []))); // [...new Set(array)] // works too
+  return {
+    languages: configuration.get('languages', []),
+    filesExtensions: configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`)),
+    isVariablesEnable: configuration.get('activate_variables_support_beta'),
+    isHideCurrentLineDecorations: configuration.get('hide_current_line_decorations'),
+    enabledVariablesExtractors,
+    enabledColorsExtractors
+  };
 }
 
 function colorizeVisibleTextEditors() {
@@ -454,8 +498,10 @@ function colorizeVisibleTextEditors() {
 }
 
 export function activate(context: ExtensionContext) {
-  readConfiguration();
+  config = readConfiguration();
+  ColorUtil.setupColorsExtractors(config.enabledColorsExtractors);
   if (config.isVariablesEnable === true) {
+    VariablesManager.setupVariablesExtractors(config.enabledVariablesExtractors);
     q.push(async cb => {
       try {
         await VariablesManager.getWorkspaceVariables();

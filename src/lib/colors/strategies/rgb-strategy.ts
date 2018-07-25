@@ -6,7 +6,7 @@ export const REGEXP = /((?:rgb\((?:\d{1,3}\s*,\s*){2}\d{1,3}\))|(?:rgba\((?:\d{1
 export const REGEXP_ONE = /^((?:rgb\((?:\d{1,3}\s*,\s*){2}\d{1,3}\))|(?:rgba\((?:\d{1,3}\s*,\s*){3}(?:[0-1]|1\.0|[0](?:\.\d+){0,1}|(?:\.\d+))\)))(?:$|"|'|,| |;|\)|\r|\n)/i;
 
 class RgbExtractor implements IColorStrategy {
-  public name: string = 'RGB_EXTRACTOR';
+  public name: string = 'RGB';
 
   private extractRGBAValue(value): number[] {
     let rgba =  value.replace(/rgb(a){0,1}\(/, '').replace(/\)/, '').split(/,/gi).map(c => parseFloat(c));

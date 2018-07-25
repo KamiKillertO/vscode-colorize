@@ -3,6 +3,17 @@ export interface IStrategy {
 }
 export class Extractor {
   public strategies: IStrategy[];
+  protected enabledStrategies: IStrategy[];
+
+  public enableStategies(strategiesToEnable: string[]) {
+    this.enabledStrategies = this.strategies.filter(strategy => {
+      if (strategiesToEnable.find(_ => _ === strategy.name)) {
+        let constructor: any = strategy.constructor;
+        return new constructor();
+      }
+    });
+  }
+
   constructor() {
     this.strategies = [];
   }

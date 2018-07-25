@@ -12,7 +12,7 @@ export const REGEXP_ONE = new RegExp(`^(@(?:[a-z]+[\\-_a-z\\d]*)(?!:))${REGEXP_E
 export const DECLARATION_REGEXP = new RegExp(`(?:(@(?:[a-z]+[\\-_a-z\\d]*)\\s*):)${REGEXP_END}`, 'gi');
 
 class LessExtractor implements IVariableStrategy {
-  name: string = 'LESS_EXTRACTOR';
+  name: string = 'LESS';
   private store: VariablesStore = new VariablesStore();
 
   public async extractDeclarations(fileName: string, fileLines: DocumentLine[]): Promise<number> {

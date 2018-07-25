@@ -56,13 +56,14 @@
           "description": "Languages that should be colorized"
         },
         "colorize.files_extensions": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$schema": "http://json-schema.org/draft-07/schema#",
           "default": [],
           "title": "Colorize files with these extensions",
           "type": "array",
           "items": {
             "type": "string",
             "pattern": "\\.\\w+$",
+            "uniqueItems": true,
             "description": "You should enter a valid file extension"
           },
           "description": "Specified files extension that should be colorized"
@@ -78,6 +79,50 @@
           "default": false,
           "type": "boolean",
           "description": "Activate the variables extractions/decorations feature (beta)"
+        },
+        "colorize.enabled_variables_extractors": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "default": [
+            "CSS",
+            "SASS",
+            "LESS",
+            "STYLUS"
+          ],
+          "items": {
+            "enum": [
+              "CSS",
+              "SASS",
+              "LESS",
+              "STYLUS"
+            ],
+            "description": "You should enter a valid extractor",
+            "uniqueItems": true
+          },
+          "title": "Extract these type of variables",
+          "type": "array",
+          "description": "Specified the type of variables that should be extracted"
+        },
+        "colorize.enabled_colors_extractors": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "default": [
+            "BROWSERS_COLORS",
+            "HEXA",
+            "RGB",
+            "HSL"
+          ],
+          "items": {
+            "enum": [
+              "BROWSERS_COLORS",
+              "HEXA",
+              "RGB",
+              "HSL"
+            ],
+            "description": "You should enter a valid extractor",
+            "uniqueItems": true
+          },
+          "title": "Colorize these type of color",
+          "type": "array",
+          "description": "Specified the type of color that should be colorized"
         }
       }
     }

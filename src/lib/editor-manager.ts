@@ -21,7 +21,7 @@ class EditorManager {
       const line = tmp.value[0];
       const deco: IDecoration[] = tmp.value[1];
       if (skipLines.indexOf(line) === -1) {
-        this.decorateOneLine(editor, tmp.value[1], line);
+        this.decorateOneLine(editor, deco, line);
       }
       tmp = it.next();
     }
@@ -40,7 +40,7 @@ class EditorManager {
    */
   public static decorateOneLine(editor: TextEditor, decorations: IDecoration[], line: number) {
     decorations.forEach((decoration: IDecoration) => {
-      if (!(<VariableDecoration>decoration).disposed) {
+      if (!(<VariableDecoration>decoration).disposed && decoration.decoration) {
         editor.setDecorations(decoration.decoration, [decoration.generateRange(line)]);
       }
     });

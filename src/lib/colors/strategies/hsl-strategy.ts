@@ -8,7 +8,7 @@ export const REGEXP = /((?:hsl\(\d*\s*,\s*\d{1,3}%\s*,\s*\d{1,3}%\))|(?:hsla\(\d
 export const REGEXP_ONE = /^((?:hsl\(\d*\s*,\s*\d{1,3}%\s*,\s*\d{1,3}%\))|(?:hsla\(\d*\s*,\s*(?:\d{1,3}%\s*,\s*){2}(?:[0-1]|1\.0|[0](?:\.\d+){0,1}|(?:\.\d+))\)))(?:$|"|'|,| |;|\)|\r|\n)/i;
 
 class HSLColorExtractor implements IColorStrategy {
-  public name: string = 'HSL_EXTRACTOR';
+  public name: string = 'HSL';
 
   private generateColorFromMatch(match: RegExpMatchArray): Color {
     const [h, s, l, a] = this.extractHSLValue(match[1]);

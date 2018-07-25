@@ -1,7 +1,4 @@
-import Variable from './variable';
-import Color, { IColor } from '../colors/color';
-import ColorExtractor from '../colors/color-extractor';
-import { dirname } from 'path';
+import Color from '../colors/color';
 import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../color-util';
 import { IStrategy, Extractor } from '../extractor-mixin';
 
@@ -17,21 +14,19 @@ export interface IVariableStrategy extends IStrategy {
 
 class VariablesExtractor extends Extractor {
 
-  public strategies: IVariableStrategy[];
-
   public async extractVariables(fileName: string, fileLines: DocumentLine[]): Promise < LineExtraction[] > {
-    const colors = await Promise.all(this.strategies.map(strategy => strategy.extractVariables(fileName, fileLines)));
+    const colors = await Promise.all(this.enabledStrategies.map(strategy => (<IVariableStrategy> strategy).extractVariables(fileName, fileLines)));
     return flattenLineExtractionsFlatten(colors); // should regroup per lines?
   }
 
   public deleteVariableInLine(fileName: string, line: number) {
-    this.strategies.forEach(strategy => strategy.deleteVariable(fileName, line));
+    this.enabledStrategies.forEach(strategy => (<IVariableStrategy> strategy).deleteVariable(fileName, line));
   }
   public async extractDeclarations(fileName: string, fileLines: DocumentLine[]): Promise<number[]> {
-    return Promise.all(this.strategies.map(strategy => strategy.extractDeclarations(fileName, fileLines)));
+    return Promise.all(this.enabledStrategies.map(strategy => (<IVariableStrategy> strategy).extractDeclarations(fileName, fileLines)));
   }
   public getVariablesCount(): number {
-    return this.strategies.reduce((cv, strategy) => cv + strategy.variablesCount(), 0);
+    return this.enabledStrategies.reduce((cv, strategy) => cv + (<IVariableStrategy> strategy).variablesCount(), 0);
   }
 }
 const instance = new VariablesExtractor();
