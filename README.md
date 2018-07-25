@@ -90,12 +90,6 @@ For example if you want to colorize `.diff` files:
 
 By default decorations for the current line are hidden. Set this setting to false to deactivate this behavior.
 
-### colorize.activate_variables_support_beta _BOOLEAN_ _default: false_
-
-Set this options to true to enable variables support.
-Variables support is in beta and you might encounter bugs.
-Do not hesitate to report bugs [GitHub Issues](https://github.com/KamiKillertO/vscode-colorize/issues).
-
 ## Roadmap
 
 - [x] Generate background for hexa colors
