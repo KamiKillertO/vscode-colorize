@@ -77,10 +77,7 @@
         "colorize.colorized_variables": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "default": [
-            "CSS",
-            "SASS",
-            "LESS",
-            "STYLUS"
+            "CSS"
           ],
           "items": {
             "enum": [
