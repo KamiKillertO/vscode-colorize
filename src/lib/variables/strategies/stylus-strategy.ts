@@ -55,9 +55,9 @@ class StylusExtractor implements IVariableStrategy {
           let variable;
           const declaration = null;
           if (decoration.color) {
-            variable = new Variable(varName, new Color(varName, match.index, decoration.color.rgb, decoration.color.alpha), declaration);
+            variable = new Variable(varName, new Color(varName, spaces + match.index, decoration.color.rgb, decoration.color.alpha), declaration);
           } else {
-            variable = new Variable(varName, new Color(varName, match.index, null), declaration);
+            variable = new Variable(varName, new Color(varName, spaces + match.index, null), declaration);
           }
           colors.push(variable);
         }
