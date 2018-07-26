@@ -25,7 +25,6 @@ import EditorManager from './lib/editor-manager';
 interface ColorizeConfig {
   languages: string[];
   filesExtensions: RegExp[];
-  isVariablesEnable: boolean;
   isHideCurrentLineDecorations: boolean;
   colorizedVariables: string[];
   colorizedColors: string[];
@@ -33,7 +32,6 @@ interface ColorizeConfig {
 let config: ColorizeConfig = {
   languages: [],
   filesExtensions: [],
-  isVariablesEnable: false,
   isHideCurrentLineDecorations: true,
   colorizedVariables: [],
   colorizedColors: []
@@ -159,12 +157,10 @@ function updatePositionsDeletion(range, positions) {
 function handleLineRemoved(editedLine: TextDocumentContentChangeEvent[], positions, context: ColorizeContext) {
   editedLine.reverse();
   editedLine.forEach((line: TextDocumentContentChangeEvent) => {
-    if (config.isVariablesEnable) {
-      for (let i = line.range.start.line; i <= line.range.end.line; i++) {
-      // ?
-      // for (let i = line.range.start.line; i <= context.editor.document.lineCount; i++) {
-        VariablesManager.deleteVariableInLine(extension.editor.document.fileName, i);
-      }
+    for (let i = line.range.start.line; i <= line.range.end.line; i++) {
+    // ?
+    // for (let i = line.range.start.line; i <= context.editor.document.lineCount; i++) {
+      VariablesManager.deleteVariableInLine(extension.editor.document.fileName, i);
     }
     positions = updatePositionsDeletion(line.range, positions);
   });
@@ -180,11 +176,9 @@ function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position,
       }
     });
     // ?
-    // if (config.isVariablesEnable) {
-    //   for (let i = line.range.start.line; i <= context.editor.document.lineCount; i++) {
-    //     VariablesManager.deleteVariableInLine(extension.editor.document.fileName, i);
-    //   }
-    // }
+  //   for (let i = line.range.start.line; i <= context.editor.document.lineCount; i++) {
+  //     VariablesManager.deleteVariableInLine(extension.editor.document.fileName, i);
+  //   }
   });
 
   return editedLine;
@@ -301,10 +295,8 @@ async function initDecorations(context: ColorizeContext) {
   const fileLines: DocumentLine[] = ColorUtil.textToFileLines(text);
   const colors: LineExtraction[] = await ColorUtil.findColors(fileLines);
 
-  let variables = [];
-  if (config.isVariablesEnable) {
-    variables = await VariablesManager.findVariables(context.editor.document.fileName, fileLines);
-  }
+  let variables = await VariablesManager.findVariables(context.editor.document.fileName, fileLines);
+
   generateDecorations(colors, variables, context.deco);
   return EditorManager.decorate(context.editor, context.deco, context.currentSelection);
 }
@@ -484,7 +476,6 @@ function readConfiguration(): ColorizeConfig {
   return {
     languages: configuration.get('languages', []),
     filesExtensions: configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`)),
-    isVariablesEnable: configuration.get('activate_variables_support_beta'),
     isHideCurrentLineDecorations: configuration.get('hide_current_line_decorations'),
     colorizedColors,
     colorizedVariables
@@ -500,20 +491,16 @@ function colorizeVisibleTextEditors() {
 export function activate(context: ExtensionContext) {
   config = readConfiguration();
   ColorUtil.setupColorsExtractors(config.colorizedColors);
-  if (config.isVariablesEnable === true) {
-    VariablesManager.setupVariablesExtractors(config.colorizedVariables);
-    q.push(async cb => {
-      try {
-        await VariablesManager.getWorkspaceVariables();
-        initEventListeners(context);
-      } catch (error) {
-        // handle promise rejection
-      }
-      return cb();
-    });
-  } else {
-    initEventListeners(context);
-  }
+  VariablesManager.setupVariablesExtractors(config.colorizedVariables);
+  q.push(async cb => {
+    try {
+      await VariablesManager.getWorkspaceVariables();
+      initEventListeners(context);
+    } catch (error) {
+      // handle promise rejection
+    }
+    return cb();
+  });
   colorizeVisibleTextEditors();
 }
 

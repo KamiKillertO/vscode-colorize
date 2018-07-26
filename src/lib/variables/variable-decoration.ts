@@ -1,12 +1,10 @@
 import {
-  TextEditor,
   Range,
   TextEditorDecorationType,
   Position,
   window
 } from 'vscode';
 import { generateOptimalTextColor } from '../color-util';
-import Color from '../colors/color';
 import Variable from './variable';
 
 class VariableDecoration {

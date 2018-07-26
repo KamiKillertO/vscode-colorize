@@ -1,5 +1,5 @@
 import Variable from './variable';
-import Color, { IColor } from '../colors/color';
+import Color from '../colors/color';
 import { dirname } from 'path';
 
 class VariablesStore {

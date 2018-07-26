@@ -1,7 +1,7 @@
 import VariablesExtractor, { IVariableStrategy } from '../variables-extractor';
 import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../../color-util';
 import Variable from '../variable';
-import Color, { IColor } from '../../colors/color';
+import Color from '../../colors/color';
 import VariablesStore from '../variable-store';
 import ColorExtractor from '../../colors/color-extractor';
 

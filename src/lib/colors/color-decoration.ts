@@ -1,5 +1,4 @@
 import {
-  TextEditor,
   Range,
   TextEditorDecorationType,
   Position,
@@ -8,7 +7,6 @@ import {
 
 import { generateOptimalTextColor } from '../color-util';
 import Color from './color';
-import color from './color';
 
 
 class ColorDecoration {

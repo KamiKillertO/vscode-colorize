@@ -1,3 +1,8 @@
+## 0.7.0
+
+- [IMPROVE] Variables support fully working
+- [ADDED] Options to enable/disabled colorization for colors/variables type
+
 ## 0.6.21
 
 - [FIX] Fix css variables decoration
