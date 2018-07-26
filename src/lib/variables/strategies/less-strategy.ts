@@ -1,7 +1,7 @@
 import VariablesExtractor, { IVariableStrategy } from '../variables-extractor';
 import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../../color-util';
 import Variable from '../variable';
-import Color, { IColor } from '../../colors/color';
+import Color from '../../colors/color';
 import VariablesStore from '../variable-store';
 import ColorExtractor from '../../colors/color-extractor';
 
@@ -12,7 +12,7 @@ export const REGEXP_ONE = new RegExp(`^(@(?:[a-z]+[\\-_a-z\\d]*)(?!:))${REGEXP_E
 export const DECLARATION_REGEXP = new RegExp(`(?:(@(?:[a-z]+[\\-_a-z\\d]*)\\s*):)${REGEXP_END}`, 'gi');
 
 class LessExtractor implements IVariableStrategy {
-  name: string = 'LESS_EXTRACTOR';
+  name: string = 'LESS';
   private store: VariablesStore = new VariablesStore();
 
   public async extractDeclarations(fileName: string, fileLines: DocumentLine[]): Promise<number> {
@@ -41,6 +41,9 @@ class LessExtractor implements IVariableStrategy {
         varName = varName.trim();
         if (this.store.has(varName)) {
           let decoration = this.store.findClosestDeclaration(varName, fileName);
+          if (decoration.color === undefined) {
+            decoration = this.store.findClosestDeclaration(varName, '.');
+          }
           let variable;
           // const declaration = { fileName, line }; //or null
           const declaration = null;
@@ -49,7 +52,6 @@ class LessExtractor implements IVariableStrategy {
           } else {
             variable = new Variable(varName, new Color(varName, match.index, null), declaration);
           }
-          variable.base = decoration; // TODO: This is temp, I need to rethink the variables declaration/usage thing
           colors.push(variable);
         }
       }

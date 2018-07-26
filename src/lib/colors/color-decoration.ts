@@ -1,5 +1,4 @@
 import {
-  TextEditor,
   Range,
   TextEditorDecorationType,
   Position,
@@ -8,11 +7,9 @@ import {
 
 import { generateOptimalTextColor } from '../color-util';
 import Color from './color';
-import color from './color';
 
 
 class ColorDecoration {
-  private _updateCallback: Function;
   /**
    * The color used to generate the TextEditorDecorationType
    *
@@ -29,6 +26,7 @@ class ColorDecoration {
    * @memberOf ColorDecoration
    */
   public disposed: boolean = false;
+  public hidden: boolean = false;
 
   private _decoration: TextEditorDecorationType;
   /**
@@ -38,8 +36,8 @@ class ColorDecoration {
    * @memberOf ColorDecoration
    */
   get decoration(): TextEditorDecorationType {
-    if (this.disposed) {
-      this.disposed = false;
+    if (this.hidden) {
+      this.hidden = false;
       this._generateDecorator();
     }
     return this._decoration;
@@ -59,7 +57,6 @@ class ColorDecoration {
    * @memberOf ColorDecoration
    */
   public dispose(): void {
-    // this.color = null;
     this._decoration.dispose();
     this.disposed = true;
   }
@@ -70,7 +67,8 @@ class ColorDecoration {
    * @memberOf ColorDecoration
    */
   public hide() {
-    return this.dispose();
+    this._decoration.dispose();
+    this.hidden = true;
   }
   /**
    * Generate the decoration Range (start and end position in line)

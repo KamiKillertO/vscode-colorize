@@ -1,5 +1,4 @@
 import Color, {IColor} from './colors/color';
-import Variable from './variables/variable';
 import './colors/strategies/hexa-strategy';
 import './colors/strategies/rgb-strategy';
 import './colors/strategies/browser-strategy';
@@ -80,6 +79,10 @@ class ColorUtil {
    */
   public static findColors(fileContent: DocumentLine[], fileName = null): Promise < LineExtraction[] > {
     return ColorExtractor.extract(fileContent);
+  }
+
+  public static setupColorsExtractors(extractors: string[]) {
+    ColorExtractor.enableStategies(extractors);
   }
 
   public static generateDecoration(color: IColor): IDecoration {

@@ -2,12 +2,12 @@
   "name": "vscode-colorize",
   "displayName": "colorize",
   "description": "A vscode extension to help visualize css colors in files.",
-  "version": "0.6.21",
+  "version": "0.7.0",
   "publisher": "kamikillerto",
   "license": "Apache-2.0",
   "icon": "assets/logo.png",
   "engines": {
-    "vscode": "^1.18.0"
+    "vscode": "^1.20.0"
   },
   "categories": [
     "Other"
@@ -37,7 +37,7 @@
   "main": "./out/src/extension",
   "contributes": {
     "configuration": {
-      "title": "Colorize extension (reboot after any changes required)",
+      "title": "Colorize extension",
       "properties": {
         "colorize.languages": {
           "default": [
@@ -56,13 +56,14 @@
           "description": "Languages that should be colorized"
         },
         "colorize.files_extensions": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$schema": "http://json-schema.org/draft-07/schema#",
           "default": [],
           "title": "Colorize files with these extensions",
           "type": "array",
           "items": {
             "type": "string",
             "pattern": "\\.\\w+$",
+            "uniqueItems": true,
             "description": "You should enter a valid file extension"
           },
           "description": "Specified files extension that should be colorized"
@@ -73,11 +74,46 @@
           "type": "boolean",
           "description": "Hide decorations for the current line. Set to `false` to turn it off"
         },
-        "colorize.activate_variables_support_beta": {
-          "title": "Activate the variables support (beta)",
-          "default": false,
-          "type": "boolean",
-          "description": "Activate the variables extractions/decorations feature (beta)"
+        "colorize.colorized_variables": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "default": [
+            "CSS"
+          ],
+          "items": {
+            "enum": [
+              "CSS",
+              "SASS",
+              "LESS",
+              "STYLUS"
+            ],
+            "description": "You should enter a valid extractor",
+            "uniqueItems": true
+          },
+          "title": "Extract these type of variables",
+          "type": "array",
+          "description": "Specified the type of variables that should be extracted"
+        },
+        "colorize.colorized_colors": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "default": [
+            "BROWSERS_COLORS",
+            "HEXA",
+            "RGB",
+            "HSL"
+          ],
+          "items": {
+            "enum": [
+              "BROWSERS_COLORS",
+              "HEXA",
+              "RGB",
+              "HSL"
+            ],
+            "description": "You should enter a valid extractor",
+            "uniqueItems": true
+          },
+          "title": "Colorize these type of color",
+          "type": "array",
+          "description": "Specified the type of color that should be colorized"
         }
       }
     }

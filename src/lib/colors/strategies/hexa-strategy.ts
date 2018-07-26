@@ -7,7 +7,7 @@ export const REGEXP = /((?:#|0x)[\da-f]{3,4}|(?:#|0x)[\da-f]{6}|(?:#|0x)[\da-f]{
 export const REGEXP_ONE = /^((?:#|0x)[\da-f]{3,4}|(?:#|0x)[\da-f]{6}|(?:#|0x)[\da-f]{8})(?:$|"|'|,| |;|\)|\r|\n)/i;
 
 class HexaColorExtractor implements IColorStrategy {
-  public name: string = 'HEXA_EXTRACTOR';
+  public name: string = 'HEXA';
 
   private extractRGBValue(value): number[] {
     let rgb: any = /#(.+)/gi.exec(value);

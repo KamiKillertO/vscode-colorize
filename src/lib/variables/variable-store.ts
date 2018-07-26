@@ -1,5 +1,5 @@
 import Variable from './variable';
-import Color, { IColor } from '../colors/color';
+import Color from '../colors/color';
 import { dirname } from 'path';
 
 class VariablesStore {
@@ -22,14 +22,9 @@ class VariablesStore {
   private __delete(variable: string, fileName: string, line: number) {
     let decorations = this.get(variable);
 
-    if (fileName === null) {
-      decorations.forEach(_ => _.dispose());
-    }
     if (line !== null) {
-      decorations.filter(_ => _.declaration.fileName === fileName && _.declaration.line === line).forEach(_ => _.dispose());
       decorations = decorations.filter(_ => _.declaration.fileName !== fileName || (_.declaration.fileName === fileName && _.declaration.line !== line));
     } else if (fileName !== null) {
-      decorations.filter(_ => _.declaration.fileName === fileName).forEach(_ => _.dispose());
       decorations = decorations.filter(_ => _.declaration.fileName !== fileName);
     }
     this.entries.set(variable, decorations);
@@ -118,7 +113,12 @@ class VariablesStore {
       decorations = decorations.sort((a, b) => a.declaration.line - b.declaration.line);
     }
 
-    return decorations.pop();
+    const _closest = decorations[decorations.length - 1];
+    let closest = decorations.pop();
+    while (closest && closest.color === undefined) {
+      closest = decorations.pop();
+    }
+    return closest || _closest;
   }
 
   private filterDecorations(decorations, dir) {

@@ -15,21 +15,24 @@ const INCLUDE_PATTERN = '{**/*.css,**/*.sass,**/*.scss,**/*.less,**/*.pcss,**/*.
 const EXCLUDE_PATTERN = '{**/.git,**/.svn,**/.hg,**/CVS,**/.DS_Store,**/.git,**/node_modules,**/bower_components,**/tmp,**/dist,**/tests}';
 
 class VariablesManager {
+  private statusBar: StatusBarItem;
+
+  constructor() {
+    this.statusBar = window.createStatusBarItem(StatusBarAlignment.Right);
+  }
 
   public async getWorkspaceVariables() {
-    const statusBar: StatusBarItem = window.createStatusBarItem(StatusBarAlignment.Right);
-
-    statusBar.text = 'Fetching files...';
-    statusBar.show();
+    this.statusBar.text = 'Fetching files...';
+    this.statusBar.show();
     try {
       const files: Uri[] = await workspace.findFiles(INCLUDE_PATTERN, EXCLUDE_PATTERN);
-      statusBar.text = `Found ${files.length} files`;
+      this.statusBar.text = `Found ${files.length} files`;
 
       await Promise.all(this.extractFilesVariable(files));
       let variablesCount: number = VariablesExtractor.getVariablesCount();
-      statusBar.text = `Found ${variablesCount} variables`;
+      this.statusBar.text = `Found ${variablesCount} variables`;
     } catch (error) {
-      statusBar.text = 'Variables extraction fail';
+      this.statusBar.text = 'Variables extraction fail';
     }
     return;
   }
@@ -64,9 +67,11 @@ class VariablesManager {
 
   public generateDecoration(variable: Variable, line: number): VariableDecoration {
     const deco = new VariableDecoration(variable, line);
-    // @ts-ignore
-    variable.base.registerObserver(deco); // tslint:disable-line
     return deco;
+  }
+
+  public setupVariablesExtractors(extractors: string[]) {
+    VariablesExtractor.enableStategies(extractors);
   }
 
   public deleteVariableInLine(fileName: string, line: number) {

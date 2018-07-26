@@ -752,7 +752,7 @@ export const REGEXP = (() => RegExp(`(?:,| |\\(|:)(${REGEXP_BASE})(?:$|,| |;|\\)
 export const REGEXP_ONE = (() => RegExp(`^(?:^|,|\s|\\(|:)(${REGEXP_BASE})(?:$|,| |;|\\)|\\r|\\n)`, 'i'))();
 
 class BrowsersColorExtractor implements IColorStrategy {
-  public name: string = 'BROWSERS_COLORS_EXTRACTOR';
+  public name: string = 'BROWSERS_COLORS';
 
   public async extractColors(fileLines: DocumentLine[]): Promise < LineExtraction[] > {
     return fileLines.map(({line, text}) => {
