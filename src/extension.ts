@@ -501,7 +501,6 @@ export function activate(context: ExtensionContext) {
     }
     return cb();
   });
-  
   colorizeVisibleTextEditors();
 }
 
