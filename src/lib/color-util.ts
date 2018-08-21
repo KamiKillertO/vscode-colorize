@@ -82,7 +82,7 @@ class ColorUtil {
   }
 
   public static setupColorsExtractors(extractors: string[]) {
-    ColorExtractor.enableStategies(extractors);
+    ColorExtractor.enableStrategies(extractors);
   }
 
   public static generateDecoration(color: IColor): IDecoration {
