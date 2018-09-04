@@ -1,4 +1,4 @@
-function regex_exec (str: string, r: RegExp): any {
+function regex_exec (str: string, r: RegExp|string): any {
   const regex = new RegExp(r);
   return regex.exec(str);
 }
