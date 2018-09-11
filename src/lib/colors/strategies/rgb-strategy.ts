@@ -1,9 +1,14 @@
 import ColorExtractor, { IColorStrategy } from '../color-extractor';
 import Color from '../color';
-import { LineExtraction, DocumentLine } from '../../color-util';
+import { LineExtraction, DocumentLine } from '../../util/color-util';
+import { DOT_VALUE, ALPHA, EOF } from '../../util/regexp';
 
-export const REGEXP = /((?:rgb\((?:\d{1,3}\s*,\s*){2}\d{1,3}\))|(?:rgba\((?:\d{1,3}\s*,\s*){3}(?:[0-1]|1\.0|[0](?:\.\d+){0,1}|(?:\.\d+))\)))(?:$|"|'|,| |;|\)|\r|\n)/gi;
-export const REGEXP_ONE = /^((?:rgb\((?:\d{1,3}\s*,\s*){2}\d{1,3}\))|(?:rgba\((?:\d{1,3}\s*,\s*){3}(?:[0-1]|1\.0|[0](?:\.\d+){0,1}|(?:\.\d+))\)))(?:$|"|'|,| |;|\)|\r|\n)/i;
+const R_RED = `(?:\\d{1,3}${DOT_VALUE}?|${DOT_VALUE})`;
+const R_GREEN = R_RED;
+const R_BLUE = R_RED;
+
+export const REGEXP = new RegExp(`((?:rgb\\(\\s*${R_RED}\\s*,\\s*${R_GREEN}\\s*,\\s*${R_BLUE}\\s*\\))|(?:rgba\\(\\s*${R_RED}\\s*,\\s*${R_GREEN}\\s*,\\s*${R_BLUE}\\s*,\\s*${ALPHA}\\s*\\)))${EOF}`, 'gi');
+export const REGEXP_ONE = new RegExp(`^((?:rgb\\(\\s*${R_RED}\\s*,\\s*${R_GREEN}\\s*,\\s*${R_BLUE}\\s*\\))|(?:rgba\\(\\s*${R_RED}\\s*,\\s*${R_GREEN}\\s*,\\s*${R_BLUE}\\s*,\\s*${ALPHA}\\s*\\)))${EOF}`, 'gi');
 
 class RgbExtractor implements IColorStrategy {
   public name: string = 'RGB';
