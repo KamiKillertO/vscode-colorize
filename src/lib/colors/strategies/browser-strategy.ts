@@ -1,6 +1,7 @@
 import Color from './../color';
 import ColorExtractor, { IColorStrategy } from '../color-extractor';
-import { LineExtraction, DocumentLine } from '../../color-util';
+import { LineExtraction, DocumentLine } from '../../util/color-util';
+import { EOL } from '../../util/regexp';
 
 export const COLORS = Object({
     'aliceblue': {
@@ -746,10 +747,10 @@ export const COLORS = Object({
 });
 
 const REGEXP_BASE = Object.keys(COLORS).map((color) => `(?:${color.toLowerCase()})`).join('|');
-export const REGEXP = (() => RegExp(`(?:,| |\\(|:)(${REGEXP_BASE})(?:$|,| |;|\\)|\\r|\\n)`, 'i'))();
+export const REGEXP = (() => RegExp(`(?:,| |\\(|:)(${REGEXP_BASE})${EOL}`, 'i'))();
 // export const REGEXP_ONE = (() => RegExp(`^(?:,| |\\(|:)(${Object.keys(COLORS).map((color) => `(?:${color.toLowerCase()})`).join('|')})(?:$|,| |;|\\)|\\r|\\n)`, 'i'))();
 // Checking for beginning beginning allow to catch stylus var value
-export const REGEXP_ONE = (() => RegExp(`^(?:^|,|\s|\\(|:)(${REGEXP_BASE})(?:$|,| |;|\\)|\\r|\\n)`, 'i'))();
+export const REGEXP_ONE = (() => RegExp(`^(?:^|,|\s|\\(|:)(${REGEXP_BASE})${EOL}`, 'i'))();
 
 class BrowsersColorExtractor implements IColorStrategy {
   public name: string = 'BROWSERS_COLORS';
