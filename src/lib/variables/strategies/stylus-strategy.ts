@@ -4,11 +4,10 @@ import Variable from '../variable';
 import Color from '../../colors/color';
 import VariablesStore from '../variable-store';
 import ColorExtractor from '../../colors/color-extractor';
+import { EOL } from '../../util/regexp';
 
-const REGEXP_END = '(?:$|\"|\'|,| |;|\\)|\\r|\\n)';
-
-export const REGEXP = new RegExp(`(^|(?::|=)\\s*)((?:[\\-]*[$a-z_][\\-_\\d]*)+)(?!=)${REGEXP_END}`, 'gi');
-export const DECLARATION_REGEXP = new RegExp(`(?:(^(?:\\$|(?:[\\-_$]+[a-z\\d]+)|(?:[^\\d||\\-|@]+))(?:[_a-zd][\\-]*)*))\\s*=${REGEXP_END}`, 'gi');
+export const REGEXP = new RegExp(`(^|(?::|=)\\s*)((?:[\\-]*[$a-z_][\\-_\\d]*)+)(?!=)${EOL}`, 'gi');
+export const DECLARATION_REGEXP = new RegExp(`(?:(^(?:\\$|(?:[\\-_$]+[a-z\\d]+)|(?:[^\\d||\\-|@]+))(?:[_a-zd][\\-]*)*))\\s*=${EOL}`, 'gi');
 // export const DECLARATION_REGEXP = new RegExp(`(?:((?:\\$|(?:[\\-_$]+[a-z\\d]+)|(?:[^\\d||\\-|@]+))(?:[_a-zd][\\-]*)*))\\s*=${REGEXP_END}`, 'gi');
 // export const DECLARATION_REGEXP = new RegExp(`(?:((?:(?:\\$)|(?:[\\-_$]+[a-z\\d]+)|(?:[^\\d]+))([\\-_a-z\d]*))\\s*)=${REGEXP_END}`, 'gi');
 
