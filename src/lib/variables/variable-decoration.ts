@@ -4,7 +4,7 @@ import {
   Position,
   window
 } from 'vscode';
-import { generateOptimalTextColor } from '../color-util';
+import { generateOptimalTextColor } from '../util/color-util';
 import Variable from './variable';
 
 class VariableDecoration {

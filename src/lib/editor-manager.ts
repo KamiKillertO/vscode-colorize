@@ -1,5 +1,5 @@
 import { TextEditor } from 'vscode';
-import { IDecoration } from './color-util';
+import { IDecoration } from './util/color-util';
 import VariableDecoration from './variables/variable-decoration';
 
 class EditorManager {

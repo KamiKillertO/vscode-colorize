@@ -9,7 +9,7 @@ import './strategies/stylus-strategy';
 
 import { workspace, window, StatusBarAlignment, StatusBarItem, Uri, TextDocument } from 'vscode';
 import { canColorize } from '../../extension';
-import { DocumentLine, LineExtraction } from '../color-util';
+import { DocumentLine, LineExtraction } from '../util/color-util';
 
 const INCLUDE_PATTERN = '{**/*.css,**/*.sass,**/*.scss,**/*.less,**/*.pcss,**/*.sss,**/*.stylus,**/*.styl}';
 const EXCLUDE_PATTERN = '{**/.git,**/.svn,**/.hg,**/CVS,**/.DS_Store,**/.git,**/node_modules,**/bower_components,**/tmp,**/dist,**/tests}';

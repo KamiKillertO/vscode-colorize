@@ -1,5 +1,5 @@
 import VariablesExtractor, { IVariableStrategy } from '../variables-extractor';
-import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../../color-util';
+import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../../util/color-util';
 import Variable from '../variable';
 import Color from '../../colors/color';
 import VariablesStore from '../variable-store';
