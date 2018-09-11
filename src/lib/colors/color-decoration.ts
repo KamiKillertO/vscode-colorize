@@ -5,7 +5,7 @@ import {
   window
 } from 'vscode';
 
-import { generateOptimalTextColor } from '../color-util';
+import { generateOptimalTextColor } from '../util/color-util';
 import Color from './color';
 
 

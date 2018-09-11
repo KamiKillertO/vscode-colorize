@@ -16,7 +16,7 @@ import {
   WorkspaceConfiguration
 } from 'vscode';
 import Variable from './lib/variables/variable';
-import ColorUtil, { IDecoration, DocumentLine, LineExtraction } from './lib/color-util';
+import ColorUtil, { IDecoration, DocumentLine, LineExtraction } from './lib/util/color-util';
 import Queue from './lib/queue';
 import VariablesManager from './lib/variables/variables-manager';
 import CacheManager from './lib/cache-manager';

@@ -2,7 +2,7 @@ import {
   assert
 } from 'chai';
 
-import ColorUtil, { colorLuminance, convertHslaToRgba, convertRgbaToHsla } from '../src/lib/color-util';
+import ColorUtil, { colorLuminance, convertHslaToRgba, convertRgbaToHsla } from '../src/lib/util/color-util';
 import Color from '../src/lib/colors/color';
 
 describe('Test utility fonction', () => {
