@@ -71,7 +71,7 @@ class VariablesManager {
   }
 
   public setupVariablesExtractors(extractors: string[]) {
-    VariablesExtractor.enableStategies(extractors);
+    VariablesExtractor.enableStrategies(extractors);
   }
 
   public deleteVariableInLine(fileName: string, line: number) {
