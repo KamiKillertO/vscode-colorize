@@ -1,5 +1,5 @@
 import Color from '../colors/color';
-import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../color-util';
+import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../util/color-util';
 import { IStrategy, Extractor } from '../extractor-mixin';
 
 // export class IVariableStrategy { // class instead? // avoid duplication (variablesCount/deleteVariable same code for all extractors)

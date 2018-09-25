@@ -1,14 +1,13 @@
 import VariablesExtractor, { IVariableStrategy } from '../variables-extractor';
-import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../../color-util';
+import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../../util/color-util';
 import Variable from '../variable';
 import Color from '../../colors/color';
 import VariablesStore from '../variable-store';
 import ColorExtractor from '../../colors/color-extractor';
+import { EOL } from '../../util/regexp';
 
-const REGEXP_END = '(?:$|\"|\'|,| |;|\\)|\\r|\\n)';
-
-export const REGEXP = new RegExp(`(^|(?::|=)\\s*)((?:[\\-]*[$a-z_][\\-_\\d]*)+)(?!=)${REGEXP_END}`, 'gi');
-export const DECLARATION_REGEXP = new RegExp(`(?:(^(?:\\$|(?:[\\-_$]+[a-z\\d]+)|(?:[^\\d||\\-|@]+))(?:[_a-zd][\\-]*)*))\\s*=${REGEXP_END}`, 'gi');
+export const REGEXP = new RegExp(`(^|(?::|=)\\s*)((?:[\\-]*[$a-z_][\\-_\\d]*)+)(?!=)${EOL}`, 'gi');
+export const DECLARATION_REGEXP = new RegExp(`(?:(^(?:\\$|(?:[\\-_$]+[a-z\\d]+)|(?:[^\\d||\\-|@]+))(?:[_a-zd][\\-]*)*))\\s*=${EOL}`, 'gi');
 // export const DECLARATION_REGEXP = new RegExp(`(?:((?:\\$|(?:[\\-_$]+[a-z\\d]+)|(?:[^\\d||\\-|@]+))(?:[_a-zd][\\-]*)*))\\s*=${REGEXP_END}`, 'gi');
 // export const DECLARATION_REGEXP = new RegExp(`(?:((?:(?:\\$)|(?:[\\-_$]+[a-z\\d]+)|(?:[^\\d]+))([\\-_a-z\d]*))\\s*)=${REGEXP_END}`, 'gi');
 
@@ -55,9 +54,9 @@ class StylusExtractor implements IVariableStrategy {
           let variable;
           const declaration = null;
           if (decoration.color) {
-            variable = new Variable(varName, new Color(varName, match.index, decoration.color.rgb, decoration.color.alpha), declaration);
+            variable = new Variable(varName, new Color(varName, spaces + match.index, decoration.color.rgb, decoration.color.alpha), declaration);
           } else {
-            variable = new Variable(varName, new Color(varName, match.index, null), declaration);
+            variable = new Variable(varName, new Color(varName, spaces + match.index, null), declaration);
           }
           colors.push(variable);
         }

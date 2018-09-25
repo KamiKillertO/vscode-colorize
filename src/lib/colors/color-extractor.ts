@@ -1,5 +1,5 @@
 import { IColor } from './color';
-import { LineExtraction, DocumentLine, flattenLineExtractionsFlatten } from '../color-util';
+import { LineExtraction, DocumentLine, flattenLineExtractionsFlatten } from '../util/color-util';
 import { Extractor, IStrategy } from '../extractor-mixin';
 
 export interface IColorStrategy extends IStrategy {

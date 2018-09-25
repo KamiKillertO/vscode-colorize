@@ -1,10 +1,10 @@
-import Color, {IColor} from './colors/color';
-import './colors/strategies/hexa-strategy';
-import './colors/strategies/rgb-strategy';
-import './colors/strategies/browser-strategy';
-import './colors/strategies/hsl-strategy';
-import ColorExtractor from './colors/color-extractor';
-import ColorDecoration from './colors/color-decoration';
+import Color, {IColor} from '../colors/color';
+import '../colors/strategies/hexa-strategy';
+import '../colors/strategies/rgb-strategy';
+import '../colors/strategies/browser-strategy';
+import '../colors/strategies/hsl-strategy';
+import ColorExtractor from '../colors/color-extractor';
+import ColorDecoration from '../colors/color-decoration';
 import { Range, TextEditorDecorationType } from 'vscode';
 
 interface DocumentLine {
@@ -82,7 +82,7 @@ class ColorUtil {
   }
 
   public static setupColorsExtractors(extractors: string[]) {
-    ColorExtractor.enableStategies(extractors);
+    ColorExtractor.enableStrategies(extractors);
   }
 
   public static generateDecoration(color: IColor): IDecoration {

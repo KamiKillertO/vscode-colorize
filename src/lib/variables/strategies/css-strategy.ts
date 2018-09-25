@@ -1,14 +1,14 @@
 import VariablesExtractor, { IVariableStrategy } from '../variables-extractor';
-import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../../color-util';
+import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../../util/color-util';
 import Variable from '../variable';
 import Color from '../../colors/color';
 import VariablesStore from '../variable-store';
 import ColorExtractor from '../../colors/color-extractor';
-const REGEXP_END = '(?:$|\"|\'|,| |;|\\)|\\r|\\n)';
+import { EOL } from '../../util/regexp';
 
-export const REGEXP = new RegExp(`(var\\((--(?:[a-z]+[\-_a-z\\d]*))\\))(?!:)${REGEXP_END}`, 'gi');
-export const REGEXP_ONE = new RegExp(`^(var\\((--(?:[a-z]+[\-_a-z\\d]*))\\))(?!:)${REGEXP_END}`, 'i');
-export const DECLARATION_REGEXP = new RegExp(`(?:(--(?:[a-z]+[\\-_a-z\\d]*)\\s*):)${REGEXP_END}`, 'gi');
+export const REGEXP = new RegExp(`(var\\((--(?:[a-z]+[\-_a-z\\d]*))\\))(?!:)${EOL}`, 'gi');
+export const REGEXP_ONE = new RegExp(`^(var\\((--(?:[a-z]+[\-_a-z\\d]*))\\))(?!:)${EOL}`, 'i');
+export const DECLARATION_REGEXP = new RegExp(`(?:(--(?:[a-z]+[\\-_a-z\\d]*)\\s*):)${EOL}`, 'gi');
 
 class CssExtractor implements IVariableStrategy {
   public name: string = 'CSS';

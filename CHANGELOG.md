@@ -1,3 +1,11 @@
+## 0.7.2
+
+- [CHANGE] Now rgb(a) and hsl(a) colors can have decimal values
+
+## 0.7.1
+
+- [FIX] Fix stylus variables decoration
+
 ## 0.7.0
 
 - [IMPROVE] Variables support fully working
