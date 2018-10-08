@@ -37,7 +37,7 @@
   "main": "./out/src/extension",
   "contributes": {
     "configuration": {
-      "title": "Colorize extension",
+      "title": "Colorize",
       "properties": {
         "colorize.languages": {
           "default": [
@@ -53,7 +53,7 @@
           ],
           "title": "Colorize files with these languages",
           "type": "array",
-          "description": "Languages that should be colorized"
+          "description": "Configure a list of languages that should be colorized. You can learn about languages at https://code.visualstudio.com/docs/languages/overview."
         },
         "colorize.files_extensions": {
           "$schema": "http://json-schema.org/draft-07/schema#",
@@ -66,7 +66,50 @@
             "uniqueItems": true,
             "description": "You should enter a valid file extension"
           },
-          "description": "Specified files extension that should be colorized"
+          "description": "Specified a list of files extension that should be colorized."
+        },
+        "colorize.variables_files_to_include": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "default": [
+            "**/*.css",
+            "**/*.sass",
+            "**/*.scss",
+            "**/*.less",
+            "**/*.pcss",
+            "**/*.sss",
+            "**/*.stylus",
+            "**/*.styl"
+          ],
+          "title": "Configure glob patterns for including files and folders from the initial variables search. When you open vscode, colorize will look inside every files in your projet to find variables.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "uniqueItems": true
+          },
+          "description": "Configure glob patterns for including files and folders from the initial variables search. (By default when you open vscode, colorize will look inside every files in your projet to find variables.)"
+        },
+        "colorize.variables_files_to_exclude": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "default": [
+            "**/.git",
+            "**/.svn",
+            "**/.hg",
+            "**/CVS",
+            "**/.DS_Store",
+            "**/.git",
+            "**/node_modules",
+            "**/bower_components",
+            "**/tmp",
+            "**/dist",
+            "**/tests"
+          ],
+          "title": "Configure glob patterns for excluding files and folders from the initial variables search. (By defaul when you open vscode, colorize will look inside every files in your projet to find variables.)",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "uniqueItems": true
+          },
+          "description": "Configure glob patterns for excluding files and folders from the initial variables search. When you open vscode, colorize will look inside every files in your projet to find variables."
         },
         "colorize.hide_current_line_decorations": {
           "title": "Hide current line decorations",

@@ -28,13 +28,17 @@ interface ColorizeConfig {
   isHideCurrentLineDecorations: boolean;
   colorizedVariables: string[];
   colorizedColors: string[];
+  variablesFilesToInclude: string[];
+  variablesFilesToExclude: string[];
 }
 let config: ColorizeConfig = {
   languages: [],
   filesExtensions: [],
   isHideCurrentLineDecorations: true,
   colorizedVariables: [],
-  colorizedColors: []
+  colorizedColors: [],
+  variablesFilesToInclude: [],
+  variablesFilesToExclude: []
 };
 
 
@@ -451,7 +455,7 @@ function handleConfigurationChanged() {
   q.push(async (cb) => {
     // remove event listeners?
     VariablesManager.setupVariablesExtractors(newConfig.colorizedVariables);
-    await VariablesManager.getWorkspaceVariables();
+    await VariablesManager.getWorkspaceVariables(newConfig.variablesFilesToInclude, newConfig.variablesFilesToExclude); // 👍
     return cb();
   });
   config = newConfig;
@@ -473,12 +477,17 @@ function readConfiguration(): ColorizeConfig {
   // remove duplicates (if duplicates)
   const colorizedVariables = Array.from(new Set(configuration.get('colorized_variables', []))); // [...new Set(array)] // works too
   const colorizedColors = Array.from(new Set(configuration.get('colorized_colors', []))); // [...new Set(array)] // works too
+
+  const variablesFilesToInclude = Array.from(new Set(configuration.get('variables_files_to_include', []))); // [...new Set(array)] // works too
+  const variablesFilesToExclude = Array.from(new Set(configuration.get('variables_files_to_exclude', []))); // [...new Set(array)] // works too
   return {
     languages: configuration.get('languages', []),
     filesExtensions: configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`)),
     isHideCurrentLineDecorations: configuration.get('hide_current_line_decorations'),
     colorizedColors,
-    colorizedVariables
+    colorizedVariables,
+    variablesFilesToInclude,
+    variablesFilesToExclude
   };
 }
 
@@ -494,7 +503,7 @@ export function activate(context: ExtensionContext) {
   VariablesManager.setupVariablesExtractors(config.colorizedVariables);
   q.push(async cb => {
     try {
-      await VariablesManager.getWorkspaceVariables();
+      await VariablesManager.getWorkspaceVariables(config.variablesFilesToInclude, config.variablesFilesToExclude); // 👍
       initEventListeners(context);
     } catch (error) {
       // handle promise rejection
