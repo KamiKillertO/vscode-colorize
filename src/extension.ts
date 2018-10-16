@@ -24,6 +24,7 @@ import VariablesManager from './lib/variables/variables-manager';
 import CacheManager from './lib/cache-manager';
 import EditorManager from './lib/editor-manager';
 import { flatten, unique } from './lib/util/array';
+import * as globToRegexp from 'glob-to-regexp';
 
 interface ColorizeConfig {
   languages: string[];
@@ -342,20 +343,32 @@ function isLanguageSupported(languageId: string): boolean {
 /**
  * Check if COLORIZE support a file extension
  *
- * @param {string} fileName A valid file extension
+ * @param {string} fileName A valid filename (path to the file)
  * @returns {boolean}
  */
 function isFileExtensionSupported(fileName: string): boolean {
   return config.filesExtensions.some((ext: RegExp) => ext.test(fileName));
 }
+
+/**
+ * Check if the file is the `colorize.include` setting
+ *
+ * @param {string} fileName A valid filename (path to the file)
+ * @returns {boolean}
+ */
+function isIncludedFile(fileName: string): boolean {
+  return config.filesToIncludes.find((globPattern: string) => globToRegexp(globPattern).test(fileName)) !== undefined;
+}
+
+
 /**
  * Check if a file can be colorized by COLORIZE
  *
  * @param {TextDocument} document The document to test
  * @returns {boolean}
  */
-function canColorize(document: TextDocument) {
-  return isLanguageSupported(document.languageId) || isFileExtensionSupported(document.fileName);
+function canColorize(document: TextDocument) { // update to use filesToExcludes. Remove `isLanguageSupported` ? checking path with file extension or include glob pattern should be enough
+  return isLanguageSupported(document.languageId) || isFileExtensionSupported(document.fileName) || isIncludedFile(document.fileName);
 }
 function handleTextSelectionChange(event: TextEditorSelectionChangeEvent, cb: Function) {
   if (!config.isHideCurrentLineDecorations || event.textEditor !== extension.editor) {
