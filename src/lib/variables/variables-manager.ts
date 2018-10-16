@@ -8,9 +8,7 @@ import './strategies/sass-strategy';
 import './strategies/stylus-strategy';
 
 import { workspace, window, StatusBarAlignment, StatusBarItem, Uri, TextDocument } from 'vscode';
-import { canColorize } from '../../extension';
 import { DocumentLine, LineExtraction } from '../util/color-util';
-
 
 class VariablesManager {
   private statusBar: StatusBarItem;
@@ -39,9 +37,7 @@ class VariablesManager {
   }
 
   private getFileContent(file: TextDocument): DocumentLine[] {
-    if (canColorize(file) === false) {
-      return;
-    }
+    // here deal with files without contents or unreadable content (like images)
     return file.getText()
       .split(/\n/)
       .map((text, index) => Object({
@@ -51,7 +47,7 @@ class VariablesManager {
   }
 
   private extractFilesVariable(files: Uri[]) {
-    return files.map(async(file) => {
+    return files.map(async(file: Uri) => {
       const document: TextDocument =  await workspace.openTextDocument(file.path);
       const content: DocumentLine[] = this.getFileContent(document);
       return VariablesExtractor.extractDeclarations(document.fileName, content);
