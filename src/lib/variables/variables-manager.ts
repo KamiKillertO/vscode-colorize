@@ -11,8 +11,6 @@ import { workspace, window, StatusBarAlignment, StatusBarItem, Uri, TextDocument
 import { canColorize } from '../../extension';
 import { DocumentLine, LineExtraction } from '../util/color-util';
 
-const INCLUDE_PATTERN_DEFAULT = '{**/*.css,**/*.sass,**/*.scss,**/*.less,**/*.pcss,**/*.sss,**/*.stylus,**/*.styl}';
-const EXCLUDE_PATTERN_DEFAULT = '{**/.git,**/.svn,**/.hg,**/CVS,**/.DS_Store,**/.git,**/node_modules,**/bower_components,**/tmp,**/dist,**/tests}';
 
 class VariablesManager {
   private statusBar: StatusBarItem;
@@ -25,9 +23,10 @@ class VariablesManager {
     this.statusBar.text = 'Fetching files...';
     this.statusBar.show();
     try {
-      const INCLUDE_PATTERN = `{${includePattern.join(',')}}` || INCLUDE_PATTERN_DEFAULT;
-      const EXCLUDE_PATTERN = `{${excludePattern.join(',')}}` || EXCLUDE_PATTERN_DEFAULT;
-      const files: Uri[] = await workspace.findFiles(INCLUDE_PATTERN, EXCLUDE_PATTERN);
+      console.time('getWorkspaceVariables');
+      const INCLUDE_PATTERN = `{${includePattern.join(',')}}`;
+      const EXCLUDE_PATTERN = `{${excludePattern.join(',')}}`;
+      let files: Uri[] = await workspace.findFiles(INCLUDE_PATTERN, EXCLUDE_PATTERN);
       this.statusBar.text = `Found ${files.length} files`;
 
       await Promise.all(this.extractFilesVariable(files));
