@@ -53,7 +53,7 @@
           ],
           "title": "Colorize files with these languages",
           "type": "array",
-          "description": "Configure a list of languages that should be colorized. You can learn about languages at https://code.visualstudio.com/docs/languages/overview."
+          "markdownDescription": "Configure a list of languages that should be colorized. You can learn about languages at https://code.visualstudio.com/docs/languages/overview."
         },
         "colorize.files_extensions": {
           "$schema": "http://json-schema.org/draft-07/schema#",
@@ -66,7 +66,7 @@
             "uniqueItems": true,
             "description": "You should enter a valid file extension"
           },
-          "description": "Specified a list of files extension that should be colorized."
+          "markdownDescription": "[deprecated] Specified a list of files extension that should be colorized. This setting is deprecated and will be removed soon, you should use the setting `colorize.include` instead."
         },
         "colorize.include": {
           "type": "array",
@@ -126,7 +126,7 @@
           "title": "Hide current line decorations",
           "default": true,
           "type": "boolean",
-          "description": "Hide decorations for the current line. Set to `false` to turn it off"
+          "markdownDescription": "Hide colors for the current line. Set to `false` to turn it off"
         },
         "colorize.colorized_variables": {
           "$schema": "http://json-schema.org/draft-07/schema#",
@@ -145,7 +145,7 @@
           },
           "title": "Extract these type of variables",
           "type": "array",
-          "description": "Specified the type of variables that should be extracted"
+          "markdownDescription": "You can specified the type of variables that should be colorized by the extension."
         },
         "colorize.colorized_colors": {
           "$schema": "http://json-schema.org/draft-07/schema#",
@@ -167,7 +167,7 @@
           },
           "title": "Colorize these type of color",
           "type": "array",
-          "description": "Specified the type of color that should be colorized"
+          "markdownDescription": "You can specified the type of color that should be colorized by the extension."
         }
       }
     }
