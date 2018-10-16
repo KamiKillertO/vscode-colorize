@@ -459,7 +459,8 @@ function handleConfigurationChanged() {
   q.push(async (cb) => {
     // remove event listeners?
     VariablesManager.setupVariablesExtractors(newConfig.colorizedVariables);
-    await VariablesManager.getWorkspaceVariables(newConfig.variablesFilesToInclude, newConfig.variablesFilesToExclude); // 👍
+
+    await VariablesManager.getWorkspaceVariables(newConfig.filesToIncludes.concat(newConfig.inferedFilesToInclude), newConfig.filesToExcludes); // 👍
     return cb();
   });
   config = newConfig;
@@ -532,7 +533,8 @@ export function activate(context: ExtensionContext) {
   VariablesManager.setupVariablesExtractors(config.colorizedVariables);
   q.push(async cb => {
     try {
-      await VariablesManager.getWorkspaceVariables(config.variablesFilesToInclude, config.variablesFilesToExclude); // 👍
+      await VariablesManager.getWorkspaceVariables(config.filesToIncludes.concat(config.inferedFilesToInclude), config.filesToExcludes); // 👍
+
       initEventListeners(context);
     } catch (error) {
       // handle promise rejection
