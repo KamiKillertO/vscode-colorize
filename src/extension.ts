@@ -5,6 +5,7 @@ import {
   window,
   workspace,
   ExtensionContext,
+  extensions,
   TextEditor,
   Range,
   TextDocument,
@@ -13,7 +14,8 @@ import {
   TextDocumentContentChangeEvent,
   TextEditorSelectionChangeEvent,
   Selection,
-  WorkspaceConfiguration
+  WorkspaceConfiguration,
+  Extension
 } from 'vscode';
 import Variable from './lib/variables/variable';
 import ColorUtil, { IDecoration, DocumentLine, LineExtraction } from './lib/util/color-util';
@@ -21,6 +23,7 @@ import Queue from './lib/queue';
 import VariablesManager from './lib/variables/variables-manager';
 import CacheManager from './lib/cache-manager';
 import EditorManager from './lib/editor-manager';
+import { flatten, unique } from './lib/util/array';
 
 interface ColorizeConfig {
   languages: string[];
@@ -30,6 +33,7 @@ interface ColorizeConfig {
   colorizedColors: string[];
   filesToExcludes: string[];
   filesToIncludes: string[];
+  inferedFilesToInclude: string[];
 }
 let config: ColorizeConfig = {
   languages: [],
@@ -39,8 +43,8 @@ let config: ColorizeConfig = {
   colorizedColors: [],
   filesToExcludes: [],
   filesToIncludes: [],
+  inferedFilesToInclude: []
 };
-
 
 interface ColorizeContext {
   editor: TextEditor;
@@ -471,6 +475,24 @@ function initEventListeners(context: ExtensionContext) {
   workspace.onDidChangeConfiguration(handleConfigurationChanged, null, context.subscriptions);
 }
 
+function inferFilesToInclude(languagesConfig, filesExtensionsConfig) {
+  let ext: Extension<any>[] = extensions.all;
+  let filesExtensions = [];
+
+  ext.forEach(extension => {
+    if (extension.packageJSON && extension.packageJSON.contributes && extension.packageJSON.contributes.languages) {
+      extension.packageJSON.contributes.languages.forEach(language => {
+        if (languagesConfig.indexOf(language.id) !== -1) {
+          filesExtensions = filesExtensions.concat(language.extensions);
+        }
+      });
+    }
+  });
+  filesExtensions = flatten(filesExtensions); // get all languages with their files extensions ^^. Now need to filter with the one set in config
+  filesExtensions = filesExtensions.concat(filesExtensionsConfig);
+  return unique(filesExtensions);
+}
+
 function readConfiguration(): ColorizeConfig {
   const configuration: WorkspaceConfiguration = workspace.getConfiguration('colorize');
 
@@ -480,6 +502,9 @@ function readConfiguration(): ColorizeConfig {
 
   const filesExtensions = configuration.get('files_extensions', []);
   const languages = configuration.get('languages', []);
+
+  const inferedFilesToInclude = inferFilesToInclude(languages, filesExtensions).map(extension => `**/*${extension}`);
+
   const filesToIncludes = Array.from(new Set(configuration.get('include', [])));
   const filesToExcludes = Array.from(new Set(configuration.get('exclude', [])));
 
@@ -491,6 +516,7 @@ function readConfiguration(): ColorizeConfig {
     colorizedVariables,
     filesToIncludes,
     filesToExcludes,
+    inferedFilesToInclude
   };
 }
 
