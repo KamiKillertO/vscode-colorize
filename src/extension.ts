@@ -28,8 +28,8 @@ interface ColorizeConfig {
   isHideCurrentLineDecorations: boolean;
   colorizedVariables: string[];
   colorizedColors: string[];
-  variablesFilesToInclude: string[];
-  variablesFilesToExclude: string[];
+  filesToExcludes: string[];
+  filesToIncludes: string[];
 }
 let config: ColorizeConfig = {
   languages: [],
@@ -37,8 +37,8 @@ let config: ColorizeConfig = {
   isHideCurrentLineDecorations: true,
   colorizedVariables: [],
   colorizedColors: [],
-  variablesFilesToInclude: [],
-  variablesFilesToExclude: []
+  filesToExcludes: [],
+  filesToIncludes: [],
 };
 
 
@@ -478,16 +478,19 @@ function readConfiguration(): ColorizeConfig {
   const colorizedVariables = Array.from(new Set(configuration.get('colorized_variables', []))); // [...new Set(array)] // works too
   const colorizedColors = Array.from(new Set(configuration.get('colorized_colors', []))); // [...new Set(array)] // works too
 
-  const variablesFilesToInclude = Array.from(new Set(configuration.get('variables_files_to_include', []))); // [...new Set(array)] // works too
-  const variablesFilesToExclude = Array.from(new Set(configuration.get('variables_files_to_exclude', []))); // [...new Set(array)] // works too
+  const filesExtensions = configuration.get('files_extensions', []);
+  const languages = configuration.get('languages', []);
+  const filesToIncludes = Array.from(new Set(configuration.get('include', [])));
+  const filesToExcludes = Array.from(new Set(configuration.get('exclude', [])));
+
   return {
-    languages: configuration.get('languages', []),
-    filesExtensions: configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`)),
+    languages,
+    filesExtensions: filesExtensions.map(ext => RegExp(`\\${ext}$`)),
     isHideCurrentLineDecorations: configuration.get('hide_current_line_decorations'),
     colorizedColors,
     colorizedVariables,
-    variablesFilesToInclude,
-    variablesFilesToExclude
+    filesToIncludes,
+    filesToExcludes,
   };
 }
 

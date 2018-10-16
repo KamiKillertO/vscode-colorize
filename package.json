@@ -68,28 +68,30 @@
           },
           "description": "Specified a list of files extension that should be colorized."
         },
-        "colorize.variables_files_to_include": {
-          "$schema": "http://json-schema.org/draft-07/schema#",
-          "default": [
-            "**/*.css",
-            "**/*.sass",
-            "**/*.scss",
-            "**/*.less",
-            "**/*.pcss",
-            "**/*.sss",
-            "**/*.stylus",
-            "**/*.styl"
-          ],
-          "title": "Configure glob patterns for including files and folders from the initial variables search. When you open vscode, colorize will look inside every files in your projet to find variables.",
+        "colorize.include": {
           "type": "array",
-          "items": {
-            "type": "string",
-            "uniqueItems": true
-          },
-          "description": "Configure glob patterns for including files and folders from the initial variables search. (By default when you open vscode, colorize will look inside every files in your projet to find variables.)"
+          "markdownDescription": "Configure glob patterns for including files and folders. By default Colorize is enable for files matching one the languages defined in the `colorize.languages` config, with this config you can enable colorize for other files or folders. Read more about glob patterns [here](https://code.visualstudio.com/docs/editor/codebasics#_advanced-search-options).",
+          "default": [],
+          "scope": 3,
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "array",
+                "properties": {
+                  "when": {
+                    "type": "string",
+                    "pattern": "\\w*\\$\\(basename\\)\\w*",
+                    "default": "$(basename).ext",
+                    "description": "Additional check on the siblings of a matching file. Use $(basename) as variable for the matching file name."
+                  }
+                }
+              }
+            ]
+          }
         },
-        "colorize.variables_files_to_exclude": {
-          "$schema": "http://json-schema.org/draft-07/schema#",
+        "colorize.exclude": {
+          "type": "array",
+          "markdownDescription": "Configure glob patterns for excluding files and folders. Colorize will not colorized colors in these files and folders and it'll also not search for variables inside. Read more about glob patterns [here](https://code.visualstudio.com/docs/editor/codebasics#_advanced-search-options).",
           "default": [
             "**/.git",
             "**/.svn",
@@ -103,13 +105,22 @@
             "**/dist",
             "**/tests"
           ],
-          "title": "Configure glob patterns for excluding files and folders from the initial variables search. (By defaul when you open vscode, colorize will look inside every files in your projet to find variables.)",
-          "type": "array",
-          "items": {
-            "type": "string",
-            "uniqueItems": true
-          },
-          "description": "Configure glob patterns for excluding files and folders from the initial variables search. When you open vscode, colorize will look inside every files in your projet to find variables."
+          "scope": 3,
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "array",
+                "properties": {
+                  "when": {
+                    "type": "string",
+                    "pattern": "\\w*\\$\\(basename\\)\\w*",
+                    "default": "$(basename).ext",
+                    "description": "Additional check on the siblings of a matching file. Use $(basename) as variable for the matching file name."
+                  }
+                }
+              }
+            ]
+          }
         },
         "colorize.hide_current_line_decorations": {
           "title": "Hide current line decorations",
