@@ -28,6 +28,7 @@ describe('Test rgb(a) color Regex', () => {
     assert.equal(regex_exec('rgb(123, 123, 123),', REGEXP)[1], 'rgb(123, 123, 123)');
     assert.equal(regex_exec('rgb(123, 123, 123);', REGEXP)[1], 'rgb(123, 123, 123)');
     assert.equal(regex_exec('rgb(123, 123, 123)\n', REGEXP)[1], 'rgb(123, 123, 123)');
+    assert.equal(regex_exec('rgb(123, 123, 123)}', REGEXP)[1], 'rgb(123, 123, 123)');
   });
 
   it('Should accept dot values (rgb)', function() {

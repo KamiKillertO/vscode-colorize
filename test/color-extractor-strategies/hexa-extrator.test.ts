@@ -58,6 +58,7 @@ describe('Test CSS hexa color Regex', () => {
     assert.equal(regex_exec('#ffffff;', REGEXP)[1], '#ffffff');
     assert.equal(regex_exec('#ffffff\n', REGEXP)[1], '#ffffff');
     assert.equal(regex_exec('#ffffff)', REGEXP)[1], '#ffffff');
+    assert.equal(regex_exec('#ffffff}', REGEXP)[1], '#ffffff');
   });
   it('Should accept accept an alpha value', function() {
     assert.equal(regex_exec('#00000000', REGEXP)[1], '#00000000');
