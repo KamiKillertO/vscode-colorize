@@ -1,3 +1,29 @@
+## 0.7.2
+
+- [CHANGE] Now rgb(a) and hsl(a) colors can have decimal values
+
+## 0.7.1
+
+- [FIX] Fix stylus variables decoration
+
+## 0.7.0
+
+- [IMPROVE] Variables support fully working
+- [ADDED] Options to enable/disabled colorization for colors/variables type
+
+## 0.6.21
+
+- [FIX] Fix css variables decoration
+
+## 0.6.20
+
+- [FIX] Fix perfs issue with stylus variables extraction
+
+## 0.6.19
+
+- [IMPROVE] Settings HOT Reload.
+- [IMPROVE] Variables usage live update
+
 ## 0.6.18
 
 - [FIX] Sass variables extraction

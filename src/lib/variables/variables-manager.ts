@@ -8,36 +8,36 @@ import './strategies/sass-strategy';
 import './strategies/stylus-strategy';
 
 import { workspace, window, StatusBarAlignment, StatusBarItem, Uri, TextDocument } from 'vscode';
-import { canColorize } from '../../extension';
-import { DocumentLine, LineExtraction } from '../color-util';
-
-const INCLUDE_PATTERN = '{**/*.css,**/*.sass,**/*.scss,**/*.less,**/*.pcss,**/*.sss,**/*.stylus,**/*.styl}';
-const EXCLUDE_PATTERN = '{**/.git,**/.svn,**/.hg,**/CVS,**/.DS_Store,**/.git,**/node_modules,**/bower_components,**/tmp,**/dist,**/tests}';
+import { DocumentLine, LineExtraction } from '../util/color-util';
 
 class VariablesManager {
+  private statusBar: StatusBarItem;
 
-  public static async getWorkspaceVariables() {
-    const statusBar: StatusBarItem = window.createStatusBarItem(StatusBarAlignment.Right);
+  constructor() {
+    this.statusBar = window.createStatusBarItem(StatusBarAlignment.Right);
+  }
 
-    statusBar.text = 'Fetching files...';
-    statusBar.show();
+  public async getWorkspaceVariables(includePattern: string[] = [], excludePattern: string[] = []) {
+    this.statusBar.text = 'Fetching files...';
+    this.statusBar.show();
     try {
-      const files: Uri[] = await workspace.findFiles(INCLUDE_PATTERN, EXCLUDE_PATTERN);
-      statusBar.text = `Found ${files.length} files`;
+      console.time('getWorkspaceVariables');
+      const INCLUDE_PATTERN = `{${includePattern.join(',')}}`;
+      const EXCLUDE_PATTERN = `{${excludePattern.join(',')}}`;
+      let files: Uri[] = await workspace.findFiles(INCLUDE_PATTERN, EXCLUDE_PATTERN);
+      this.statusBar.text = `Found ${files.length} files`;
 
       await Promise.all(this.extractFilesVariable(files));
       let variablesCount: number = VariablesExtractor.getVariablesCount();
-      statusBar.text = `Found ${variablesCount} variables`;
+      this.statusBar.text = `Found ${variablesCount} variables`;
     } catch (error) {
-      statusBar.text = 'Variables extraction fail';
+      this.statusBar.text = 'Variables extraction fail';
     }
     return;
   }
 
-  private static getFileContent(file: TextDocument): DocumentLine[] {
-    if (canColorize(file) === false) {
-      return;
-    }
+  private getFileContent(file: TextDocument): DocumentLine[] {
+    // here deal with files without contents or unreadable content (like images)
     return file.getText()
       .split(/\n/)
       .map((text, index) => Object({
@@ -46,31 +46,36 @@ class VariablesManager {
       }));
   }
 
-  private static extractFilesVariable(files: Uri[]) {
-    return files.map(async(file) => {
+  private extractFilesVariable(files: Uri[]) {
+    return files.map(async(file: Uri) => {
       const document: TextDocument =  await workspace.openTextDocument(file.path);
       const content: DocumentLine[] = this.getFileContent(document);
       return VariablesExtractor.extractDeclarations(document.fileName, content);
     });
   }
 
-  public static findVariablesDeclarations(fileName, fileLines: DocumentLine[]): Promise <number[]> {
+  public findVariablesDeclarations(fileName, fileLines: DocumentLine[]): Promise <number[]> {
     return VariablesExtractor.extractDeclarations(fileName, fileLines);
   }
 
-  public static findVariables(fileName, fileLines: DocumentLine[]): Promise <LineExtraction[]> {
+  public findVariables(fileName, fileLines: DocumentLine[]): Promise <LineExtraction[]> {
     return VariablesExtractor.extractVariables(fileName, fileLines);
   }
 
-  public static generateDecoration(Variable: Variable): VariableDecoration {
-    const deco = new VariableDecoration(Variable);
-    Variable.registerObserver(deco);
+  public generateDecoration(variable: Variable, line: number): VariableDecoration {
+    const deco = new VariableDecoration(variable, line);
     return deco;
   }
 
-  public static deleteVariableInLine(fileName: string, line: number) {
+  public setupVariablesExtractors(extractors: string[]) {
+    VariablesExtractor.enableStrategies(extractors);
+  }
+
+  public deleteVariableInLine(fileName: string, line: number) {
     VariablesExtractor.deleteVariableInLine(fileName, line);
   }
 }
 
-export default VariablesManager;
+const instance = new VariablesManager();
+
+export default instance;

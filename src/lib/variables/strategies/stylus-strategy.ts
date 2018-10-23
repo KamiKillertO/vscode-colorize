@@ -1,17 +1,18 @@
 import VariablesExtractor, { IVariableStrategy } from '../variables-extractor';
-import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../../color-util';
+import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../../util/color-util';
 import Variable from '../variable';
-import Color, { IColor } from '../../colors/color';
+import Color from '../../colors/color';
 import VariablesStore from '../variable-store';
 import ColorExtractor from '../../colors/color-extractor';
+import { EOL } from '../../util/regexp';
 
-const REGEXP_END = '(?:$|\"|\'|,| |;|\\)|\\r|\\n)';
-
-export const REGEXP = new RegExp(`(^|(?::|=)\\s*)((?:-|_)*[$a-z]+[\\-_\\d]*)+(?!=)${REGEXP_END}`, 'gi');
-export const DECLARATION_REGEXP = new RegExp(`(?:((?:[\\$a-z]+[\\-_a-z\\d]*)\\s*)=)${REGEXP_END}`, 'gi');
+export const REGEXP = new RegExp(`(^|(?::|=)\\s*)((?:[\\-]*[$a-z_][\\-_\\d]*)+)(?!=)${EOL}`, 'gi');
+export const DECLARATION_REGEXP = new RegExp(`(?:(^(?:\\$|(?:[\\-_$]+[a-z\\d]+)|(?:[^\\d||\\-|@]+))(?:[_a-zd][\\-]*)*))\\s*=${EOL}`, 'gi');
+// export const DECLARATION_REGEXP = new RegExp(`(?:((?:\\$|(?:[\\-_$]+[a-z\\d]+)|(?:[^\\d||\\-|@]+))(?:[_a-zd][\\-]*)*))\\s*=${REGEXP_END}`, 'gi');
+// export const DECLARATION_REGEXP = new RegExp(`(?:((?:(?:\\$)|(?:[\\-_$]+[a-z\\d]+)|(?:[^\\d]+))([\\-_a-z\d]*))\\s*)=${REGEXP_END}`, 'gi');
 
 class StylusExtractor implements IVariableStrategy {
-  name: string = 'STYLUS_EXTRACTOR';
+  name: string = 'STYLUS';
   private store: VariablesStore = new VariablesStore();
 
   public async extractDeclarations(fileName: string, fileLines: DocumentLine[]): Promise<number> {
@@ -21,6 +22,9 @@ class StylusExtractor implements IVariableStrategy {
     let match = null;
     while ((match = DECLARATION_REGEXP.exec(text)) !== null) {
       const varName = (match[1] || match[2]).trim();
+      if (varName === '') {
+        continue;
+      }
       let color = ColorExtractor.extractOneColor(text.slice(match.index + match[0].length).trim()) || this.extractVariable(fileName, text.slice(match.index + match[0].length).trim());
       if (this.store.has(varName, fileName, line)) {
         const decoration = this.store.findDeclaration(varName, fileName, line);
@@ -38,15 +42,23 @@ class StylusExtractor implements IVariableStrategy {
       while ((match = REGEXP.exec(text)) !== null) {
         let varName =  match[2];
         varName = varName.trim();
+        if (varName === '') {
+          continue;
+        }
         let spaces = (match[1] || '').length;
         if (this.store.has(varName)) {
           let decoration = this.store.findClosestDeclaration(varName, fileName);
-          if (decoration.color) {
-            decoration.color = Object.create(new Color(varName, match.index + spaces, decoration.color.rgb, decoration.color.alpha));
-          } else {
-            decoration.color = Object.create(new Color(varName, match.index + spaces, null));
+          if (decoration.color === undefined) {
+            decoration = this.store.findClosestDeclaration(varName, '.');
           }
-          colors.push(decoration);
+          let variable;
+          const declaration = null;
+          if (decoration.color) {
+            variable = new Variable(varName, new Color(varName, spaces + match.index, decoration.color.rgb, decoration.color.alpha), declaration);
+          } else {
+            variable = new Variable(varName, new Color(varName, spaces + match.index, null), declaration);
+          }
+          colors.push(variable);
         }
       }
       return {line, colors};
