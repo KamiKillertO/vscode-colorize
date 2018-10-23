@@ -37,7 +37,7 @@
   "main": "./out/src/extension",
   "contributes": {
     "configuration": {
-      "title": "Colorize extension",
+      "title": "Colorize",
       "properties": {
         "colorize.languages": {
           "default": [
@@ -53,7 +53,7 @@
           ],
           "title": "Colorize files with these languages",
           "type": "array",
-          "description": "Languages that should be colorized"
+          "markdownDescription": "Configure a list of languages that should be colorized. You can learn about languages at https://code.visualstudio.com/docs/languages/overview."
         },
         "colorize.files_extensions": {
           "$schema": "http://json-schema.org/draft-07/schema#",
@@ -66,13 +66,67 @@
             "uniqueItems": true,
             "description": "You should enter a valid file extension"
           },
-          "description": "Specified files extension that should be colorized"
+          "markdownDescription": "[deprecated] Specified a list of files extension that should be colorized. This setting is deprecated and will be removed soon, you should use the setting `colorize.include` instead."
+        },
+        "colorize.include": {
+          "type": "array",
+          "markdownDescription": "Configure glob patterns for including files and folders. By default Colorize is enable for files matching one the languages defined in the `colorize.languages` config, with this config you can enable colorize for other files or folders. Read more about glob patterns [here](https://code.visualstudio.com/docs/editor/codebasics#_advanced-search-options).",
+          "default": [],
+          "scope": 3,
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "array",
+                "properties": {
+                  "when": {
+                    "type": "string",
+                    "pattern": "\\w*\\$\\(basename\\)\\w*",
+                    "default": "$(basename).ext",
+                    "description": "Additional check on the siblings of a matching file. Use $(basename) as variable for the matching file name."
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "colorize.exclude": {
+          "type": "array",
+          "markdownDescription": "Configure glob patterns for excluding files and folders. Colorize will not colorized colors in these files and folders and it'll also not search for variables inside. Read more about glob patterns [here](https://code.visualstudio.com/docs/editor/codebasics#_advanced-search-options).",
+          "default": [
+            "**/.git",
+            "**/.svn",
+            "**/.hg",
+            "**/CVS",
+            "**/.DS_Store",
+            "**/.git",
+            "**/node_modules",
+            "**/bower_components",
+            "**/tmp",
+            "**/dist",
+            "**/tests"
+          ],
+          "scope": 3,
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "array",
+                "properties": {
+                  "when": {
+                    "type": "string",
+                    "pattern": "\\w*\\$\\(basename\\)\\w*",
+                    "default": "$(basename).ext",
+                    "description": "Additional check on the siblings of a matching file. Use $(basename) as variable for the matching file name."
+                  }
+                }
+              }
+            ]
+          }
         },
         "colorize.hide_current_line_decorations": {
           "title": "Hide current line decorations",
           "default": true,
           "type": "boolean",
-          "description": "Hide decorations for the current line. Set to `false` to turn it off"
+          "markdownDescription": "Hide colors for the current line. Set to `false` to turn it off"
         },
         "colorize.colorized_variables": {
           "$schema": "http://json-schema.org/draft-07/schema#",
@@ -91,7 +145,7 @@
           },
           "title": "Extract these type of variables",
           "type": "array",
-          "description": "Specified the type of variables that should be extracted"
+          "markdownDescription": "You can specified the type of variables that should be colorized by the extension."
         },
         "colorize.colorized_colors": {
           "$schema": "http://json-schema.org/draft-07/schema#",
@@ -113,7 +167,7 @@
           },
           "title": "Colorize these type of color",
           "type": "array",
-          "description": "Specified the type of color that should be colorized"
+          "markdownDescription": "You can specified the type of color that should be colorized by the extension."
         }
       }
     }
@@ -134,5 +188,8 @@
     "mocha": "4.1.0",
     "tslint": "5.9.1",
     "vscode": "1.1.21"
+  },
+  "dependencies": {
+    "glob-to-regexp": "^0.4.0"
   }
 }
