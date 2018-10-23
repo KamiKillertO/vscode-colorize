@@ -15,7 +15,8 @@ import {
   TextEditorSelectionChangeEvent,
   Selection,
   WorkspaceConfiguration,
-  Extension
+  Extension,
+  commands
 } from 'vscode';
 import Variable from './lib/variables/variable';
 import ColorUtil, { IDecoration, DocumentLine, LineExtraction } from './lib/util/color-util';
@@ -507,6 +508,30 @@ function inferFilesToInclude(languagesConfig, filesExtensionsConfig) {
   return unique(filesExtensions);
 }
 
+async function displayFilesExtensionsDeprecationWarning(filesExtensionsConfig: string[]) {
+  const config = workspace.getConfiguration('colorize');
+  const ignoreWarning = config.get('ignore_files_extensions_deprecation');
+
+  if (filesExtensionsConfig.length > 0 && ignoreWarning === false) {
+
+    const updateSetting = 'Update setting';
+    const neverShowAgain = 'Don\'t Show Again';
+    const choice = await window.showWarningMessage('You\'re using the `colorize.files_extensions` settings. This settings as been deprecated in favor of `colorize.include`',
+      updateSetting,
+      neverShowAgain
+    );
+
+    if (choice === updateSetting) {
+      commands.executeCommand('workbench.action.openSettings2');
+    } else if (choice === neverShowAgain) {
+      await config.update('ignore_files_extensions_deprecation', true, true);
+    }
+    //   const no: MessageItem = { isCloseAffordance: true, title: localize('no', 'No') };
+    //   const askLater: MessageItem = { title: localize('not now', 'Ask Me Later') };
+    //   const result = await window.showInformationMessage(localize('suggest auto fetch', 'Would you like Code to [periodically run 'git fetch']({0})?', 'https://go.microsoft.com/fwlink/?linkid=865294'), yes, no, askLater);
+  }
+}
+
 function readConfiguration(): ColorizeConfig {
   const configuration: WorkspaceConfiguration = workspace.getConfiguration('colorize');
 
@@ -515,6 +540,7 @@ function readConfiguration(): ColorizeConfig {
   const colorizedColors = Array.from(new Set(configuration.get('colorized_colors', []))); // [...new Set(array)] // works too
 
   const filesExtensions = configuration.get('files_extensions', []);
+  displayFilesExtensionsDeprecationWarning(filesExtensions);
   const languages = configuration.get('languages', []);
 
   const inferedFilesToInclude = inferFilesToInclude(languages, filesExtensions).map(extension => `**/*${extension}`);
@@ -567,3 +593,34 @@ export function deactivate() {
 }
 
 export { canColorize };
+
+
+// async function onFirstGoodRemoteOperation(): Promise<void> {
+//   const didInformUser = !this.globalState.get<boolean>(AutoFetcher.DidInformUser);
+
+//   if (this.enabled && !didInformUser) {
+//     this.globalState.update(AutoFetcher.DidInformUser, true);
+//   }
+
+//   const shouldInformUser = !this.enabled && didInformUser;
+
+//   if (!shouldInformUser) {
+//     return;
+//   }
+
+//   const yes: MessageItem = { title: localize('yes', 'Yes') };
+//   const no: MessageItem = { isCloseAffordance: true, title: localize('no', 'No') };
+//   const askLater: MessageItem = { title: localize('not now', 'Ask Me Later') };
+//   const result = await window.showInformationMessage(localize('suggest auto fetch', 'Would you like Code to [periodically run 'git fetch']({0})?', 'https://go.microsoft.com/fwlink/?linkid=865294'), yes, no, askLater);
+
+//   if (result === askLater) {
+//     return;
+//   }
+
+//   if (result === yes) {
+//     const gitConfig = workspace.getConfiguration('git');
+//     gitConfig.update('autofetch', true, ConfigurationTarget.Global);
+//   }
+
+//   this.globalState.update(AutoFetcher.DidInformUser, true);
+// }

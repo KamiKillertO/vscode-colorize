@@ -68,6 +68,11 @@
           },
           "markdownDescription": "[deprecated] Specified a list of files extension that should be colorized. This setting is deprecated and will be removed soon, you should use the setting `colorize.include` instead."
         },
+        "colorize.ignore_files_extensions_deprecation": {
+          "default": false,
+          "type": "boolean",
+          "markdownDescription": "Ignores the warning for `colorize.files_extensions`."
+        },
         "colorize.include": {
           "type": "array",
           "markdownDescription": "Configure glob patterns for including files and folders. By default Colorize is enable for files matching one the languages defined in the `colorize.languages` config, with this config you can enable colorize for other files or folders. Read more about glob patterns [here](https://code.visualstudio.com/docs/editor/codebasics#_advanced-search-options).",
