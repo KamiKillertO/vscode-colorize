@@ -526,9 +526,6 @@ async function displayFilesExtensionsDeprecationWarning(filesExtensionsConfig: s
     } else if (choice === neverShowAgain) {
       await config.update('ignore_files_extensions_deprecation', true, true);
     }
-    //   const no: MessageItem = { isCloseAffordance: true, title: localize('no', 'No') };
-    //   const askLater: MessageItem = { title: localize('not now', 'Ask Me Later') };
-    //   const result = await window.showInformationMessage(localize('suggest auto fetch', 'Would you like Code to [periodically run 'git fetch']({0})?', 'https://go.microsoft.com/fwlink/?linkid=865294'), yes, no, askLater);
   }
 }
 
@@ -593,34 +590,3 @@ export function deactivate() {
 }
 
 export { canColorize };
-
-
-// async function onFirstGoodRemoteOperation(): Promise<void> {
-//   const didInformUser = !this.globalState.get<boolean>(AutoFetcher.DidInformUser);
-
-//   if (this.enabled && !didInformUser) {
-//     this.globalState.update(AutoFetcher.DidInformUser, true);
-//   }
-
-//   const shouldInformUser = !this.enabled && didInformUser;
-
-//   if (!shouldInformUser) {
-//     return;
-//   }
-
-//   const yes: MessageItem = { title: localize('yes', 'Yes') };
-//   const no: MessageItem = { isCloseAffordance: true, title: localize('no', 'No') };
-//   const askLater: MessageItem = { title: localize('not now', 'Ask Me Later') };
-//   const result = await window.showInformationMessage(localize('suggest auto fetch', 'Would you like Code to [periodically run 'git fetch']({0})?', 'https://go.microsoft.com/fwlink/?linkid=865294'), yes, no, askLater);
-
-//   if (result === askLater) {
-//     return;
-//   }
-
-//   if (result === yes) {
-//     const gitConfig = workspace.getConfiguration('git');
-//     gitConfig.update('autofetch', true, ConfigurationTarget.Global);
-//   }
-
-//   this.globalState.update(AutoFetcher.DidInformUser, true);
-// }
