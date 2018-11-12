@@ -27,7 +27,8 @@ describe('Test browser predefined color Regex', () => {
     assert.equal(regex_exec(' white,', REGEXP)[1], 'white');
     assert.equal(regex_exec(' white;', REGEXP)[1], 'white');
     assert.equal(regex_exec(' white\n', REGEXP)[1], 'white');
-    assert.equal(regex_exec(' white)\n', REGEXP)[1], 'white');
+    assert.equal(regex_exec(' white)', REGEXP)[1], 'white');
+    assert.equal(regex_exec(' white}', REGEXP)[1], 'white');
   });
   it('Should not match', function () {
     assert.isNull(regex_exec('white-', REGEXP));

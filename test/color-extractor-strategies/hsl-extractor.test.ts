@@ -30,6 +30,7 @@ describe('Test hsl(a) color Regex', () => {
     assert.equal(regex_exec('hsl(200, 10%, 10%),', REGEXP)[1], 'hsl(200, 10%, 10%)');
     assert.equal(regex_exec('hsl(200, 10%, 10%);', REGEXP)[1], 'hsl(200, 10%, 10%)');
     assert.equal(regex_exec('hsl(200, 10%, 10%)\n', REGEXP)[1], 'hsl(200, 10%, 10%)');
+    assert.equal(regex_exec('hsl(200, 10%, 10%)}', REGEXP)[1], 'hsl(200, 10%, 10%)');
   });
 
   it('Should accept dot values (hsl)', function() {

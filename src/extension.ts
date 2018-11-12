@@ -5,6 +5,7 @@ import {
   window,
   workspace,
   ExtensionContext,
+  extensions,
   TextEditor,
   Range,
   TextDocument,
@@ -13,7 +14,9 @@ import {
   TextDocumentContentChangeEvent,
   TextEditorSelectionChangeEvent,
   Selection,
-  WorkspaceConfiguration
+  WorkspaceConfiguration,
+  Extension,
+  commands
 } from 'vscode';
 import Variable from './lib/variables/variable';
 import ColorUtil, { IDecoration, DocumentLine, LineExtraction } from './lib/util/color-util';
@@ -21,6 +24,8 @@ import Queue from './lib/queue';
 import VariablesManager from './lib/variables/variables-manager';
 import CacheManager from './lib/cache-manager';
 import EditorManager from './lib/editor-manager';
+import { flatten, unique } from './lib/util/array';
+import * as globToRegexp from 'glob-to-regexp';
 
 interface ColorizeConfig {
   languages: string[];
@@ -28,15 +33,20 @@ interface ColorizeConfig {
   isHideCurrentLineDecorations: boolean;
   colorizedVariables: string[];
   colorizedColors: string[];
+  filesToExcludes: string[];
+  filesToIncludes: string[];
+  inferedFilesToInclude: string[];
 }
 let config: ColorizeConfig = {
   languages: [],
   filesExtensions: [],
   isHideCurrentLineDecorations: true,
   colorizedVariables: [],
-  colorizedColors: []
+  colorizedColors: [],
+  filesToExcludes: [],
+  filesToIncludes: [],
+  inferedFilesToInclude: []
 };
-
 
 interface ColorizeContext {
   editor: TextEditor;
@@ -334,20 +344,32 @@ function isLanguageSupported(languageId: string): boolean {
 /**
  * Check if COLORIZE support a file extension
  *
- * @param {string} fileName A valid file extension
+ * @param {string} fileName A valid filename (path to the file)
  * @returns {boolean}
  */
 function isFileExtensionSupported(fileName: string): boolean {
   return config.filesExtensions.some((ext: RegExp) => ext.test(fileName));
 }
+
+/**
+ * Check if the file is the `colorize.include` setting
+ *
+ * @param {string} fileName A valid filename (path to the file)
+ * @returns {boolean}
+ */
+function isIncludedFile(fileName: string): boolean {
+  return config.filesToIncludes.find((globPattern: string) => globToRegexp(globPattern).test(fileName)) !== undefined;
+}
+
+
 /**
  * Check if a file can be colorized by COLORIZE
  *
  * @param {TextDocument} document The document to test
  * @returns {boolean}
  */
-function canColorize(document: TextDocument) {
-  return isLanguageSupported(document.languageId) || isFileExtensionSupported(document.fileName);
+function canColorize(document: TextDocument) { // update to use filesToExcludes. Remove `isLanguageSupported` ? checking path with file extension or include glob pattern should be enough
+  return isLanguageSupported(document.languageId) || isFileExtensionSupported(document.fileName) || isIncludedFile(document.fileName);
 }
 function handleTextSelectionChange(event: TextEditorSelectionChangeEvent, cb: Function) {
   if (!config.isHideCurrentLineDecorations || event.textEditor !== extension.editor) {
@@ -451,7 +473,8 @@ function handleConfigurationChanged() {
   q.push(async (cb) => {
     // remove event listeners?
     VariablesManager.setupVariablesExtractors(newConfig.colorizedVariables);
-    await VariablesManager.getWorkspaceVariables();
+
+    await VariablesManager.getWorkspaceVariables(newConfig.filesToIncludes.concat(newConfig.inferedFilesToInclude), newConfig.filesToExcludes); // 👍
     return cb();
   });
   config = newConfig;
@@ -467,18 +490,70 @@ function initEventListeners(context: ExtensionContext) {
   workspace.onDidChangeConfiguration(handleConfigurationChanged, null, context.subscriptions);
 }
 
+function inferFilesToInclude(languagesConfig, filesExtensionsConfig) {
+  let ext: Extension<any>[] = extensions.all;
+  let filesExtensions = [];
+
+  ext.forEach(extension => {
+    if (extension.packageJSON && extension.packageJSON.contributes && extension.packageJSON.contributes.languages) {
+      extension.packageJSON.contributes.languages.forEach(language => {
+        if (languagesConfig.indexOf(language.id) !== -1) {
+          filesExtensions = filesExtensions.concat(language.extensions);
+        }
+      });
+    }
+  });
+  filesExtensions = flatten(filesExtensions); // get all languages with their files extensions ^^. Now need to filter with the one set in config
+  filesExtensions = filesExtensions.concat(filesExtensionsConfig);
+  return unique(filesExtensions);
+}
+
+async function displayFilesExtensionsDeprecationWarning(filesExtensionsConfig: string[]) {
+  const config = workspace.getConfiguration('colorize');
+  const ignoreWarning = config.get('ignore_files_extensions_deprecation');
+
+  if (filesExtensionsConfig.length > 0 && ignoreWarning === false) {
+
+    const updateSetting = 'Update setting';
+    const neverShowAgain = 'Don\'t Show Again';
+    const choice = await window.showWarningMessage('You\'re using the `colorize.files_extensions` settings. This settings as been deprecated in favor of `colorize.include`',
+      updateSetting,
+      neverShowAgain
+    );
+
+    if (choice === updateSetting) {
+      commands.executeCommand('workbench.action.openSettings2');
+    } else if (choice === neverShowAgain) {
+      await config.update('ignore_files_extensions_deprecation', true, true);
+    }
+  }
+}
+
 function readConfiguration(): ColorizeConfig {
   const configuration: WorkspaceConfiguration = workspace.getConfiguration('colorize');
 
   // remove duplicates (if duplicates)
   const colorizedVariables = Array.from(new Set(configuration.get('colorized_variables', []))); // [...new Set(array)] // works too
   const colorizedColors = Array.from(new Set(configuration.get('colorized_colors', []))); // [...new Set(array)] // works too
+
+  const filesExtensions = configuration.get('files_extensions', []);
+  displayFilesExtensionsDeprecationWarning(filesExtensions);
+  const languages = configuration.get('languages', []);
+
+  const inferedFilesToInclude = inferFilesToInclude(languages, filesExtensions).map(extension => `**/*${extension}`);
+
+  const filesToIncludes = Array.from(new Set(configuration.get('include', [])));
+  const filesToExcludes = Array.from(new Set(configuration.get('exclude', [])));
+
   return {
-    languages: configuration.get('languages', []),
-    filesExtensions: configuration.get('files_extensions', []).map(ext => RegExp(`\\${ext}$`)),
+    languages,
+    filesExtensions: filesExtensions.map(ext => RegExp(`\\${ext}$`)),
     isHideCurrentLineDecorations: configuration.get('hide_current_line_decorations'),
     colorizedColors,
-    colorizedVariables
+    colorizedVariables,
+    filesToIncludes,
+    filesToExcludes,
+    inferedFilesToInclude
   };
 }
 
@@ -494,7 +569,8 @@ export function activate(context: ExtensionContext) {
   VariablesManager.setupVariablesExtractors(config.colorizedVariables);
   q.push(async cb => {
     try {
-      await VariablesManager.getWorkspaceVariables();
+      await VariablesManager.getWorkspaceVariables(config.filesToIncludes.concat(config.inferedFilesToInclude), config.filesToExcludes); // 👍
+
       initEventListeners(context);
     } catch (error) {
       // handle promise rejection
