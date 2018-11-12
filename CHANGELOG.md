@@ -1,3 +1,10 @@
+## 0.8.0
+
+- [FEATURE] Add two new settings `colorize.include` and `colorize.exclude`. These two settings can be used to add/remove files to the list of files that can be colorized.
+- [DEPRECATE] With the release of `colorize.include` and `colorize.exclude`, the setting `colorize.files_extensions` is now deprecated.
+- [IMPROVEMENT] Now the list of files/folder that can be colorized or used for the variables search is determined using the three settings `colorize.include`, `colorize.exclude` and `colorize.languages`. It was static previously.
+- [FIX] `}` is now a valid end for a color.
+
 ## 0.7.2
 
 - [CHANGE] Now rgb(a) and hsl(a) colors can have decimal values
