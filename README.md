@@ -16,85 +16,88 @@ This extension  your styles files looking for colors and generate a colored back
 ![](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/demo.gif)
 
 ![](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/demo_variables.gif)
+
 💡 [How to enable variables support](#colorizeactivate_variables_support_beta-boolean-default-false)
 
 ## Features
 
-- 🆕 Generate colored background for css variables
-- 🆕 Generate colored background for preprocessor variables
-- Generate colored background for hsl colors
-- Generate colored background for hsla colors
+- Generate colored background for css variables
+- Generate colored background for preprocessor variables
+- Generate colored background for hsl/hsla colors
 - Generate colored background for cross browsers colors
 - Generate colored background for css hexa color
-- Generate colored background for rgb color
-- Generate colored background for rgba color
-- Update the background when the color is updated
+- Generate colored background for rgb/rgba color
+- Color background live update
 
 ## Options (settings)
 
 The following Visual Studio Code settings are available for the Colorize extension.
 These can be set in user preferences `(cmd+,)` or workspace settings `(.vscode/settings.json)`.
 
-```json
-{
-    "colorize.languages": [
-            "css",
-            "sass",
-            "scss",
-            "less",
-            "pcss",
-            "sss",
-            "stylus",
-            "xml",
-            "svg"
-    ],
-    "colorize.files_extensions": [],
-    "colorize.hide_current_line_decorations": true
-}
-```
 
 ### colorize.languages _ARRAY_
 
-Modified this option to add or remove support for a [language](https://code.visualstudio.com/docs/languages/overview).
+Configure a list of languages that should be colorized. You can learn about languages at <https://code.visualstudio.com/docs/languages/overview.>
 
-For example if you want to add `javascript`:
+For example, if you want to colorize colors in `javascript` files, you just need to include it:
 
 ```json
   "colorize.languages": [
-            "javascript",
-            "css",
-            "sass",
-            "scss",
-            "less",
-            "pcss",
-            "sss",
-            "stylus",
-            "xml",
-            "svg"
-    ]
+    "javascript",
+    // ...
+  ]
 ```
 
-### colorize.files_extensions _ARRAY_
+### colorize.include
 
+Configure glob patterns for including files and folders. By default Colorize is enable for files matching one the languages defined in the `colorize.languages` config, with this config you can enable colorize for other files or folders. Read more about glob patterns [here](https://code.visualstudio.com/docs/editor/codebasics#_advanced-search-options).
+
+### colorize.exclude
+
+Configure glob patterns for excluding files and folders. Colorize will not colorized colors in these files and folders and it'll also not search for variables inside. Read more about glob patterns [here](https://code.visualstudio.com/docs/editor/codebasics#_advanced-search-options).
+
+### [DEPRECATED] colorize.files_extensions _ARRAY_
+
+_⚠️ this setting is deprecated, you should use [colorize.include](#colorizeinclude-array) instead_
 Modified this option to activate colorize for files with the matching extension.
 
 For example if you want to colorize `.diff` files:
 
 ```json
   "colorize.files_extensions": [
-            ".diff"
-    ]
+    ".diff"
+  ]
 ```
 
 ### colorize.hide_current_line_decorations _BOOLEAN_ _default: true_
 
-By default decorations for the current line are hidden. Set this setting to false to deactivate this behavior.
+By default, decorations for the current line are hidden. Set this setting to `false` if you want to deactivate this behavior.
 
-### colorize.activate_variables_support_beta _BOOLEAN_ _default: false_
+### colorize.colorized_colors _ARRAY_
 
-Set this options to true to enable variables support.
-Variables support is in beta and you might encounter bugs.
-Do not hesitate to report bugs [GitHub Issues](https://github.com/KamiKillertO/vscode-colorize/issues).
+This options allow you to enable/disable colorization for a type of colors.
+
+For example if you want to only colorize hexa colors (`#fff, #ffffff, 0xFFF`) in your files you can update the option like this
+
+```json
+  "colorize.colorized_colors": [
+    "HEXA"
+  ]
+```
+
+### colorize.colorized_variables
+
+This options allow you to enable/disable colorization for a type of variables.
+
+For example if you use less in your project you setup the option like this
+
+```json
+  "colorize.colorized_variables": [
+    "LESS"
+  ]
+```
+
+_This way all @variables will be colorized_
 
 ## Roadmap
 
@@ -105,31 +108,11 @@ Do not hesitate to report bugs [GitHub Issues](https://github.com/KamiKillertO/v
 - [x] Generate background for hsl colors
 - [x] Generate background for hsla colors (~ missing transparency)
 - [x] Generate background for Predefined/Cross-browser colors
-- [ ] Generate background for preprocessor variables 🚧
-- [ ] Generate background for css variables 🚧
+- [x] Generate background for preprocessor variables
+- [x] Generate background for css variables
+- [x] Config livereload
 
 ## Release
-
-### Latest 0.6.x (2017.07.12)
-
-- 💡 Hide decorations for the current line
-- Variables (css, stylus, sass, less...) beta (partial decoration update)
-- 🚀 Speed up decorations update
-
-### 0.5.0 (2017.05.4)
-
-- Generate background for hsl/hsla colors
-
-### 0.4.x
-
-- Generate background for cross browsers colors (white, black...)
-- Add settings to easily add support for new languages
-- Fix several issues and improve performance
-- You can now use `.1` instead of `0.1` in your rbga colors
-- No more issue with files using `\r` as end of lines
-- Open/reopen your save/unsaved files is now longer a problem (no more weird generated background)
-
-...
 
 See [CHANGELOG](CHANGELOG.md) for more information.
 

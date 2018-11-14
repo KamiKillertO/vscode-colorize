@@ -1,17 +1,22 @@
 import Color from './../color';
 import ColorExtractor, { IColorStrategy } from '../color-extractor';
-import { convertHslaToRgba } from '../../color-util';
-import { LineExtraction, DocumentLine } from '../../color-util';
+import { convertHslaToRgba } from '../../util/color-util';
+import { LineExtraction, DocumentLine } from '../../util/color-util';
+import { DOT_VALUE, ALPHA, EOL } from '../../util/regexp';
 
+const R_HUE = `\\d*${DOT_VALUE}?`;
+const R_SATURATION = `(?:\\d{1,3}${DOT_VALUE}?|${DOT_VALUE})%`;
+const R_LUMINANCE = R_SATURATION;
 
-export const REGEXP = /((?:hsl\(\d*\s*,\s*\d{1,3}%\s*,\s*\d{1,3}%\))|(?:hsla\(\d*\s*,\s*(?:\d{1,3}%\s*,\s*){2}(?:[0-1]|1\.0|[0](?:\.\d+){0,1}|(?:\.\d+))\)))(?:$|"|'|,| |;|\)|\r|\n)/gi;
-export const REGEXP_ONE = /^((?:hsl\(\d*\s*,\s*\d{1,3}%\s*,\s*\d{1,3}%\))|(?:hsla\(\d*\s*,\s*(?:\d{1,3}%\s*,\s*){2}(?:[0-1]|1\.0|[0](?:\.\d+){0,1}|(?:\.\d+))\)))(?:$|"|'|,| |;|\)|\r|\n)/i;
+export const REGEXP = new RegExp(`((?:hsl\\(\\s*${R_HUE}\\s*,\\s*${R_SATURATION}\\s*,\\s*${R_LUMINANCE}\\s*\\))|(?:hsla\\(\\s*${R_HUE}\\s*,\\s*${R_SATURATION}\\s*,\\s*${R_LUMINANCE}\\s*,\\s*${ALPHA}\\s*\\)))${EOL}`, 'gi');
+export const REGEXP_ONE = new RegExp(`^((?:hsl\\(\\s*${R_HUE}\\s*,\\s*${R_SATURATION}\\s*,\\s*${R_LUMINANCE}\\s*\\))|(?:hsla\\(\\s*${R_HUE}\\s*,\\s*${R_SATURATION}\\s*,\\s*${R_LUMINANCE}\\s*,\\s*${ALPHA}\\s*\\)))${EOL}`, 'i');
+// export const REGEXP_ONE = /^((?:hsl\(\d*\s*,\s*\d{1,3}%\s*,\s*\d{1,3}%\))|(?:hsla\(\d*\s*,\s*(?:\d{1,3}%\s*,\s*){2}(?:[0-1]|1\.0|[0](?:\.\d+){0,1}|(?:\.\d+))\)))(?:$|"|'|,| |;|\)|\r|\n)/i;
 
 class HSLColorExtractor implements IColorStrategy {
-  public name: string = 'HSL_EXTRACTOR';
+  public name: string = 'HSL';
 
   private generateColorFromMatch(match: RegExpMatchArray): Color {
-    const [h, s, l, a] = this.extractHSLValue(match[1]);
+    const [h, s, l, a] = this.extractHSLValue(match[0]);
     if (s <= 100 && l <= 100) {
       let [r, g, b] = convertHslaToRgba(h, s, l, a);
       return new Color(match[1], match.index, [r, g, b]);

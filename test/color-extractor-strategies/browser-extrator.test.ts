@@ -1,35 +1,37 @@
 import { assert } from 'chai';
 
 import { REGEXP } from '../../src/lib/colors/strategies/browser-strategy';
+import { regex_exec } from '../test-util';
 
 // Defines a Mocha test suite to group tests of similar kind together
 describe('Test browser predefined color Regex', () => {
 
   it('white should match', function () {
-    assert.ok(' white'.match(REGEXP));
-    assert.ok(',white'.match(REGEXP));
-    assert.ok('(white'.match(REGEXP));
-    assert.ok(':white'.match(REGEXP));
+    assert.equal(regex_exec(' white', REGEXP)[1], 'white');
+    assert.equal(regex_exec(',white', REGEXP)[1], 'white');
+    assert.equal(regex_exec('(white', REGEXP)[1], 'white');
+    assert.equal(regex_exec(':white', REGEXP)[1], 'white');
   });
   it('Should not match inside a string', function() {
-    assert.notOk('"white""'.match(REGEXP));
+    assert.isNull(regex_exec('"white"', REGEXP));
   });
   it('Should not match without a valid char before', function() {
-    assert.notOk('awhite'.match(REGEXP));
-    assert.notOk('-white'.match(REGEXP));
-    assert.notOk('$white'.match(REGEXP));
+    assert.isNull(regex_exec('awhite', REGEXP));
+    assert.isNull(regex_exec('-white', REGEXP));
+    assert.isNull(regex_exec('$white', REGEXP));
   });
 
   it('Should match with different characters at the end', function () {
-    assert.ok(' white'.match(REGEXP));
-    assert.ok(' white '.match(REGEXP));
-    assert.ok(' white,'.match(REGEXP));
-    assert.ok(' white;'.match(REGEXP));
-    assert.ok(' white\n'.match(REGEXP));
-    assert.ok(' white)\n'.match(REGEXP));
+    assert.equal(regex_exec(' white', REGEXP)[1], 'white');
+    assert.equal(regex_exec(' white ', REGEXP)[1], 'white');
+    assert.equal(regex_exec(' white,', REGEXP)[1], 'white');
+    assert.equal(regex_exec(' white;', REGEXP)[1], 'white');
+    assert.equal(regex_exec(' white\n', REGEXP)[1], 'white');
+    assert.equal(regex_exec(' white)', REGEXP)[1], 'white');
+    assert.equal(regex_exec(' white}', REGEXP)[1], 'white');
   });
   it('Should not match', function () {
-    assert.notOk('white-'.match(REGEXP));
-    // assert.notOk('-white'.match(REGEXP)); //?
+    assert.isNull(regex_exec('white-', REGEXP));
+    assert.isNull(regex_exec('-white', REGEXP));
   });
 });

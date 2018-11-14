@@ -1,13 +1,15 @@
 import Color from './../color';
 import ColorExtractor, { IColorStrategy } from '../color-extractor';
 import color from './../color';
-import { LineExtraction, DocumentLine } from '../../color-util';
+import { LineExtraction, DocumentLine } from '../../util/color-util';
+import { EOL, HEXA_VALUE } from '../../util/regexp';
 
-export const REGEXP = /((?:#|0x)[\da-f]{3,4}|(?:#|0x)[\da-f]{6}|(?:#|0x)[\da-f]{8})(?:$|"|'|,| |;|\)|\r|\n)/gi;
-export const REGEXP_ONE = /^((?:#|0x)[\da-f]{3,4}|(?:#|0x)[\da-f]{6}|(?:#|0x)[\da-f]{8})(?:$|"|'|,| |;|\)|\r|\n)/i;
+const HEXA_PREFIX = '(?:#|0x)';
+export const REGEXP = new RegExp(`(${HEXA_PREFIX}(?:${HEXA_VALUE}{3,4}|${HEXA_VALUE}{6}|${HEXA_VALUE}{8}))${EOL}`, 'gi');
+export const REGEXP_ONE = new RegExp(`^(${HEXA_PREFIX}(?:${HEXA_VALUE}{3,4}|${HEXA_VALUE}{6}|${HEXA_VALUE}{8}))${EOL}`, 'i');
 
 class HexaColorExtractor implements IColorStrategy {
-  public name: string = 'HEXA_EXTRACTOR';
+  public name: string = 'HEXA';
 
   private extractRGBValue(value): number[] {
     let rgb: any = /#(.+)/gi.exec(value);

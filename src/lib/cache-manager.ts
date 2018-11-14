@@ -1,4 +1,4 @@
-import { IDecoration } from './color-util';
+import { IDecoration } from './util/color-util';
 import { TextDocument } from 'vscode';
 
 class CacheManager {

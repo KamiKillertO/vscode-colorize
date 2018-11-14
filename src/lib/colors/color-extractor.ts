@@ -1,5 +1,5 @@
 import { IColor } from './color';
-import { LineExtraction, DocumentLine, flattenLineExtractionsFlatten } from '../color-util';
+import { LineExtraction, DocumentLine, flattenLineExtractionsFlatten } from '../util/color-util';
 import { Extractor, IStrategy } from '../extractor-mixin';
 
 export interface IColorStrategy extends IStrategy {
@@ -7,14 +7,12 @@ export interface IColorStrategy extends IStrategy {
   extractColor(text: string): IColor;
 }
 class ColorExtractor extends Extractor {
-  public strategies: IColorStrategy[];
-
   public async extract(fileLines: DocumentLine[]): Promise < LineExtraction[] > {
-    const colors = await Promise.all(this.strategies.map(strategy => strategy.extractColors(fileLines)));
+    const colors = await Promise.all(this.enabledStrategies.map(strategy => (<IColorStrategy> strategy).extractColors(fileLines)));
     return flattenLineExtractionsFlatten(colors); // should regroup per lines?
   }
   public extractOneColor(text: string): IColor {
-    let colors = this.strategies.map(strategy => strategy.extractColor(text));
+    let colors = this.enabledStrategies.map(strategy => (<IColorStrategy> strategy).extractColor(text));
     return colors.find(color => color !== null);
   }
 }
