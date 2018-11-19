@@ -45,6 +45,7 @@ describe('Test rgb(a) color Regex', () => {
     assert.equal(regex_exec('rgba(123, 12.3, 123, 0)', REGEXP)[1], 'rgba(123, 12.3, 123, 0)');
     assert.equal(regex_exec('rgba(123, 123, 12.3, 0)', REGEXP)[1], 'rgba(123, 123, 12.3, 0)');
     assert.equal(regex_exec('rgba(123, 123, 123, 1.0)', REGEXP)[1], 'rgba(123, 123, 123, 1.0)');
+    assert.equal(regex_exec('rgba(123, 123, 123, 1.00)', REGEXP)[1], 'rgba(123, 123, 123, 1.00)');
     assert.equal(regex_exec('rgba(123, 123, 123, 1)', REGEXP)[1], 'rgba(123, 123, 123, 1)');
     assert.equal(regex_exec('rgba(.123, 123, 123, 1)', REGEXP)[1], 'rgba(.123, 123, 123, 1)');
   });
