@@ -36,6 +36,7 @@ interface ColorizeConfig {
   filesToExcludes: string[];
   filesToIncludes: string[];
   inferedFilesToInclude: string[];
+  searchVariables: boolean;
 }
 let config: ColorizeConfig = {
   languages: [],
@@ -45,7 +46,8 @@ let config: ColorizeConfig = {
   colorizedColors: [],
   filesToExcludes: [],
   filesToIncludes: [],
-  inferedFilesToInclude: []
+  inferedFilesToInclude: [],
+  searchVariables: false
 };
 
 interface ColorizeContext {
@@ -303,6 +305,9 @@ async function initDecorations(context: ColorizeContext) {
   let text = context.editor.document.getText();
 
   const fileLines: DocumentLine[] = ColorUtil.textToFileLines(text);
+  disposeAllVariablesUseDecorations(context);
+  await VariablesManager.findVariablesDeclarations(context.editor.document.fileName, fileLines);
+  let variables = await VariablesManager.findVariables(context.editor.document.fileName, fileLines);
   const colors: LineExtraction[] = await ColorUtil.findColors(fileLines);
 
   let variables = await VariablesManager.findVariables(context.editor.document.fileName, fileLines);
@@ -474,7 +479,9 @@ function handleConfigurationChanged() {
     // remove event listeners?
     VariablesManager.setupVariablesExtractors(newConfig.colorizedVariables);
 
-    await VariablesManager.getWorkspaceVariables(newConfig.filesToIncludes.concat(newConfig.inferedFilesToInclude), newConfig.filesToExcludes); // 👍
+    if (config.searchVariables) {
+      await VariablesManager.getWorkspaceVariables(newConfig.filesToIncludes.concat(newConfig.inferedFilesToInclude), newConfig.filesToExcludes); // 👍
+    }
     return cb();
   });
   config = newConfig;
@@ -508,6 +515,26 @@ function inferFilesToInclude(languagesConfig, filesExtensionsConfig) {
   return unique(filesExtensions);
 }
 
+async function displayVariablesSearchMessage() {
+  const config = workspace.getConfiguration('colorize');
+  const ignoreMessage = config.get('ignore_search_variables_info');
+  if (ignoreMessage === false) {
+    // const updateSetting = 'Update setting';
+    const neverShowAgain = 'Don\'t Show Again';
+    const choice = await window.showWarningMessage('The variables search has been disable by default, if you want to know why please read http://ssss.',
+      // updateSetting,
+      neverShowAgain
+    );
+
+    /* if (choice === updateSetting) {
+      commands.executeCommand('workbench.action.openSettings2');
+    } else */
+    if (choice === neverShowAgain) {
+      await config.update('ignore_search_variables_info', true, true);
+    }
+  }
+}
+
 async function displayFilesExtensionsDeprecationWarning(filesExtensionsConfig: string[]) {
   const config = workspace.getConfiguration('colorize');
   const ignoreWarning = config.get('ignore_files_extensions_deprecation');
@@ -537,13 +564,18 @@ function readConfiguration(): ColorizeConfig {
   const colorizedColors = Array.from(new Set(configuration.get('colorized_colors', []))); // [...new Set(array)] // works too
 
   const filesExtensions = configuration.get('files_extensions', []);
+
   displayFilesExtensionsDeprecationWarning(filesExtensions);
+  displayVariablesSearchMessage();
+
   const languages = configuration.get('languages', []);
 
   const inferedFilesToInclude = inferFilesToInclude(languages, filesExtensions).map(extension => `**/*${extension}`);
 
   const filesToIncludes = Array.from(new Set(configuration.get('include', [])));
   const filesToExcludes = Array.from(new Set(configuration.get('exclude', [])));
+
+  const searchVariables = configuration.get('enable_search_variables', false);
 
   return {
     languages,
@@ -553,7 +585,8 @@ function readConfiguration(): ColorizeConfig {
     colorizedVariables,
     filesToIncludes,
     filesToExcludes,
-    inferedFilesToInclude
+    inferedFilesToInclude,
+    searchVariables
   };
 }
 
@@ -569,7 +602,9 @@ export function activate(context: ExtensionContext) {
   VariablesManager.setupVariablesExtractors(config.colorizedVariables);
   q.push(async cb => {
     try {
-      await VariablesManager.getWorkspaceVariables(config.filesToIncludes.concat(config.inferedFilesToInclude), config.filesToExcludes); // 👍
+      if (config.searchVariables) {
+        await VariablesManager.getWorkspaceVariables(config.filesToIncludes.concat(config.inferedFilesToInclude), config.filesToExcludes); // 👍
+      }
 
       initEventListeners(context);
     } catch (error) {

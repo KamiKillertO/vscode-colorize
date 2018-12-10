@@ -71,7 +71,7 @@
         "colorize.ignore_files_extensions_deprecation": {
           "default": false,
           "type": "boolean",
-          "markdownDescription": "Ignores the warning for `colorize.files_extensions`."
+          "markdownDescription": "Ignore the warning for `colorize.files_extensions`."
         },
         "colorize.include": {
           "type": "array",
@@ -173,6 +173,17 @@
           "title": "Colorize these type of color",
           "type": "array",
           "markdownDescription": "You can specified the type of color that should be colorized by the extension."
+        },
+        "colorize.ignore_search_variables_info": {
+          "default": false,
+          "type": "boolean",
+          "markdownDescription": "Ignore the info message about variables search."
+        },
+        "colorize.enable_search_variables": {
+          "title": "Enable the search for variables at opening time",
+          "default": false,
+          "type": "boolean",
+          "markdownDescription": "Enable the search for variables at opening time. Be careful this setting can cause some performance issues, make sure to read this explanation before setting to true."
         }
       }
     }
