@@ -2,17 +2,16 @@ import VariablesExtractor, { IVariableStrategy } from '../variables-extractor';
 import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../../util/color-util';
 import Variable, { VariableLocation } from '../variable';
 import Color from '../../colors/color';
-import VariablesStore from '../variable-store';
 import ColorExtractor from '../../colors/color-extractor';
 import { EOL } from '../../util/regexp';
+import BaseStrategy from './__strategy-base';
 
 export const REGEXP = new RegExp(`(\\$(?:[_a-z]+[\\-_a-z\\d]*)(?!:))${EOL}`, 'gi');
 export const REGEXP_ONE = new RegExp(`^(\\$(?:[_a-z]+[\\-_a-z\\d]*)(?!:))${EOL}`, 'i');
 export const DECLARATION_REGEXP = new RegExp(`(?:(\\$(?:[_a-z]+[\\-_a-z\\d]*)\\s*):)${EOL}`, 'gi');
 
-class SassExtractor implements IVariableStrategy {
+class SassExtractor extends BaseStrategy implements IVariableStrategy {
   name: string = 'SASS';
-  private store: VariablesStore = new VariablesStore();
 
   public async extractDeclarations(fileName: string, fileLines: DocumentLine[]): Promise<number> {
     return fileLines.map(({text, line}) => this.__extractDeclarations(fileName, text, line)).length;
@@ -32,22 +31,6 @@ class SassExtractor implements IVariableStrategy {
     }
   }
 
-  public getVariableValue(variable: Variable): Color | null {
-    if (this.store.has(variable.name) === false) {
-      return null;
-    }
-    let decoration = this.store.findClosestDeclaration(variable.name, variable.location.fileName);
-    if (decoration.color === undefined) {
-      decoration = this.store.findClosestDeclaration(variable.name, '.');
-    }
-    let color = null;
-
-    if (decoration.color) {
-      color = new Color(variable.color.value, variable.location.position, decoration.color.rgb, decoration.color.alpha);
-    }
-    return color;
-  }
-
   extractVariables(fileName: string, fileLines: DocumentLine[]): Promise<LineExtraction[]> {
     const variables = fileLines.map(({line, text}) => {
       let match = null;
@@ -55,7 +38,6 @@ class SassExtractor implements IVariableStrategy {
       while ((match = REGEXP.exec(text)) !== null) {
         let varName =  match[1];
         varName = varName.trim();
-
         const location: VariableLocation = { fileName, line, position: match.index };
         let variable = new Variable(varName, new Color(varName, match.index, null, null), location, this.name);
         colors.push(variable);
@@ -71,12 +53,6 @@ class SassExtractor implements IVariableStrategy {
       variable = this.store.findClosestDeclaration(match[1], fileName);
     }
     return variable ? variable.color : undefined;
-  }
-  variablesCount() {
-    return this.store.count;
-  }
-  deleteVariable(fileName: string, line: number) {
-    return this.store.delete(null, fileName, line);
   }
 }
 

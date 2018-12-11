@@ -2,17 +2,16 @@ import VariablesExtractor, { IVariableStrategy } from '../variables-extractor';
 import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../../util/color-util';
 import Variable, { VariableLocation } from '../variable';
 import Color from '../../colors/color';
-import VariablesStore from '../variable-store';
 import ColorExtractor from '../../colors/color-extractor';
 import { EOL } from '../../util/regexp';
+import BaseStrategy from './__strategy-base';
 
 export const REGEXP = new RegExp(`(var\\((--(?:[a-z]+[\-_a-z\\d]*))\\))(?!:)${EOL}`, 'gi');
 export const REGEXP_ONE = new RegExp(`^(var\\((--(?:[a-z]+[\-_a-z\\d]*))\\))(?!:)${EOL}`, 'i');
 export const DECLARATION_REGEXP = new RegExp(`(?:(--(?:[a-z]+[\\-_a-z\\d]*)\\s*):)${EOL}`, 'gi');
 
-class CssExtractor implements IVariableStrategy {
+class CssExtractor extends BaseStrategy implements IVariableStrategy {
   public name: string = 'CSS';
-  private store: VariablesStore = new VariablesStore();
 
   public async extractDeclarations(fileName: string, fileLines: DocumentLine[]): Promise<number> {
     return fileLines.map(({text, line}) => this.__extractDeclarations(fileName, text, line)).length;
@@ -52,21 +51,6 @@ class CssExtractor implements IVariableStrategy {
     return flattenLineExtractionsFlatten(variables);
   }
 
-  public getVariableValue(variable: Variable): Color | null {
-    let color = null;
-    if (this.store.has(variable.name) === true) {
-      let decoration = this.store.findClosestDeclaration(variable.name, variable.location.fileName);
-      if (decoration.color === undefined) {
-        decoration = this.store.findClosestDeclaration(variable.name, '.');
-      }
-
-      if (decoration.color) {
-        color = new Color(variable.color.value, variable.location.position, decoration.color.rgb, decoration.color.alpha);
-      }
-    }
-    return color;
-  }
-
   extractVariable(fileName: string, text: string): Color | undefined {
     let match: RegExpMatchArray = text.match(REGEXP_ONE);
     let variable;
@@ -74,12 +58,6 @@ class CssExtractor implements IVariableStrategy {
       variable = this.store.findClosestDeclaration(match[2], fileName);
     }
     return variable ? variable.color : undefined;
-  }
-  variablesCount(): number {
-    return this.store.count;
-  }
-  deleteVariable(fileName: string, line: number) {
-    return this.store.delete(null, fileName, line);
   }
 }
 VariablesExtractor.registerStrategy(new CssExtractor());
