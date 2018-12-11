@@ -1,6 +1,6 @@
 import VariablesExtractor, { IVariableStrategy } from '../variables-extractor';
 import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../../util/color-util';
-import Variable from '../variable';
+import Variable, { VariableLocation } from '../variable';
 import Color from '../../colors/color';
 import VariablesStore from '../variable-store';
 import ColorExtractor from '../../colors/color-extractor';
@@ -26,10 +26,26 @@ class LessExtractor implements IVariableStrategy {
         const decoration = this.store.findDeclaration(varName, fileName, line);
         decoration.update(<Color>color);
       } else {
-        const variable = new Variable(varName, <Color> color, {fileName, line});
+        const variable = new Variable(varName, <Color> color, {fileName, line, position: match.position }, this.name);
         this.store.addEntry(varName, variable); // update entry??
       }
     }
+  }
+
+  public getVariableValue(variable: Variable): Color | null {
+    if (this.store.has(variable.name) === false) {
+      return null;
+    }
+    let decoration = this.store.findClosestDeclaration(variable.name, variable.location.fileName);
+    if (decoration.color === undefined) {
+      decoration = this.store.findClosestDeclaration(variable.name, '.');
+    }
+    let color = null;
+
+    if (decoration.color) {
+      color = new Color(variable.color.value, variable.location.position, decoration.color.rgb, decoration.color.alpha);
+    }
+    return color;
   }
   public extractVariables(fileName: string, fileLines: DocumentLine[]): Promise<LineExtraction[]> {
     const variables = fileLines.map(({line, text}) => {
@@ -38,21 +54,10 @@ class LessExtractor implements IVariableStrategy {
       while ((match = REGEXP.exec(text)) !== null) {
         let varName =  match[1];
         varName = varName.trim();
-        if (this.store.has(varName)) {
-          let decoration = this.store.findClosestDeclaration(varName, fileName);
-          if (decoration.color === undefined) {
-            decoration = this.store.findClosestDeclaration(varName, '.');
-          }
-          let variable;
-          // const declaration = { fileName, line }; //or null
-          const declaration = null;
-          if (decoration.color) {
-            variable = new Variable(varName, new Color(varName, match.index, decoration.color.rgb, decoration.color.alpha), declaration);
-          } else {
-            variable = new Variable(varName, new Color(varName, match.index, null), declaration);
-          }
-          colors.push(variable);
-        }
+
+        const location: VariableLocation = { fileName, line, position: match.index };
+        let variable = new Variable(varName, new Color(varName, match.index, null, null), location, this.name);
+        colors.push(variable);
       }
       return {line, colors};
     });

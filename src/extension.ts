@@ -187,10 +187,6 @@ function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position,
         position.newPosition = position.newPosition + 1;
       }
     });
-    // ?
-  //   for (let i = line.range.start.line; i <= context.editor.document.lineCount; i++) {
-  //     VariablesManager.deleteVariableInLine(extension.editor.document.fileName, i);
-  //   }
   });
 
   return editedLine;
@@ -282,7 +278,7 @@ async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEve
     return {line, text: text[line]};
   });
   try {
-    let variables = [];
+    let variables: LineExtraction[] = [];
     const lines: DocumentLine[] = ColorUtil.textToFileLines(context.editor.document.getText());
     disposeAllVariablesUseDecorations(context);
     await VariablesManager.findVariablesDeclarations(context.editor.document.fileName, lines);
@@ -307,11 +303,8 @@ async function initDecorations(context: ColorizeContext) {
   const fileLines: DocumentLine[] = ColorUtil.textToFileLines(text);
   disposeAllVariablesUseDecorations(context);
   await VariablesManager.findVariablesDeclarations(context.editor.document.fileName, fileLines);
-  let variables = await VariablesManager.findVariables(context.editor.document.fileName, fileLines);
+  let variables: LineExtraction[] = await VariablesManager.findVariables(context.editor.document.fileName, fileLines);
   const colors: LineExtraction[] = await ColorUtil.findColors(fileLines);
-
-  let variables = await VariablesManager.findVariables(context.editor.document.fileName, fileLines);
-
   generateDecorations(colors, variables, context.deco);
   return EditorManager.decorate(context.editor, context.deco, context.currentSelection);
 }
@@ -421,6 +414,7 @@ async function colorize(editor: TextEditor, cb) {
   if (deco) {
     extension.deco = deco;
     extension.nbLine = editor.document.lineCount;
+
     EditorManager.decorate(extension.editor, extension.deco, extension.currentSelection);
   } else {
     extension.nbLine = editor.document.lineCount;

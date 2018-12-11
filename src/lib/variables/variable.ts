@@ -1,8 +1,9 @@
 import Color, { IColor } from '../colors/color';
 
-interface FileDeclaration {
+interface VariableLocation {
   fileName: string;
   line: number;
+  position?: number;
 }
 
 class Variable implements IColor {
@@ -11,14 +12,17 @@ class Variable implements IColor {
 
   public color: Color;
 
-  public declaration: FileDeclaration;
+  public location: VariableLocation;
 
   public id: number;
 
-  public constructor(name: string, color: Color, declaration: FileDeclaration) {
+  public type: string;
+
+  public constructor(name: string, color: Color, location: VariableLocation, type: string) {
     this.name = name;
     this.color = color;
-    this.declaration = declaration;
+    this.location = location;
+    this.type = type;
   }
 
   /**
@@ -40,3 +44,5 @@ class Variable implements IColor {
   }
 }
 export default Variable;
+
+export { VariableLocation };
