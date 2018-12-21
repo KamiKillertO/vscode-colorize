@@ -34,6 +34,10 @@ This extension  your styles files looking for colors and generate a colored back
 The following Visual Studio Code settings are available for the Colorize extension.
 These can be set in user preferences `(cmd+,)` or workspace settings `(.vscode/settings.json)`.
 
+### colorize.enable_search_variables _BOOLEAN_ _default: false
+
+By default colorize display colored backgrounds for known variables (current opened files or previous files). If you set this setting to `true`, colorize will read all files in project (targeted by the settings [colorize.include](#colorizeinclude), [colorize.exlude](#colorizeexclude)
+and [colorize.files_extensions](##deprecated-colorizefiles_extensions-array)) and extract all variables. Thanks to this behavior all variables will have colored background even if you never open the file containing the declaration. _⚠️ use this setting with care as it can slow down you editor for some seconds at opening time_
 
 ### colorize.languages _ARRAY_
 
@@ -58,7 +62,7 @@ Configure glob patterns for excluding files and folders. Colorize will not color
 
 ### [DEPRECATED] colorize.files_extensions _ARRAY_
 
-_⚠️ this setting is deprecated, you should use [colorize.include](#colorizeinclude-array) instead_
+_⚠️ this setting is deprecated, you should use [colorize.include](#colorizeinclude) instead_
 Modified this option to activate colorize for files with the matching extension.
 
 For example if you want to colorize `.diff` files:
