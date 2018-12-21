@@ -1,3 +1,14 @@
+# Changelog
+
+## [current] 0.8.2
+
+- [CHANGE] Disable search variables at boot time
+- [FEATURE] Add a setting to enable/disable variables search at boot time
+
+## 0.8.1
+
+- [FIX] Fix an issue where alpha values with multiples `0` were not correctly colorized (like 0.00 or 1.00).
+
 ## 0.8.0
 
 - [FEATURE] Add two new settings `colorize.include` and `colorize.exclude`. These two settings can be used to add/remove files to the list of files that can be colorized.

@@ -12,10 +12,10 @@ class VariablesStore {
   public get(variable: string, fileName: string = null, line: number = null): Variable[] {
     let decorations = this.entries.get(variable) || [];
     if (fileName !== null) {
-      decorations = decorations.filter(_ => _.declaration.fileName === fileName);
+      decorations = decorations.filter(_ => _.location.fileName === fileName);
     }
     if (line !== null) {
-      decorations = decorations.filter(_ => _.declaration.line === line);
+      decorations = decorations.filter(_ => _.location.line === line);
     }
     return decorations;
   }
@@ -23,9 +23,9 @@ class VariablesStore {
     let decorations = this.get(variable);
 
     if (line !== null) {
-      decorations = decorations.filter(_ => _.declaration.fileName !== fileName || (_.declaration.fileName === fileName && _.declaration.line !== line));
+      decorations = decorations.filter(_ => _.location.fileName !== fileName || (_.location.fileName === fileName && _.location.line !== line));
     } else if (fileName !== null) {
-      decorations = decorations.filter(_ => _.declaration.fileName !== fileName);
+      decorations = decorations.filter(_ => _.location.fileName !== fileName);
     }
     this.entries.set(variable, decorations);
     return;
@@ -108,9 +108,9 @@ class VariablesStore {
     }
     decorations = this.filterDecorations(decorations, file);
     if (line) {
-      decorations = decorations.filter(decoration => decoration.declaration.line === line);
+      decorations = decorations.filter(decoration => decoration.location.line === line);
     } else {
-      decorations = decorations.sort((a, b) => a.declaration.line - b.declaration.line);
+      decorations = decorations.sort((a, b) => a.location.line - b.location.line);
     }
 
     const _closest = decorations[decorations.length - 1];
@@ -124,7 +124,7 @@ class VariablesStore {
   private filterDecorations(decorations, dir) {
     const folder = dirname(dir);
     const r = new RegExp(`^${encodeURI(folder)}`);
-    let decorationsFound = decorations.filter((deco: Variable) => r.test(encodeURI(deco.declaration.fileName)));
+    let decorationsFound = decorations.filter((deco: Variable) => r.test(encodeURI(deco.location.fileName)));
     if (decorationsFound.length !== 0 || folder === dir) {
       return decorationsFound;
     }

@@ -1,18 +1,17 @@
 import VariablesExtractor, { IVariableStrategy } from '../variables-extractor';
 import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../../util/color-util';
-import Variable from '../variable';
+import Variable, { VariableLocation } from '../variable';
 import Color from '../../colors/color';
-import VariablesStore from '../variable-store';
 import ColorExtractor from '../../colors/color-extractor';
 import { EOL } from '../../util/regexp';
+import BaseStrategy from './__strategy-base';
 
 export const REGEXP = new RegExp(`(@(?:[a-z]+[\\-_a-z\\d]*)(?!:))${EOL}`, 'gi');
 export const REGEXP_ONE = new RegExp(`^(@(?:[a-z]+[\\-_a-z\\d]*)(?!:))${EOL}`, 'i');
 export const DECLARATION_REGEXP = new RegExp(`(?:(@(?:[a-z]+[\\-_a-z\\d]*)\\s*):)${EOL}`, 'gi');
 
-class LessExtractor implements IVariableStrategy {
+class LessExtractor extends BaseStrategy implements IVariableStrategy {
   name: string = 'LESS';
-  private store: VariablesStore = new VariablesStore();
 
   public async extractDeclarations(fileName: string, fileLines: DocumentLine[]): Promise<number> {
     return fileLines.map(({text, line}) => this.__extractDeclarations(fileName, text, line)).length;
@@ -26,11 +25,12 @@ class LessExtractor implements IVariableStrategy {
         const decoration = this.store.findDeclaration(varName, fileName, line);
         decoration.update(<Color>color);
       } else {
-        const variable = new Variable(varName, <Color> color, {fileName, line});
+        const variable = new Variable(varName, <Color> color, {fileName, line, position: match.position }, this.name);
         this.store.addEntry(varName, variable); // update entry??
       }
     }
   }
+
   public extractVariables(fileName: string, fileLines: DocumentLine[]): Promise<LineExtraction[]> {
     const variables = fileLines.map(({line, text}) => {
       let match = null;
@@ -38,21 +38,10 @@ class LessExtractor implements IVariableStrategy {
       while ((match = REGEXP.exec(text)) !== null) {
         let varName =  match[1];
         varName = varName.trim();
-        if (this.store.has(varName)) {
-          let decoration = this.store.findClosestDeclaration(varName, fileName);
-          if (decoration.color === undefined) {
-            decoration = this.store.findClosestDeclaration(varName, '.');
-          }
-          let variable;
-          // const declaration = { fileName, line }; //or null
-          const declaration = null;
-          if (decoration.color) {
-            variable = new Variable(varName, new Color(varName, match.index, decoration.color.rgb, decoration.color.alpha), declaration);
-          } else {
-            variable = new Variable(varName, new Color(varName, match.index, null), declaration);
-          }
-          colors.push(variable);
-        }
+
+        const location: VariableLocation = { fileName, line, position: match.index };
+        let variable = new Variable(varName, new Color(varName, match.index, null, null), location, this.name);
+        colors.push(variable);
       }
       return {line, colors};
     });
@@ -65,12 +54,6 @@ class LessExtractor implements IVariableStrategy {
       variable = this.store.findClosestDeclaration(match[1], fileName);
     }
     return variable ? variable.color : undefined;
-  }
-  variablesCount(): number {
-    return this.store.count;
-  }
-  deleteVariable(fileName: string, line: number) {
-    return this.store.delete(null, fileName, line);
   }
 }
 

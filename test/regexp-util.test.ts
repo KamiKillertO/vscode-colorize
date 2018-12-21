@@ -15,6 +15,7 @@ describe('Util regexp (util/regexp.ts)', () => {
     assert.equal(regex_exec('0.0123456789', ALPHA)[0], '0.0123456789', 'Should extract 0.0123456789');
     assert.equal(regex_exec('1.0', ALPHA)[0], '1.0', 'Should extract 1.0');
     assert.equal(regex_exec('.0', ALPHA)[0], '.0', 'Should extract .0');
+    assert.equal(regex_exec('.00', ALPHA)[0], '.00', 'Should extract .00');
     assert.equal(regex_exec('.0123456789', ALPHA)[0], '.0123456789', 'Should extract .0123456789');
   });
 
