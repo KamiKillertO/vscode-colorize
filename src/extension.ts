@@ -473,7 +473,7 @@ function handleConfigurationChanged() {
     // remove event listeners?
     VariablesManager.setupVariablesExtractors(newConfig.colorizedVariables);
 
-    if (config.searchVariables) {
+    if (newConfig.searchVariables) {
       await VariablesManager.getWorkspaceVariables(newConfig.filesToIncludes.concat(newConfig.inferedFilesToInclude), newConfig.filesToExcludes); // 👍
     }
     return cb();
@@ -512,10 +512,11 @@ function inferFilesToInclude(languagesConfig, filesExtensionsConfig) {
 async function displayVariablesSearchMessage() {
   const config = workspace.getConfiguration('colorize');
   const ignoreMessage = config.get('ignore_search_variables_info');
-  if (ignoreMessage === false) {
+  const searchVariables = config.get('enable_search_variables');
+  if (ignoreMessage === false && searchVariables === false) {
     // const updateSetting = 'Update setting';
     const neverShowAgain = 'Don\'t Show Again';
-    const choice = await window.showWarningMessage('The variables search has been disable by default, if you want to know why please read http://ssss.',
+    const choice = await window.showWarningMessage('Some variables might not been colorized by default, if you want to know why you can read this issue https://github.com/KamiKillertO/vscode-colorize/issues/174.',
       // updateSetting,
       neverShowAgain
     );
