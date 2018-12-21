@@ -6,6 +6,7 @@ import {
 } from 'vscode';
 import { generateOptimalTextColor } from '../util/color-util';
 import Variable from './variable';
+import VariablesManager from './variables-manager';
 
 class VariableDecoration {
   /**
@@ -36,10 +37,7 @@ class VariableDecoration {
    * @memberOf ColorDecoration
    */
   get decoration(): TextEditorDecorationType {
-    if (this.hidden || this._decoration === undefined) {
-      this.hidden = false;
-      this._generateDecorator();
-    }
+    this._generateDecorator();
     return this._decoration;
   }
   set decoration(deco: TextEditorDecorationType) {
@@ -91,7 +89,12 @@ class VariableDecoration {
   }
 
   private _generateDecorator() {
-    if (this.variable.color.rgb) {
+    let color = VariablesManager.findVariable(this.variable);
+    if (color) {
+      this.variable.color = color;
+    }
+
+    if (this.variable.color && this.variable.color.rgb) {
       let backgroundDecorationType = window.createTextEditorDecorationType({
         borderWidth: '1px',
         borderStyle: 'solid',

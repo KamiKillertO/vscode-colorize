@@ -1,6 +1,7 @@
 import Color from '../colors/color';
 import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../util/color-util';
 import { IStrategy, Extractor } from '../extractor-mixin';
+import Variable from './variable';
 
 // export class IVariableStrategy { // class instead? // avoid duplication (variablesCount/deleteVariable same code for all extractors)
 export interface IVariableStrategy extends IStrategy {
@@ -8,8 +9,9 @@ export interface IVariableStrategy extends IStrategy {
 
   extractVariables(fileName: string, fileLines: DocumentLine[]): Promise <LineExtraction[]>;
   extractVariable(fileName: string, text: string): Color;
-  variablesCount(): number;
+  getVariableValue(variable);
   deleteVariable(fileName: string, line: number);
+  variablesCount(): number;
 }
 
 class VariablesExtractor extends Extractor {
@@ -27,6 +29,10 @@ class VariablesExtractor extends Extractor {
   }
   public getVariablesCount(): number {
     return this.enabledStrategies.reduce((cv, strategy) => cv + (<IVariableStrategy> strategy).variablesCount(), 0);
+  }
+
+  public findVariable(variable: Variable) {
+    return (<IVariableStrategy>this.get(variable.type)).getVariableValue(variable);
   }
 }
 const instance = new VariablesExtractor();
