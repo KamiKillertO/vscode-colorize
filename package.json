@@ -181,9 +181,9 @@
         },
         "colorize.enable_search_variables": {
           "title": "Enable the search for variables at opening time",
-          "default": false,
+          "default": true,
           "type": "boolean",
-          "markdownDescription": "Enable the search for variables at opening time. Be careful this setting can cause some performance issues, make sure to read this explanation before setting to true."
+          "markdownDescription": "Vhen vscode starts, Colorize fetch all files targeted by the settings `colorize.include`, `colorize.languages` and `colorize.files_extensions` but not the ones targeted by the setting `colorize.exclude`. When the fetch is done, colorize open and parse all files searching for variables. That way variables will be colorized in every files. _⚠️ this setting can slown down your editor a little at opening time, read this [issue](https://github.com/KamiKillertO/vscode-colorize/issues/174) to learn more about it._"
         }
       }
     }
