@@ -1,6 +1,10 @@
 # Changelog
 
-## [current] 0.8.2
+## [current] 0.8.3
+
+- [CHANGE] Enable the search variables at boot time again, but explain why vscode might feel slow at opening time.
+
+## 0.8.2
 
 - [CHANGE] Disable search variables at boot time
 - [FEATURE] Add a setting to enable/disable variables search at boot time
