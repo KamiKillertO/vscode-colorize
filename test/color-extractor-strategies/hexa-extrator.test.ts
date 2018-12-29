@@ -59,6 +59,7 @@ describe('Test CSS hexa color Regex', () => {
     assert.equal(regex_exec('#ffffff\n', REGEXP)[1], '#ffffff');
     assert.equal(regex_exec('#ffffff)', REGEXP)[1], '#ffffff');
     assert.equal(regex_exec('#ffffff}', REGEXP)[1], '#ffffff');
+    assert.equal(regex_exec('#ffffff<', REGEXP)[1], '#ffffff');
   });
   it('Should accept accept an alpha value', function() {
     assert.equal(regex_exec('#00000000', REGEXP)[1], '#00000000');
@@ -92,6 +93,8 @@ describe('Test CSS hexa (with 0x prefix) color Regex', () => {
     assert.equal(regex_exec('0xffffff;', REGEXP)[1], '0xffffff');
     assert.equal(regex_exec('0xffffff\n', REGEXP)[1], '0xffffff');
     assert.equal(regex_exec('0xffffff)', REGEXP)[1], '0xffffff');
+    assert.equal(regex_exec('0xffffff}', REGEXP)[1], '0xffffff');
+    assert.equal(regex_exec('0xffffff<', REGEXP)[1], '0xffffff');
   });
   it('Should accept accept an alpha value', function() {
     assert.equal(regex_exec('0x00000000', REGEXP)[1], '0x00000000');
