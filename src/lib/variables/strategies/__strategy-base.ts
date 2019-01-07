@@ -14,13 +14,13 @@ export default class BaseStrategy {
   public getVariableValue(variable: Variable): Color | null {
     let color = null;
     if (this.store.has(variable.name) === true) {
-      let decoration = this.store.findClosestDeclaration(variable.name, variable.location.fileName);
-      if (decoration.color === undefined) {
-        decoration = this.store.findClosestDeclaration(variable.name, '.');
+      let declaration = this.store.findClosestDeclaration(variable.name, variable.location.fileName);
+      if (declaration.color === undefined) {
+        declaration = this.store.findClosestDeclaration(variable.name, '.');
       }
 
-      if (decoration.color) {
-        color = new Color(variable.color.value, variable.location.position, decoration.color.rgb, decoration.color.alpha);
+      if (declaration.color) {
+        color = new Color(variable.color.value, variable.location.position, declaration.color.rgb, declaration.color.alpha);
       }
     }
     return color;
