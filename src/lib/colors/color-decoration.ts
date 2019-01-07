@@ -36,7 +36,7 @@ class ColorDecoration implements IDecoration {
    * @memberOf ColorDecoration
    */
   get decoration(): TextEditorDecorationType {
-    if (this.hidden) {
+    if (this.hidden === true) {
       this.hidden = false;
       this._generateDecorator();
     }
@@ -47,7 +47,7 @@ class ColorDecoration implements IDecoration {
   }
   public constructor(color: Color) {
     this.color = color;
-    this._generateDecorator();
+    // this._generateDecorator();
   }
   /**
    * Dispose the TextEditorDecorationType
@@ -82,7 +82,16 @@ class ColorDecoration implements IDecoration {
     return new Range(new Position(line, this.color.positionInText), new Position(line, this.color.positionInText + this.color.value.length));
   }
 
+  public shouldGenerateDecoration(): boolean {
+    if (this.disposed === true /* || this.hidden === true */) {
+      return false;
+    }
+
+    return this._decoration === null || this._decoration === undefined || this.hidden ;
+  }
+
   private _generateDecorator() {
+    // console.log(`_generateDecorator for color: ${this.color.value}`)
     let backgroundDecorationType = window.createTextEditorDecorationType({
       borderWidth: '1px',
       borderStyle: 'solid',

@@ -7,6 +7,7 @@ import {
 import { generateOptimalTextColor, IDecoration } from '../util/color-util';
 import Variable from './variable';
 import VariablesManager from './variables-manager';
+import Color from '../colors/color';
 
 class VariableDecoration implements IDecoration {
   /**
@@ -45,7 +46,7 @@ class VariableDecoration implements IDecoration {
   }
   public constructor(variable: Variable, line: number) {
     this.variable = variable;
-    this._generateDecorator();
+    // this._generateDecorator();
     if (this.variable.color) {
       this.generateRange(line);
     } else {
@@ -88,9 +89,27 @@ class VariableDecoration implements IDecoration {
     return range;
   }
 
+  public shouldGenerateDecoration(): boolean {
+    if (this.disposed === true /* || this.hidden === true */) {
+      return false;
+    }
+
+    if (this._decoration === null || this._decoration === undefined || this.hidden) {
+      return true;
+    }
+    let color: Color | null = VariablesManager.findVariable(this.variable);
+
+    const hasChanged: boolean = (color !== null && this.variable.color.value !== color.value);
+    if (hasChanged === true || this.variable.color.rgb === null) {
+      return false
+    }
+    return hasChanged;
+  }
+
   private _generateDecorator() {
     let color = VariablesManager.findVariable(this.variable);
-    if (color) {
+    // console.timeEnd('findVariableValue');
+    if (color && this.variable.color !== color) {
       this.variable.color = color;
     }
 

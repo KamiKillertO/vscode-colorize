@@ -1,6 +1,5 @@
 import { TextEditor } from 'vscode';
 import { IDecoration } from './util/color-util';
-import VariableDecoration from './variables/variable-decoration';
 
 class EditorManager {
 
@@ -40,7 +39,7 @@ class EditorManager {
    */
   public static decorateOneLine(editor: TextEditor, decorations: IDecoration[], line: number) {
     decorations.forEach((decoration: IDecoration) => {
-      if (!(<VariableDecoration>decoration).disposed && decoration.decoration) {
+      if (decoration.shouldGenerateDecoration() === true) {
         editor.setDecorations(decoration.decoration, [decoration.generateRange(line)]);
       }
     });

@@ -9,7 +9,7 @@ export interface IVariableStrategy extends IStrategy {
 
   extractVariables(fileName: string, fileLines: DocumentLine[]): Promise <LineExtraction[]>;
   extractVariable(fileName: string, text: string): Color;
-  getVariableValue(variable);
+  getVariableValue(variable): Color | null;
   deleteVariable(fileName: string, line: number);
   variablesCount(): number;
 }
@@ -31,7 +31,7 @@ class VariablesExtractor extends Extractor {
     return this.enabledStrategies.reduce((cv, strategy) => cv + (<IVariableStrategy> strategy).variablesCount(), 0);
   }
 
-  public findVariable(variable: Variable) {
+  public findVariable(variable: Variable): Color | null {
     return (<IVariableStrategy>this.get(variable.type)).getVariableValue(variable);
   }
 }
