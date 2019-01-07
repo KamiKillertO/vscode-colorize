@@ -5,11 +5,11 @@ import {
   window
 } from 'vscode';
 
-import { generateOptimalTextColor } from '../util/color-util';
+import { generateOptimalTextColor, IDecoration } from '../util/color-util';
 import Color from './color';
 
 
-class ColorDecoration {
+class ColorDecoration implements IDecoration {
   /**
    * The color used to generate the TextEditorDecorationType
    *

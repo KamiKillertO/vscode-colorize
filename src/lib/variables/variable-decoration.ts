@@ -4,11 +4,11 @@ import {
   Position,
   window
 } from 'vscode';
-import { generateOptimalTextColor } from '../util/color-util';
+import { generateOptimalTextColor, IDecoration } from '../util/color-util';
 import Variable from './variable';
 import VariablesManager from './variables-manager';
 
-class VariableDecoration {
+class VariableDecoration implements IDecoration {
   /**
    * The color variable used to generate the TextEditorDecorationType
    *
