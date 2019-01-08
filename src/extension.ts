@@ -442,6 +442,7 @@ async function colorize(editor: TextEditor, cb) {
 
 function handleChangeActiveTextEditor(editor: TextEditor) {
   if (extension.editor !== undefined && extension.editor !== null) {
+    extension.deco.forEach(decorations => decorations.forEach(deco => deco.hide()));
     CacheManager.saveDecorations(extension.editor.document, extension.deco);
   }
   window.visibleTextEditors.filter(e => e !== editor).forEach(e => {
