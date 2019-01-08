@@ -94,12 +94,17 @@ class VariableDecoration implements IDecoration {
       return false;
     }
 
+    let color: Color | null = VariablesManager.findVariable(this.variable);
+
+    if (color === null) {
+      return false;
+    }
+
     if (this._decoration === null || this._decoration === undefined || this.hidden) {
       return true;
     }
-    let color: Color | null = VariablesManager.findVariable(this.variable);
 
-    const hasChanged: boolean = (color !== null && this.variable.color.value !== color.value);
+    const hasChanged: boolean = (this.variable.color.value !== color.value);
     if (hasChanged === true || this.variable.color.rgb === null) {
       return false
     }
