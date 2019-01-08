@@ -290,6 +290,7 @@ async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEve
   try {
     let variables: LineExtraction[] = [];
     const lines: DocumentLine[] = ColorUtil.textToFileLines(context.editor.document.getText());
+    VariablesManager.removeVariablesDeclarations(context.editor.document.fileName);
     await VariablesManager.findVariablesDeclarations(context.editor.document.fileName, lines);
     variables = await VariablesManager.findVariables(context.editor.document.fileName, lines);
 
