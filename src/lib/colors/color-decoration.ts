@@ -28,6 +28,7 @@ class ColorDecoration implements IDecoration {
   public disposed: boolean = false;
   public hidden: boolean = false;
 
+  public currentRange: Range;
   private _decoration: TextEditorDecorationType;
   /**
    * The TextEditorDecorationType associated to the color
@@ -79,7 +80,9 @@ class ColorDecoration implements IDecoration {
    * @memberOf ColorDecoration
    */
   public generateRange(line: number): Range {
-    return new Range(new Position(line, this.color.positionInText), new Position(line, this.color.positionInText + this.color.value.length));
+    const range = new Range(new Position(line, this.color.positionInText), new Position(line, this.color.positionInText + this.color.value.length));
+    this.currentRange = range;
+    return range;
   }
 
   public shouldGenerateDecoration(): boolean {
@@ -91,7 +94,6 @@ class ColorDecoration implements IDecoration {
   }
 
   private _generateDecorator() {
-    // console.log(`_generateDecorator for color: ${this.color.value}`)
     let backgroundDecorationType = window.createTextEditorDecorationType({
       borderWidth: '1px',
       borderStyle: 'solid',

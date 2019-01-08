@@ -254,24 +254,26 @@ function updateContextDecorations(decorations: Map<number, IDecoration[]>, conte
 
 function removeDuplicateDecorations(context: ColorizeContext) {
   let it = context.deco.entries();
-
+  let m: Map<number, IDecoration[]> = new Map();
   let tmp = it.next();
+
   while (!tmp.done) {
     let line = tmp.value[0];
     let decorations = tmp.value[1];
-
     let newDecorations = [];
     decorations.forEach((deco: VariableDecoration, i) => {
-      const exist = newDecorations.find((_: VariableDecoration) => deco.currentRange.isEqual(_.currentRange));
-      if (exist === undefined) {
-        newDecorations.push(deco);
-      } else {
-        deco.dispose();
+      deco.generateRange(line);
+      const exist = newDecorations.findIndex((_: IDecoration) => deco.currentRange.isEqual(_.currentRange));
+      if (exist !== -1) {
+        newDecorations[exist].dispose();
+        newDecorations = newDecorations.filter((_, i) => i === exist);
       }
+      newDecorations.push(deco);
     });
-    context.deco.set(line, newDecorations);
+    m.set(line, newDecorations);
     tmp = it.next();
   }
+  context.deco = m;
 }
 
 async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, cb) {
@@ -298,6 +300,7 @@ async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEve
     removeDuplicateDecorations(context);
     EditorManager.decorate(context.editor, decorations, context.currentSelection);
     updateContextDecorations(decorations, context);
+    removeDuplicateDecorations(context);
   } catch (error) {
   }
   return cb();

@@ -24,6 +24,8 @@ const WHITE = '#FFFFFF',
 
 interface IDecoration {
   decoration: TextEditorDecorationType;
+
+  currentRange: Range;
   /**
    * Dispose the TextEditorDecorationType
    * (destroy the colored background)
@@ -61,7 +63,7 @@ interface IDecoration {
   /**
    * Check if the decoration need to be updated (regenerated)
    * @returns {boolean}
-   * 
+   *
    * @memberof IDecoration
    */
   shouldGenerateDecoration(): boolean;
