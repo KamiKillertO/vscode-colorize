@@ -46,4 +46,4 @@ class EditorManager {
   }
 }
 
-export default  EditorManager;
+export default EditorManager;

@@ -44,9 +44,9 @@ class VariableDecoration implements IDecoration {
   set decoration(deco: TextEditorDecorationType) {
     this._decoration = deco;
   }
+
   public constructor(variable: Variable, line: number) {
     this.variable = variable;
-    // this._generateDecorator();
     if (this.variable.color) {
       this.generateRange(line);
     } else {
@@ -90,30 +90,17 @@ class VariableDecoration implements IDecoration {
   }
 
   public shouldGenerateDecoration(): boolean {
-    if (this.disposed === true /* || this.hidden === true */) {
-      return false;
-    }
-
     let color: Color | null = VariablesManager.findVariable(this.variable);
 
-    if (color === null) {
+    if (this.disposed === true || color === null ) {
       return false;
     }
 
-    if (this._decoration === null || this._decoration === undefined || this.hidden) {
-      return true;
-    }
-
-    const hasChanged: boolean = (this.variable.color.value !== color.value);
-    if (hasChanged === true || this.variable.color.rgb === null) {
-      return false
-    }
-    return hasChanged;
+    return (this._decoration === null || this._decoration === undefined || this.hidden);
   }
 
   private _generateDecorator() {
     let color = VariablesManager.findVariable(this.variable);
-    // console.timeEnd('findVariableValue');
     if (color && this.variable.color !== color) {
       this.variable.color = color;
     }

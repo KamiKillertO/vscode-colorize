@@ -8,7 +8,6 @@ import {
 import { generateOptimalTextColor, IDecoration } from '../util/color-util';
 import Color from './color';
 
-
 class ColorDecoration implements IDecoration {
   /**
    * The color used to generate the TextEditorDecorationType
@@ -37,10 +36,7 @@ class ColorDecoration implements IDecoration {
    * @memberOf ColorDecoration
    */
   get decoration(): TextEditorDecorationType {
-    if (this.hidden === true) {
-      this.hidden = false;
-      this._generateDecorator();
-    }
+    this._generateDecorator();
     return this._decoration;
   }
   set decoration(deco: TextEditorDecorationType) {
@@ -48,7 +44,6 @@ class ColorDecoration implements IDecoration {
   }
   public constructor(color: Color) {
     this.color = color;
-    // this._generateDecorator();
   }
   /**
    * Dispose the TextEditorDecorationType
