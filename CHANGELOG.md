@@ -1,6 +1,10 @@
 # Changelog
 
-## [current] 0.8.3
+## [current] 0.8.4
+
+- [FIX] Remove a blinking effect when updating the content of a variable.
+
+## 0.8.3
 
 - [CHANGE] Enable the search variables at boot time again, but explain why vscode might feel slow at opening time.
 
