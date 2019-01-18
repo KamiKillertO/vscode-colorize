@@ -63,7 +63,9 @@ class ColorDecoration implements IDecoration {
    * @memberOf ColorDecoration
    */
   public hide() {
-    this._decoration.dispose();
+    if (this._decoration) {
+      this._decoration.dispose();
+    }
     this.hidden = true;
   }
   /**

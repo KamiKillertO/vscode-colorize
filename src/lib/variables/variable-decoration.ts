@@ -68,10 +68,9 @@ class VariableDecoration implements IDecoration {
     this.disposed = true;
   }
   public hide(): void {
-    // this.color = null;
-    try {
+    if (this._decoration) {
       this._decoration.dispose();
-    } catch (error) {}
+    }
     this.hidden = true;
   }
 
