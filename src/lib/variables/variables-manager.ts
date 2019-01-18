@@ -21,7 +21,6 @@ class VariablesManager {
     this.statusBar.text = 'Fetching files...';
     this.statusBar.show();
     try {
-      console.time('getWorkspaceVariables');
       const INCLUDE_PATTERN = `{${includePattern.join(',')}}`;
       const EXCLUDE_PATTERN = `{${excludePattern.join(',')}}`;
       let files: Uri[] = await workspace.findFiles(INCLUDE_PATTERN, EXCLUDE_PATTERN);
@@ -77,6 +76,10 @@ class VariablesManager {
 
   public deleteVariableInLine(fileName: string, line: number) {
     VariablesExtractor.deleteVariableInLine(fileName, line);
+  }
+
+  public removeVariablesDeclarations(fileName: string) {
+    VariablesExtractor.removeVariablesDeclarations(fileName);
   }
 }
 

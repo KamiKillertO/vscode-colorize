@@ -4,11 +4,12 @@ import {
   Position,
   window
 } from 'vscode';
-import { generateOptimalTextColor } from '../util/color-util';
+import { generateOptimalTextColor, IDecoration } from '../util/color-util';
 import Variable from './variable';
 import VariablesManager from './variables-manager';
+import Color from '../colors/color';
 
-class VariableDecoration {
+class VariableDecoration implements IDecoration {
   /**
    * The color variable used to generate the TextEditorDecorationType
    *
@@ -43,9 +44,9 @@ class VariableDecoration {
   set decoration(deco: TextEditorDecorationType) {
     this._decoration = deco;
   }
+
   public constructor(variable: Variable, line: number) {
     this.variable = variable;
-    this._generateDecorator();
     if (this.variable.color) {
       this.generateRange(line);
     } else {
@@ -67,10 +68,9 @@ class VariableDecoration {
     this.disposed = true;
   }
   public hide(): void {
-    // this.color = null;
-    try {
+    if (this._decoration) {
       this._decoration.dispose();
-    } catch (error) {}
+    }
     this.hidden = true;
   }
 
@@ -88,9 +88,19 @@ class VariableDecoration {
     return range;
   }
 
+  public shouldGenerateDecoration(): boolean {
+    let color: Color | null = VariablesManager.findVariable(this.variable);
+
+    if (this.disposed === true || color === null ) {
+      return false;
+    }
+
+    return (this._decoration === null || this._decoration === undefined || this.hidden);
+  }
+
   private _generateDecorator() {
     let color = VariablesManager.findVariable(this.variable);
-    if (color) {
+    if (color && this.variable.color !== color) {
       this.variable.color = color;
     }
 
