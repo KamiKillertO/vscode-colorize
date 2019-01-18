@@ -24,6 +24,8 @@ const WHITE = '#FFFFFF',
 
 interface IDecoration {
   decoration: TextEditorDecorationType;
+
+  currentRange: Range;
   /**
    * Dispose the TextEditorDecorationType
    * (destroy the colored background)
@@ -47,17 +49,24 @@ interface IDecoration {
    * @public
    * @memberOf IDecoration
    */
-  disposed: Boolean;
-
+  disposed: boolean;
   /**
    * Generate the decoration Range (start and end position in line)
    *
    * @param {number} line
    * @returns {Range}
    *
-   * @memberOf ColorDecoration
+   * @memberOf IDecoration
    */
   generateRange(line: number): Range;
+
+  /**
+   * Check if the decoration need to be updated (regenerated)
+   * @returns {boolean}
+   *
+   * @memberof IDecoration
+   */
+  shouldGenerateDecoration(): boolean;
 }
 
 class ColorUtil {

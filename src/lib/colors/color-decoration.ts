@@ -5,11 +5,10 @@ import {
   window
 } from 'vscode';
 
-import { generateOptimalTextColor } from '../util/color-util';
+import { generateOptimalTextColor, IDecoration } from '../util/color-util';
 import Color from './color';
 
-
-class ColorDecoration {
+class ColorDecoration implements IDecoration {
   /**
    * The color used to generate the TextEditorDecorationType
    *
@@ -28,6 +27,7 @@ class ColorDecoration {
   public disposed: boolean = false;
   public hidden: boolean = false;
 
+  public currentRange: Range;
   private _decoration: TextEditorDecorationType;
   /**
    * The TextEditorDecorationType associated to the color
@@ -36,10 +36,7 @@ class ColorDecoration {
    * @memberOf ColorDecoration
    */
   get decoration(): TextEditorDecorationType {
-    if (this.hidden) {
-      this.hidden = false;
-      this._generateDecorator();
-    }
+    this._generateDecorator();
     return this._decoration;
   }
   set decoration(deco: TextEditorDecorationType) {
@@ -47,7 +44,6 @@ class ColorDecoration {
   }
   public constructor(color: Color) {
     this.color = color;
-    this._generateDecorator();
   }
   /**
    * Dispose the TextEditorDecorationType
@@ -67,7 +63,9 @@ class ColorDecoration {
    * @memberOf ColorDecoration
    */
   public hide() {
-    this._decoration.dispose();
+    if (this._decoration) {
+      this._decoration.dispose();
+    }
     this.hidden = true;
   }
   /**
@@ -79,7 +77,17 @@ class ColorDecoration {
    * @memberOf ColorDecoration
    */
   public generateRange(line: number): Range {
-    return new Range(new Position(line, this.color.positionInText), new Position(line, this.color.positionInText + this.color.value.length));
+    const range = new Range(new Position(line, this.color.positionInText), new Position(line, this.color.positionInText + this.color.value.length));
+    this.currentRange = range;
+    return range;
+  }
+
+  public shouldGenerateDecoration(): boolean {
+    if (this.disposed === true /* || this.hidden === true */) {
+      return false;
+    }
+
+    return this._decoration === null || this._decoration === undefined || this.hidden ;
   }
 
   private _generateDecorator() {
