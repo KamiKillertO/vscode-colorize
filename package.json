@@ -203,7 +203,7 @@
     "typescript": "2.6.2",
     "mocha": "5.2.0",
     "tslint": "5.9.1",
-    "vscode": "1.1.23"
+    "vscode": "1.1.27"
   },
   "dependencies": {
     "glob-to-regexp": "^0.4.0"
