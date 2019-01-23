@@ -9,9 +9,14 @@ describe('Test variables declaration Regex', () => {
   it('Should match (stylus variables)', function () {
     assert.equal(regex_exec('var=', DECLARATION_REGEXP)[1], 'var', '"var=" should match');
     assert.equal(regex_exec('var-two=', DECLARATION_REGEXP)[1], 'var-two', '"var-two=" should match');
+    assert.equal(regex_exec('var-1=', DECLARATION_REGEXP)[1], 'var-1', '"var-1=" should match');
     assert.equal(regex_exec('var-two-three=', DECLARATION_REGEXP)[1], 'var-two-three', '"var-two-tree=" should match');
+    assert.equal(regex_exec('var_two=', DECLARATION_REGEXP)[1], 'var_two', '"var_two=" should match');
+    assert.equal(regex_exec('var_two_three=', DECLARATION_REGEXP)[1], 'var_two_three', '"var-two-tree=" should match');
     assert.equal(regex_exec('var--two=', DECLARATION_REGEXP)[1], 'var--two', '"var---two=" should match');
     assert.equal(regex_exec('var--two--three=', DECLARATION_REGEXP)[1], 'var--two--three', '"var-two-tree=" should match');
+    assert.equal(regex_exec('var__two=', DECLARATION_REGEXP)[1], 'var__two', '"var__two=" should match');
+    assert.equal(regex_exec('var__two__three=', DECLARATION_REGEXP)[1], 'var__two__three', '"var-two-tree=" should match');
     assert.equal(regex_exec('var-two      =', DECLARATION_REGEXP)[1], 'var-two', '"var-two=" should match');
     assert.equal(regex_exec('a=', DECLARATION_REGEXP)[1], 'a', '"a" should match');
     assert.equal(regex_exec('_=', DECLARATION_REGEXP)[1], '_', '"_" should match');
