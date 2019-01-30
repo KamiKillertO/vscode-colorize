@@ -61,13 +61,13 @@ export default class VariableStrategy {
   }
   extractVariable(fileName: string, text: string): Color | undefined {
     let match: RegExpMatchArray = text.match(this.USE_REGEXP);
-    const varName = this.regexpExtractor.getVariableNameFromUse(match);
     let variable;
     if (match) {
-      variable = this.store.findClosestDeclaration(varName, fileName);
-      // variable = this.store.findClosestDeclaration(match[2], fileName);
+        const varName = this.regexpExtractor.getVariableNameFromUse(match);
+        variable = this.store.findClosestDeclaration(varName, fileName);
+        // variable = this.store.findClosestDeclaration(match[2], fileName);
+      return variable ? variable.color : undefined;
     }
-    return variable ? variable.color : undefined;
   }
 
   /**
