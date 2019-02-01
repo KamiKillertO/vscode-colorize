@@ -54,9 +54,9 @@ describe('Test variables use regexp', function() {
 describe('Test decoration generation', () => {
 
   it('The generated decoration should contain (var)', async function() {
-    const extractor = new CssExtractor();
-    await extractor.extractDeclarations('fileName', [{line: 0, text: '--darken: blue'}]);
-    const variables = await extractor.extractVariables('fileName', [{line: 0, text: 'var(--darken);'}]);
+    // const extractor = new CssExtractor();
+    await CssExtractor.extractDeclarations('fileName', [{line: 0, text: '--darken: blue'}]);
+    const variables = await CssExtractor.extractVariables('fileName', [{line: 0, text: 'var(--darken);'}]);
     assert.lengthOf(variables, 1);
     assert.lengthOf(variables[0].colors, 1);
     const decoration = VariablesManager.generateDecoration(<Variable>variables[0].colors[0], 0);
@@ -67,9 +67,9 @@ describe('Test decoration generation', () => {
   });
 
   it('The generated decoration should surround the variable use', async function() {
-    const extractor = new CssExtractor();
-    await extractor.extractDeclarations('fileName', [{line: 0, text: '--darken: blue'}]);
-    const variables = await extractor.extractVariables('fileName', [{line: 0, text: 'color: var(--darken);'}]);
+    // const extractor = new CssExtractor();
+    await CssExtractor.extractDeclarations('fileName', [{line: 0, text: '--darken: blue'}]);
+    const variables = await CssExtractor.extractVariables('fileName', [{line: 0, text: 'color: var(--darken);'}]);
     assert.lengthOf(variables, 1);
     assert.lengthOf(variables[0].colors, 1);
     const decoration = VariablesManager.generateDecoration(<Variable>variables[0].colors[0], 0);

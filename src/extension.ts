@@ -69,28 +69,9 @@ const q = new Queue();
 
 // Return all map's keys in an array
 function mapKeysToArray(map: Map < number, any > ) {
-  let it = map.keys();
-  let tmp = it.next();
-  let array = [];
-  while (!tmp.done) {
-    array.push(tmp.value);
-    tmp = it.next();
-  }
-  return array;
+  return Array.from(map.keys());
 }
 
-// Check if two arrays are equals
-function arrayEquals(arr1: any[], arr2: any[]): boolean {
-  if (arr1.length !== arr2.length) {
-    return false;
-  }
-  for (let i in arr1) {
-    if (arr1[i] !== arr2[i]) {
-      return false;
-    }
-  }
-  return true;
-}
 
 // Generate a TextDocumentContentChangeEvent like object for one line
 function generateTextDocumentContentChange(line: number, text: string): TextDocumentContentChangeEvent {

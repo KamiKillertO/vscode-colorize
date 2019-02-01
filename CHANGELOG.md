@@ -1,6 +1,11 @@
 # Changelog
 
-## [current] 0.8.4
+## [current] 0.8.5
+
+- [FIX] No more ram pick at boot time
+- [FIX] Stylus variables with underscore are now detected
+
+## 0.8.4
 
 - [FIX] Remove a blinking effect when updating the content of a variable.
 
