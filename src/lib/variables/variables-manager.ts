@@ -6,7 +6,8 @@ import './strategies/css-strategy';
 import './strategies/less-strategy';
 import './strategies/sass-strategy';
 import './strategies/stylus-strategy';
-
+import * as path from 'path';
+import * as fs from 'fs';
 import { workspace, window, StatusBarAlignment, StatusBarItem, Uri, TextDocument } from 'vscode';
 import { DocumentLine, LineExtraction } from '../util/color-util';
 
@@ -35,6 +36,14 @@ class VariablesManager {
     return;
   }
 
+  private textToDocumentLine(text: string): DocumentLine[] {
+    return text.split(/\n/)
+      .map((text, index) => Object({
+        'text': text,
+        'line': index
+      }));
+  }
+
   private getFileContent(file: TextDocument): DocumentLine[] {
     // here deal with files without contents or unreadable content (like images)
     return file.getText()
@@ -47,9 +56,12 @@ class VariablesManager {
 
   private extractFilesVariable(files: Uri[]) {
     return files.map(async(file: Uri) => {
-      const document: TextDocument =  await workspace.openTextDocument(file.path);
-      const content: DocumentLine[] = this.getFileContent(document);
-      return VariablesExtractor.extractDeclarations(document.fileName, content);
+
+      // const document: TextDocument =  await workspace.openTextDocument(file.path);
+    // const content: DocumentLine[] = this.getFileContent(document);
+      const text = fs.readFileSync(file.fsPath, 'utf8');
+      const content: DocumentLine[] = this.textToDocumentLine(text);
+      return VariablesExtractor.extractDeclarations(file.fsPath, content);
     });
   }
 
