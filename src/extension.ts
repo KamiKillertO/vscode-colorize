@@ -77,6 +77,7 @@ function mapKeysToArray(map: Map < number, any > ) {
 function generateTextDocumentContentChange(line: number, text: string): TextDocumentContentChangeEvent {
   return {
     rangeLength: 0,
+    rangeOffset: 0,
     text: text,
     range: new Range(new Position(line, 0), new Position(line, text.length))
   };
