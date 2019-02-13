@@ -505,27 +505,6 @@ function inferFilesToInclude(languagesConfig, filesExtensionsConfig) {
   return unique(filesExtensions);
 }
 
-async function displayVariablesSearchMessage() {
-  const config = workspace.getConfiguration('colorize');
-  const ignoreMessage = config.get('ignore_search_variables_info');
-  const searchVariables = config.get('enable_search_variables');
-  if (ignoreMessage === false && searchVariables === true) {
-    // const updateSetting = 'Update setting';
-    const neverShowAgain = 'Don\'t Show Again';
-    const choice = await window.showWarningMessage('You\'re experiencing some slowing down when vscode start ? You might need to update your settings for colorize, you can learn more about it [here](https://github.com/KamiKillertO/vscode-colorize/issues/174).',
-      // updateSetting,
-      neverShowAgain
-    );
-
-    /* if (choice === updateSetting) {
-      commands.executeCommand('workbench.action.openSettings2');
-    } else */
-    if (choice === neverShowAgain) {
-      await config.update('ignore_search_variables_info', true, true);
-    }
-  }
-}
-
 async function displayFilesExtensionsDeprecationWarning(filesExtensionsConfig: string[]) {
   const config = workspace.getConfiguration('colorize');
   const ignoreWarning = config.get('ignore_files_extensions_deprecation');
@@ -557,7 +536,6 @@ function readConfiguration(): ColorizeConfig {
   const filesExtensions = configuration.get('files_extensions', []);
 
   displayFilesExtensionsDeprecationWarning(filesExtensions);
-  displayVariablesSearchMessage();
 
   const languages = configuration.get('languages', []);
 

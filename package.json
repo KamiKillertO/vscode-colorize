@@ -174,16 +174,16 @@
           "type": "array",
           "markdownDescription": "You can specified the type of color that should be colorized by the extension."
         },
-        "colorize.ignore_search_variables_info": {
+        "colorize.colorize_only_visible_beta": {
           "default": false,
           "type": "boolean",
-          "markdownDescription": "Ignore the info message about variables search."
+          "markdownDescription": "Set to true in order to colorize only what's visible. ⚠️ This feature is still in beta, please report any bug [here](https://github.com/KamiKillertO/vscode-colorize/issues)."
         },
         "colorize.enable_search_variables": {
           "title": "Enable the search for variables at opening time",
           "default": true,
           "type": "boolean",
-          "markdownDescription": "Vhen vscode starts, Colorize fetch all files targeted by the settings `colorize.include`, `colorize.languages` and `colorize.files_extensions` but not the ones targeted by the setting `colorize.exclude`. When the fetch is done, colorize open and parse all files searching for variables. That way variables will be colorized in every files. _⚠️ this setting can slown down your editor a little at opening time, read this [issue](https://github.com/KamiKillertO/vscode-colorize/issues/174) to learn more about it._"
+          "markdownDescription": "When vscode starts, Colorize fetch all files targeted by the settings `colorize.include`, `colorize.languages` and `colorize.files_extensions` but not the ones targeted by the setting `colorize.exclude`. When the fetch is done, colorize open and parse all files searching for variables. That way variables will be colorized in every files. _⚠️ this setting can slown down your editor a little at opening time, read this [issue](https://github.com/KamiKillertO/vscode-colorize/issues/174) to learn more about it._"
         }
       }
     }
