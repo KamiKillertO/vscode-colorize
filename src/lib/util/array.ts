@@ -12,4 +12,9 @@ function unique(arr: any[], f?: callbackFn) {
   return arr.filter((_, i) => vArr.indexOf(vArr[i]) === i);
 }
 
-export { flatten, unique };
+// Return all map's keys in an array
+function mapKeysToArray(map: Map < number, any > ) {
+  return Array.from(map.keys());
+}
+
+export { flatten, unique, mapKeysToArray };
