@@ -42,8 +42,14 @@ class ColorDecoration implements IDecoration {
   set decoration(deco: TextEditorDecorationType) {
     this._decoration = deco;
   }
-  public constructor(color: Color) {
+
+  get rgb() {
+    return this.color.rgb;
+  }
+
+  public constructor(color: Color, line: number) {
     this.color = color;
+    this.generateRange(line);
   }
   /**
    * Dispose the TextEditorDecorationType
@@ -53,8 +59,10 @@ class ColorDecoration implements IDecoration {
    * @memberOf ColorDecoration
    */
   public dispose(): void {
-    this._decoration.dispose();
-    this.disposed = true;
+    try {
+      this._decoration.dispose();
+      this.disposed = true;
+    } catch (error) {}
   }
   /**
    * Hide the TextEditorDecorationType.

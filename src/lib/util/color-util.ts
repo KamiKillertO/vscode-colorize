@@ -25,6 +25,8 @@ const WHITE = '#FFFFFF',
 interface IDecoration {
   decoration: TextEditorDecorationType;
 
+  rgb: number[];
+
   currentRange: Range;
   /**
    * Dispose the TextEditorDecorationType
@@ -94,8 +96,8 @@ class ColorUtil {
     ColorExtractor.enableStrategies(extractors);
   }
 
-  public static generateDecoration(color: IColor): IDecoration {
-    return new ColorDecoration(<Color>color);
+  public static generateDecoration(color: IColor, line: number): IDecoration {
+    return new ColorDecoration(<Color>color, line);
   }
 }
 
