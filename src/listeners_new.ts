@@ -22,29 +22,29 @@ const taskRuner: TasksRunner = new TasksRunner();
 function getDecorationsToColorize(colors, variables): Map<number, IDecoration[]> {
   let decorations = generateDecorations(colors, variables, new Map());
 
+  function filterDuplicated(A, B) {
+    return A.filter((decoration: IDecoration) => {
+      const exist = B.findIndex((_: IDecoration) => {
+        let position = decoration.currentRange.isEqual(_.currentRange);
+        if (decoration.rgb === null && _.rgb !== null) {
+          return false;
+        }
+        let colors = equals(decoration.rgb, _.rgb);
+        return position && colors;
+      });
+     return exist === -1;
+    });
+  }
+
   extension.editor.visibleRanges.forEach(range => {
     let i = range.start.line;
 
     for (i; i <= range.end.line + 1; i++) {
       if (extension.deco.has(i) === true && decorations.has(i) === true) {
         // compare and remove duplicate and remove deleted ones
-        let _ = decorations.get(i).filter((decoration: IDecoration) => {
-          const exist = extension.deco.get(i).findIndex((_: IDecoration) => {
-            let position = decoration.currentRange.isEqual(_.currentRange);
-            if (decoration.rgb === null && _.rgb !== null) {
-              return false;
-            }
-            let colors = equals(decoration.rgb, _.rgb);
-            return position && colors;
-          });
-         return exist === -1;
-        });
-        decorations.set(i, _);
+        decorations.set(i, filterDuplicated(decorations.get(i), extension.deco.get(i)));
       }
 
-      if (!extension.deco.has(i) && decorations.has(i)) {
-        // nothing to do
-      }
       if (extension.deco.has(i) && !decorations.has(i)) {
         // dispose decorations
         extension.deco.get(i).forEach(decoration => decoration.dispose());

@@ -295,6 +295,12 @@ function initEventListeners(context: ExtensionContext) {
   workspace.onDidSaveTextDocument(handleCloseOpen, null, context.subscriptions);
   window.onDidChangeActiveTextEditor(handleChangeActiveTextEditor, null, context.subscriptions);
   workspace.onDidChangeConfiguration(handleConfigurationChanged, null, context.subscriptions);
+
+  if (config.betaCWYS) {
+    NewListeners.setupEventListeners(context);
+  } else {
+    OldListeners.setupEventListeners(context);
+  }
 }
 
 function colorizeVisibleTextEditors() {
@@ -313,11 +319,6 @@ export function activate(context: ExtensionContext) {
         await VariablesManager.getWorkspaceVariables(config.filesToIncludes.concat(config.inferedFilesToInclude), config.filesToExcludes); // 👍
       }
       initEventListeners(context);
-      if (config.betaCWYS) {
-        NewListeners.setupEventListeners(context);
-      } else {
-        OldListeners.setupEventListeners(context);
-      }
     } catch (error) {}
     return cb();
   });
