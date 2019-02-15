@@ -45,6 +45,10 @@ class VariableDecoration implements IDecoration {
     this._decoration = deco;
   }
 
+  get rgb() {
+    return this.variable.color.rgb;
+  }
+
   public constructor(variable: Variable, line: number) {
     this.variable = variable;
     if (this.variable.color) {
