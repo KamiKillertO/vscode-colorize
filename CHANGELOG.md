@@ -1,6 +1,14 @@
 # Changelog
 
-## [current] 0.8.5
+## [current]
+
+## 0.8.6
+
+- [FEATURE] Add a new feature to colorize/update only the visible text. The feature is in beta and activable using the new setting `colorize_only_visible_beta`.
+- [FIX] Remove the warning message about variables search as it's not a problem anymore.
+- [FIX] Set property `rangeBehavior` to `ClosedClosed` to make sure a decoration never expand
+
+## 0.8.5
 
 - [FIX] No more ram pick at boot time
 - [FIX] Stylus variables with underscore are now detected
