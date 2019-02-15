@@ -2,7 +2,8 @@ import {
   Range,
   TextEditorDecorationType,
   Position,
-  window
+  window,
+  DecorationRangeBehavior
 } from 'vscode';
 import { generateOptimalTextColor, IDecoration } from '../util/color-util';
 import Variable from './variable';
@@ -114,7 +115,8 @@ class VariableDecoration implements IDecoration {
         borderStyle: 'solid',
         borderColor: this.variable.color.toRgbString(),
         backgroundColor: this.variable.color.toRgbString(),
-        color: generateOptimalTextColor(this.variable.color)
+        color: generateOptimalTextColor(this.variable.color),
+        rangeBehavior: DecorationRangeBehavior.ClosedClosed
       });
       this._decoration = backgroundDecorationType;
     }
