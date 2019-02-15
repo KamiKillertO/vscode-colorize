@@ -15,7 +15,7 @@ import EditorManager from './lib/editor-manager';
 import { mapKeysToArray } from './lib/util/array';
 import VariableDecoration from './lib/variables/variable-decoration';
 import { mutEditedLIne } from './lib/util/mut-edited-line';
-import { extension, q, ColorizeContext, updateContextDecorations, generateDecorations, removeDuplicateDecorations } from './extension';
+import { extension, q, ColorizeContext, updateContextDecorations, generateDecorations, removeDuplicateDecorations, cleanDecorationList } from './extension';
 
 function updatePositionsDeletion(range, positions) {
   let rangeLength = range.end.line - range.start.line;
@@ -140,18 +140,6 @@ async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEve
     updateContextDecorations(decorations, context);
     removeDuplicateDecorations(context);
   } catch (error) {
-  }
-  return cb();
-}
-
-function cleanDecorationList(context: ColorizeContext, cb) {
-  let it = context.deco.entries();
-  let tmp = it.next();
-  while (!tmp.done) {
-    let line = tmp.value[0];
-    let decorations = tmp.value[1];
-    context.deco.set(line, decorations.filter(decoration => !decoration.disposed));
-    tmp = it.next();
   }
   return cb();
 }

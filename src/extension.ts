@@ -333,4 +333,15 @@ export function deactivate() {
   CacheManager.clearCache();
 }
 
-export { canColorize, ColorizeContext, colorize, config, extension, q, updateContextDecorations, generateDecorations, removeDuplicateDecorations };
+export {
+  canColorize,
+  ColorizeContext,
+  colorize,
+  config,
+  extension,
+  q,
+  updateContextDecorations,
+  generateDecorations,
+  removeDuplicateDecorations,
+  cleanDecorationList
+};
