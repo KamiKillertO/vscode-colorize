@@ -177,7 +177,7 @@
         "colorize.colorize_only_visible_beta": {
           "default": false,
           "type": "boolean",
-          "markdownDescription": "Set to true in order to colorize only what's visible. ⚠️ This feature is still in beta, please report any bug [here](https://github.com/KamiKillertO/vscode-colorize/issues)."
+          "markdownDescription": "By default all colors in a file are colorized and updated when needed, with this feature only what you see will be colorized/updated. ⚠️ This feature is still in beta, please report any bug [here](https://github.com/KamiKillertO/vscode-colorize/issues). ⚠️ A reload is required after any change to this setting."
         },
         "colorize.enable_search_variables": {
           "title": "Enable the search for variables at opening time",

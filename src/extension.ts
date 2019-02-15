@@ -9,7 +9,7 @@ import {
   TextDocument,
   TextEditorSelectionChangeEvent,
   Selection,
-  Range,
+  Range
 } from 'vscode';
 import Variable from './lib/variables/variable';
 import ColorUtil, { IDecoration, DocumentLine, LineExtraction } from './lib/util/color-util';
