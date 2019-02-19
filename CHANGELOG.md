@@ -1,6 +1,9 @@
 # Changelog
 
-## [current]
+## [current] 0.8.7
+
+- [FIX] Don't try to colorize one more line than the visible range when it's the end of the file
+- [CHANGE] Remove the wait time before generating decorations on scroll
 
 ## 0.8.6
 
