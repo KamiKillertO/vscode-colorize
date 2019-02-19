@@ -73,7 +73,7 @@ function getCurrentRangeText(): DocumentLine[] {
 // Need to regenerate  variables decorations when base as changed
 function* handleVisibleRangeEvent() {
   // trigger on ctrl + z ????
-  yield new Promise(resolve => setTimeout(resolve, 50));
+  // yield new Promise(resolve => setTimeout(resolve, 50));
   let text = extension.editor.document.getText();
   const fileLines: DocumentLine[] = ColorUtil.textToFileLines(text);
   let lines = getCurrentRangeText();
