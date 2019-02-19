@@ -62,7 +62,9 @@ function getCurrentRangeText(): DocumentLine[] {
   extension.editor.visibleRanges.forEach((range: Range) => {
     let i = range.start.line;
     for (i; i <= range.end.line + 1; i++) {
+      if (fileLines[i].line !== null) {
         lines.push(fileLines[i]);
+      }
     }
   });
   return lines;
