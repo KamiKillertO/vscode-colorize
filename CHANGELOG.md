@@ -1,6 +1,10 @@
 # Changelog
 
-## [current] 0.8.7
+## [current] 0.8.8
+
+- [FIX] Some bugfixes for `colorize_only_visible_beta`
+
+## 0.8.7
 
 - [FIX] Don't try to colorize one more line than the visible range when it's the end of the file
 - [CHANGE] Remove the wait time before generating decorations on scroll
