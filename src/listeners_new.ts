@@ -72,6 +72,8 @@ function getCurrentRangeText(): DocumentLine[] {
 
 // Need to regenerate  variables decorations when base as changed
 function* handleVisibleRangeEvent() {
+  console.log('handleVisibleRangeEvent')
+
   // trigger on ctrl + z ????
   // yield new Promise(resolve => setTimeout(resolve, 50));
   let text = extension.editor.document.getText();
@@ -119,8 +121,8 @@ function cleanDecorationMap(decorations: Map<number, IDecoration[]>) {
   }
 }
 
-let taskRunerQ: TasksRunner = new TasksRunner();
 function handleChangeTextDocument(event: TextDocumentChangeEvent) {
+  console.log('update')
   if (extension.editor && event.document.fileName === extension.editor.document.fileName) {
     extension.editor = window.activeTextEditor;
     let editedLine = event.contentChanges;
@@ -130,7 +132,7 @@ function handleChangeTextDocument(event: TextDocumentChangeEvent) {
       editedLine = handleLineDiff(editedLine, extension, diffLine);
       extension.nbLine = extension.editor.document.lineCount;
     }
-    taskRunerQ.run(updateDecorations);
+    taskRuner.run(updateDecorations);
   }
 }
 
