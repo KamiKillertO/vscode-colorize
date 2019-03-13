@@ -62,7 +62,7 @@ function getCurrentRangeText(): DocumentLine[] {
   extension.editor.visibleRanges.forEach((range: Range) => {
     let i = range.start.line;
     for (i; i <= range.end.line + 1; i++) {
-      if (fileLines[i].line !== null) {
+      if (fileLines[i] && fileLines[i].line !== null) {
         lines.push(fileLines[i]);
       }
     }
@@ -91,6 +91,7 @@ function* handleVisibleRangeEvent() {
 
 
 function* updateDecorations() {
+  console.log('update')
   yield new Promise(resolve => setTimeout(resolve, 50));
   const fileName = extension.editor.document.fileName;
   const fileLines: DocumentLine[] = ColorUtil.textToFileLines(extension.editor.document.getText());
@@ -122,7 +123,9 @@ function cleanDecorationMap(decorations: Map<number, IDecoration[]>) {
 }
 
 function handleChangeTextDocument(event: TextDocumentChangeEvent) {
-  console.log('update')
+  if (event.contentChanges.length === 0) {
+    return;
+  }
   if (extension.editor && event.document.fileName === extension.editor.document.fileName) {
     extension.editor = window.activeTextEditor;
     let editedLine = event.contentChanges;
