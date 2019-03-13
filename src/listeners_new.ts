@@ -14,7 +14,7 @@ import EditorManager from './lib/editor-manager';
 import { equals } from './lib/util/array';
 import TasksRunner from './lib/tasks-runner';
 import { extension, updateContextDecorations, generateDecorations, removeDuplicateDecorations } from './extension';
-import { handleLineDiff } from './listeners_old';
+import { handleLineDiff, disposeDecorationsForEditedLines } from './listeners_old';
 
 const taskRuner: TasksRunner = new TasksRunner();
 
@@ -135,6 +135,7 @@ function handleChangeTextDocument(event: TextDocumentChangeEvent) {
       editedLine = handleLineDiff(editedLine, extension, diffLine);
       extension.nbLine = extension.editor.document.lineCount;
     }
+    disposeDecorationsForEditedLines(editedLine, extension);
     taskRuner.run(updateDecorations);
   }
 }
