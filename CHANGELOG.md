@@ -1,6 +1,10 @@
 # Changelog
 
-## [current] 0.8.8
+## [current] 0.8.9
+
+- [FIX] Some bugfixes and crashfixes for `colorize_only_visible_beta`
+
+## 0.8.8
 
 - [FIX] Some bugfixes for `colorize_only_visible_beta`
 
