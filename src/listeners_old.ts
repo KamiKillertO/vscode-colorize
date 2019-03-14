@@ -112,17 +112,27 @@ function updateDecorations(editedLine: TextDocumentContentChangeEvent[], context
   checkDecorationForUpdate(editedLine, context, cb);
 }
 
-async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, cb) {
-  const text = context.editor.document.getText().split(/\n/);
-  const fileLines: DocumentLine[] = editedLine.map(({range}: TextDocumentContentChangeEvent) => {
+function disposeDecorationsForEditedLines(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext) {
+  editedLine.map(({range}: TextDocumentContentChangeEvent) => {
     const line = range.start.line;
     if (context.deco.has(line)) {
       context.deco.get(line).forEach(decoration => {
         decoration.dispose();
       });
     }
-    return {line, text: text[line]};
   });
+}
+
+function getTextForEditedLines(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext): DocumentLine[] {
+  const text = context.editor.document.getText().split(/\n/);
+  return editedLine.map(({range: {start: { line }}}: TextDocumentContentChangeEvent) => Object({line, text: text[line]}));
+}
+
+
+async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, cb) {
+
+  disposeDecorationsForEditedLines(editedLine, context);
+  const fileLines: DocumentLine[] = getTextForEditedLines(editedLine, context);
 
   try {
     let variables: LineExtraction[] = [];
@@ -158,4 +168,4 @@ function setupEventListeners(context: ExtensionContext) {
 }
 
 export default { setupEventListeners };
-export { handleLineDiff };
+export { handleLineDiff, disposeDecorationsForEditedLines };
