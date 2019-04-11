@@ -1,5 +1,6 @@
 import Color, {IColor} from '../colors/color';
 import '../colors/strategies/hexa-strategy';
+import '../colors/strategies/argb-strategy';
 import '../colors/strategies/rgb-strategy';
 import '../colors/strategies/browser-strategy';
 import '../colors/strategies/hsl-strategy';
@@ -24,6 +25,8 @@ const WHITE = '#FFFFFF',
 
 interface IDecoration {
   decoration: TextEditorDecorationType;
+
+  rgb: number[];
 
   currentRange: Range;
   /**
@@ -94,8 +97,8 @@ class ColorUtil {
     ColorExtractor.enableStrategies(extractors);
   }
 
-  public static generateDecoration(color: IColor): IDecoration {
-    return new ColorDecoration(<Color>color);
+  public static generateDecoration(color: IColor, line: number): IDecoration {
+    return new ColorDecoration(<Color>color, line);
   }
 }
 

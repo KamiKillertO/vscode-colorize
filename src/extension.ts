@@ -5,18 +5,11 @@ import {
   window,
   workspace,
   ExtensionContext,
-  extensions,
   TextEditor,
-  Range,
   TextDocument,
-  Position,
-  TextDocumentChangeEvent,
-  TextDocumentContentChangeEvent,
   TextEditorSelectionChangeEvent,
   Selection,
-  WorkspaceConfiguration,
-  Extension,
-  commands
+  Range
 } from 'vscode';
 import Variable from './lib/variables/variable';
 import ColorUtil, { IDecoration, DocumentLine, LineExtraction } from './lib/util/color-util';
@@ -24,21 +17,13 @@ import Queue from './lib/queue';
 import VariablesManager from './lib/variables/variables-manager';
 import CacheManager from './lib/cache-manager';
 import EditorManager from './lib/editor-manager';
-import { flatten, unique } from './lib/util/array';
 import * as globToRegexp from 'glob-to-regexp';
 import VariableDecoration from './lib/variables/variable-decoration';
+import { getColorizeConfig, ColorizeConfig } from './lib/colorize-config';
 
-interface ColorizeConfig {
-  languages: string[];
-  filesExtensions: RegExp[];
-  isHideCurrentLineDecorations: boolean;
-  colorizedVariables: string[];
-  colorizedColors: string[];
-  filesToExcludes: string[];
-  filesToIncludes: string[];
-  inferedFilesToInclude: string[];
-  searchVariables: boolean;
-}
+import OldListeners from './listeners_old';
+import NewListeners from './listeners_new';
+
 let config: ColorizeConfig = {
   languages: [],
   filesExtensions: [],
@@ -48,7 +33,8 @@ let config: ColorizeConfig = {
   filesToExcludes: [],
   filesToIncludes: [],
   inferedFilesToInclude: [],
-  searchVariables: false
+  searchVariables: false,
+  betaCWYS: false
 };
 
 interface ColorizeContext {
@@ -67,157 +53,26 @@ let extension: ColorizeContext = {
 
 const q = new Queue();
 
-// Return all map's keys in an array
-function mapKeysToArray(map: Map < number, any > ) {
-  return Array.from(map.keys());
-}
-
-
-// Generate a TextDocumentContentChangeEvent like object for one line
-function generateTextDocumentContentChange(line: number, text: string): TextDocumentContentChangeEvent {
-  return {
-    rangeLength: 0,
-    text: text,
-    range: new Range(new Position(line, 0), new Position(line, text.length))
-  };
-}
-// Split the TextDocumentContentChangeEvent into multiple line if the added text contain multiple lines
-// example :
-//  let editedLine = [{
-//  rangeLength: 0,
-//  text: 'a\nb\nc\n',
-//  range: {start:{line:1}, end:{line:1}}
-// }]
-// became
-//  let editedLine = [{
-//  rangeLength: 0,
-//  text: 'a',
-//  range: {start:{line:1,/*...*/}, end:{line:1,/*...*/}}
-// }, {
-//  rangeLength: 0,
-//  text: 'b',
-//  range: {start:{line:2,/*...*/}, end:{line:2,/*...*/}}
-// }, {
-//  rangeLength: 0,
-//  text: 'c',
-//  range: {start:{line:3,/*...*/}, end:{line:3,/*...*/}}
-// }, {
-//  rangeLength: 0,
-//  text: '',
-//  range: {start:{line:4,/*...*/}, end:{line:4,/*...*/}}
-// }]
-//
-function mutEditedLIne(editedLine: TextDocumentContentChangeEvent[]): TextDocumentContentChangeEvent[] {
-  let newEditedLine: TextDocumentContentChangeEvent[] = [];
-  let startLine = 0;
-  let before = 0;
-  editedLine.reverse();
-  editedLine.forEach(line => {
-    let a = line.text.match(/\n/g);
-    startLine = line.range.start.line + before;
-    line.text.split(/\n/).map((text, i, array) => {
-      if (i === 0 && text === '' && array.length === 1) {
-        startLine++;
-      } else {
-        newEditedLine.push(generateTextDocumentContentChange(startLine++, text));
-      }
-      before++;
+async function initDecorations(context: ColorizeContext) {
+  if (!context.editor) {
+    return;
+  }
+  let text = context.editor.document.getText();
+  const fileLines: DocumentLine[] = ColorUtil.textToFileLines(text);
+  let lines: DocumentLine[] = [];
+  if (config.betaCWYS) {
+    context.editor.visibleRanges.forEach((range: Range) => {
+      lines = lines.concat(fileLines.slice(range.start.line, range.end.line + 2));
     });
-    before--;
-  });
-  return newEditedLine;
-}
-
-function updatePositionsDeletion(range, positions) {
-  let rangeLength = range.end.line - range.start.line;
-  positions.forEach(position => {
-    if (position.newPosition === null) {
-      return;
-    }
-    if (position.oldPosition > range.start.line && position.oldPosition <= range.end.line) {
-      position.newPosition = null;
-      return;
-    }
-    if (position.oldPosition >= range.end.line) {
-      position.newPosition = position.newPosition - rangeLength;
-    }
-    if (position.newPosition < 0) {
-      position.newPosition = 0;
-    }
-  });
-  return positions;
-}
-
-function handleLineRemoved(editedLine: TextDocumentContentChangeEvent[], positions, context: ColorizeContext) {
-  editedLine.reverse();
-  editedLine.forEach((line: TextDocumentContentChangeEvent) => {
-    for (let i = line.range.start.line; i <= line.range.end.line; i++) {
-    // ?
-    // for (let i = line.range.start.line; i <= context.editor.document.lineCount; i++) {
-      VariablesManager.deleteVariableInLine(extension.editor.document.fileName, i);
-    }
-    positions = updatePositionsDeletion(line.range, positions);
-  });
-  return editedLine;
-}
-
-function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position, context: ColorizeContext) {
-  editedLine = mutEditedLIne(editedLine);
-  editedLine.forEach((line) => {
-    position.forEach(position => {
-      if (position.newPosition >= line.range.start.line) {
-        position.newPosition = position.newPosition + 1;
-      }
-    });
-  });
-
-  return editedLine;
-}
-
-function filterPositions(position, deco, diffLine) {
-  if (position.newPosition === null) {
-    deco.get(position.oldPosition).forEach(decoration => decoration.dispose());
-    return false;
-  }
-  if (position.newPosition === 0 && extension.editor.document.lineCount === 1 && extension.editor.document.lineAt(0).text === '') {
-    deco.get(position.oldPosition).forEach(decoration => decoration.dispose());
-    return false;
-  }
-  if (Math.abs(position.oldPosition - position.newPosition) > Math.abs(diffLine)) {
-    position.newPosition = position.oldPosition + diffLine;
-  }
-  return true;
-}
-
-function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, diffLine: number) {
-  let positions = mapKeysToArray(context.deco).map(position => Object({
-    oldPosition: position,
-    newPosition: position
-  }));
-
-  if (diffLine < 0) {
-    editedLine = handleLineRemoved(editedLine, positions, context);
   } else {
-    editedLine = handleLineAdded(editedLine, positions, context);
+    lines = fileLines;
   }
-  positions = positions.filter(position => filterPositions(position, context.deco, diffLine));
-  context.deco = positions.reduce((decorations, position) => {
-    if (decorations.has(position.newPosition)) {
-      return decorations.set(position.newPosition, decorations.get(position.newPosition).concat(context.deco.get(position.oldPosition)));
-    }
-    return decorations.set(position.newPosition, context.deco.get(position.oldPosition));
-  }, new Map());
-  return editedLine;
-}
-
-function updateDecorations(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, cb: Function) {
-  let diffLine = context.editor.document.lineCount - context.nbLine;
-  let positions;
-  if (diffLine !== 0) {
-    editedLine = handleLineDiff(editedLine, context, diffLine);
-    context.nbLine = context.editor.document.lineCount;
-  }
-  checkDecorationForUpdate(editedLine, context, cb);
+  // removeDuplicateDecorations(context);
+  await VariablesManager.findVariablesDeclarations(context.editor.document.fileName, fileLines);
+  let variables: LineExtraction[] = await VariablesManager.findVariables(context.editor.document.fileName, lines);
+  const colors: LineExtraction[] = await ColorUtil.findColors(lines);
+  generateDecorations(colors, variables, context.deco);
+  return EditorManager.decorate(context.editor, context.deco, context.currentSelection);
 }
 function updateContextDecorations(decorations: Map<number, IDecoration[]>, context: ColorizeContext) {
   let it = decorations.entries();
@@ -247,7 +102,7 @@ function removeDuplicateDecorations(context: ColorizeContext) {
       const exist = newDecorations.findIndex((_: IDecoration) => deco.currentRange.isEqual(_.currentRange));
       if (exist !== -1) {
         newDecorations[exist].dispose();
-        newDecorations = newDecorations.filter((_, i) => i === exist);
+        newDecorations = newDecorations.filter((_, i) => i !== exist);
       }
       newDecorations.push(deco);
     });
@@ -255,52 +110,6 @@ function removeDuplicateDecorations(context: ColorizeContext) {
     tmp = it.next();
   }
   context.deco = m;
-}
-
-async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, cb) {
-  const text = context.editor.document.getText().split(/\n/);
-  const fileLines: DocumentLine[] = editedLine.map(({range}: TextDocumentContentChangeEvent) => {
-    const line = range.start.line;
-    if (context.deco.has(line)) {
-      context.deco.get(line).forEach(decoration => {
-        decoration.dispose();
-      });
-    }
-    return {line, text: text[line]};
-  });
-  try {
-    let variables: LineExtraction[] = [];
-    const lines: DocumentLine[] = ColorUtil.textToFileLines(context.editor.document.getText());
-    VariablesManager.removeVariablesDeclarations(context.editor.document.fileName);
-    await VariablesManager.findVariablesDeclarations(context.editor.document.fileName, lines);
-    variables = await VariablesManager.findVariables(context.editor.document.fileName, lines);
-
-    const colors: LineExtraction[] = await ColorUtil.findColors(fileLines, context.editor.document.fileName);
-
-    const decorations = generateDecorations(colors, variables, new Map());
-
-    removeDuplicateDecorations(context);
-    EditorManager.decorate(context.editor, decorations, context.currentSelection);
-    updateContextDecorations(decorations, context);
-    removeDuplicateDecorations(context);
-  } catch (error) {
-  }
-  return cb();
-}
-
-async function initDecorations(context: ColorizeContext) {
-  if (!context.editor) {
-    return;
-  }
-  let text = context.editor.document.getText();
-
-  const fileLines: DocumentLine[] = ColorUtil.textToFileLines(text);
-  // removeDuplicateDecorations(context);
-  await VariablesManager.findVariablesDeclarations(context.editor.document.fileName, fileLines);
-  let variables: LineExtraction[] = await VariablesManager.findVariables(context.editor.document.fileName, fileLines);
-  const colors: LineExtraction[] = await ColorUtil.findColors(fileLines);
-  generateDecorations(colors, variables, context.deco);
-  return EditorManager.decorate(context.editor, context.deco, context.currentSelection);
 }
 
 function updateDecorationMap(map: Map<number, IDecoration[]>, line: number, decoration: IDecoration ) {
@@ -313,7 +122,7 @@ function updateDecorationMap(map: Map<number, IDecoration[]>, line: number, deco
 function generateDecorations(colors: LineExtraction[], variables: LineExtraction[], decorations: Map<number, IDecoration[]>) {
 
   colors.map(({line, colors}) => colors.forEach((color) => {
-    const decoration = ColorUtil.generateDecoration(color);
+    const decoration = ColorUtil.generateDecoration(color, line);
     updateDecorationMap(decorations, line, decoration);
   }));
   variables.map(({line, colors}) => colors.forEach((variable) => {
@@ -353,7 +162,6 @@ function isIncludedFile(fileName: string): boolean {
   return config.filesToIncludes.find((globPattern: string) => globToRegexp(globPattern).test(fileName)) !== undefined;
 }
 
-
 /**
  * Check if a file can be colorized by COLORIZE
  *
@@ -363,6 +171,7 @@ function isIncludedFile(fileName: string): boolean {
 function canColorize(document: TextDocument) { // update to use filesToExcludes. Remove `isLanguageSupported` ? checking path with file extension or include glob pattern should be enough
   return isLanguageSupported(document.languageId) || isFileExtensionSupported(document.fileName) || isIncludedFile(document.fileName);
 }
+
 function handleTextSelectionChange(event: TextEditorSelectionChangeEvent, cb: Function) {
   if (!config.isHideCurrentLineDecorations || event.textEditor !== extension.editor) {
     return cb();
@@ -444,13 +253,13 @@ function cleanDecorationList(context: ColorizeContext, cb) {
   return cb();
 }
 
-function handleChangeTextDocument(event: TextDocumentChangeEvent) {
-  if (extension.editor && event.document.fileName === extension.editor.document.fileName) {
-    extension.editor = window.activeTextEditor;
-    q.push((cb) => updateDecorations(event.contentChanges, extension, cb));
-    q.push((cb) => cleanDecorationList(extension, cb));
-  }
-}
+// function handleChangeTextDocument(event: TextDocumentChangeEvent) {
+//   if (extension.editor && event.document.fileName === extension.editor.document.fileName) {
+//     extension.editor = window.activeTextEditor;
+//     q.push((cb) => updateDecorations(event.contentChanges, extension, cb));
+//     q.push((cb) => cleanDecorationList(extension, cb));
+//   }
+// }
 
 function clearCache() {
   extension.deco.clear();
@@ -459,7 +268,7 @@ function clearCache() {
 }
 
 function handleConfigurationChanged() {
-  const newConfig = readConfiguration();
+  const newConfig = getColorizeConfig();
   clearCache();
   // delete current decorations then regenerate decorations
   ColorUtil.setupColorsExtractors(newConfig.colorizedColors);
@@ -478,106 +287,20 @@ function handleConfigurationChanged() {
 }
 
 function initEventListeners(context: ExtensionContext) {
+  // workspace.onDidChangeTextDocument(handleChangeTextDocument, null, context.subscriptions);
+
   window.onDidChangeTextEditorSelection((event) => q.push((cb) => handleTextSelectionChange(event, cb)), null, context.subscriptions);
+
   workspace.onDidCloseTextDocument(handleCloseOpen, null, context.subscriptions);
   workspace.onDidSaveTextDocument(handleCloseOpen, null, context.subscriptions);
   window.onDidChangeActiveTextEditor(handleChangeActiveTextEditor, null, context.subscriptions);
-  workspace.onDidChangeTextDocument(handleChangeTextDocument, null, context.subscriptions);
   workspace.onDidChangeConfiguration(handleConfigurationChanged, null, context.subscriptions);
-}
 
-function inferFilesToInclude(languagesConfig, filesExtensionsConfig) {
-  let ext: Extension<any>[] = extensions.all;
-  let filesExtensions = [];
-
-  ext.forEach(extension => {
-    if (extension.packageJSON && extension.packageJSON.contributes && extension.packageJSON.contributes.languages) {
-      extension.packageJSON.contributes.languages.forEach(language => {
-        if (languagesConfig.indexOf(language.id) !== -1) {
-          filesExtensions = filesExtensions.concat(language.extensions);
-        }
-      });
-    }
-  });
-  filesExtensions = flatten(filesExtensions); // get all languages with their files extensions ^^. Now need to filter with the one set in config
-  filesExtensions = filesExtensions.concat(filesExtensionsConfig);
-  return unique(filesExtensions);
-}
-
-async function displayVariablesSearchMessage() {
-  const config = workspace.getConfiguration('colorize');
-  const ignoreMessage = config.get('ignore_search_variables_info');
-  const searchVariables = config.get('enable_search_variables');
-  if (ignoreMessage === false && searchVariables === true) {
-    // const updateSetting = 'Update setting';
-    const neverShowAgain = 'Don\'t Show Again';
-    const choice = await window.showWarningMessage('You\'re experiencing some slowing down when vscode start ? You might need to update your settings for colorize, you can learn more about it [here](https://github.com/KamiKillertO/vscode-colorize/issues/174).',
-      // updateSetting,
-      neverShowAgain
-    );
-
-    /* if (choice === updateSetting) {
-      commands.executeCommand('workbench.action.openSettings2');
-    } else */
-    if (choice === neverShowAgain) {
-      await config.update('ignore_search_variables_info', true, true);
-    }
+  if (config.betaCWYS) {
+    NewListeners.setupEventListeners(context);
+  } else {
+    OldListeners.setupEventListeners(context);
   }
-}
-
-async function displayFilesExtensionsDeprecationWarning(filesExtensionsConfig: string[]) {
-  const config = workspace.getConfiguration('colorize');
-  const ignoreWarning = config.get('ignore_files_extensions_deprecation');
-
-  if (filesExtensionsConfig.length > 0 && ignoreWarning === false) {
-
-    const updateSetting = 'Update setting';
-    const neverShowAgain = 'Don\'t Show Again';
-    const choice = await window.showWarningMessage('You\'re using the `colorize.files_extensions` settings. This settings as been deprecated in favor of `colorize.include`',
-      updateSetting,
-      neverShowAgain
-    );
-
-    if (choice === updateSetting) {
-      commands.executeCommand('workbench.action.openSettings2');
-    } else if (choice === neverShowAgain) {
-      await config.update('ignore_files_extensions_deprecation', true, true);
-    }
-  }
-}
-
-function readConfiguration(): ColorizeConfig {
-  const configuration: WorkspaceConfiguration = workspace.getConfiguration('colorize');
-
-  // remove duplicates (if duplicates)
-  const colorizedVariables = Array.from(new Set(configuration.get('colorized_variables', []))); // [...new Set(array)] // works too
-  const colorizedColors = Array.from(new Set(configuration.get('colorized_colors', []))); // [...new Set(array)] // works too
-
-  const filesExtensions = configuration.get('files_extensions', []);
-
-  displayFilesExtensionsDeprecationWarning(filesExtensions);
-  displayVariablesSearchMessage();
-
-  const languages = configuration.get('languages', []);
-
-  const inferedFilesToInclude = inferFilesToInclude(languages, filesExtensions).map(extension => `**/*${extension}`);
-
-  const filesToIncludes = Array.from(new Set(configuration.get('include', [])));
-  const filesToExcludes = Array.from(new Set(configuration.get('exclude', [])));
-
-  const searchVariables = configuration.get('enable_search_variables', false);
-
-  return {
-    languages,
-    filesExtensions: filesExtensions.map(ext => RegExp(`\\${ext}$`)),
-    isHideCurrentLineDecorations: configuration.get('hide_current_line_decorations'),
-    colorizedColors,
-    colorizedVariables,
-    filesToIncludes,
-    filesToExcludes,
-    inferedFilesToInclude,
-    searchVariables
-  };
 }
 
 function colorizeVisibleTextEditors() {
@@ -587,7 +310,7 @@ function colorizeVisibleTextEditors() {
 }
 
 export function activate(context: ExtensionContext) {
-  config = readConfiguration();
+  config = getColorizeConfig();
   ColorUtil.setupColorsExtractors(config.colorizedColors);
   VariablesManager.setupVariablesExtractors(config.colorizedVariables);
   q.push(async cb => {
@@ -595,11 +318,8 @@ export function activate(context: ExtensionContext) {
       if (config.searchVariables) {
         await VariablesManager.getWorkspaceVariables(config.filesToIncludes.concat(config.inferedFilesToInclude), config.filesToExcludes); // 👍
       }
-
       initEventListeners(context);
-    } catch (error) {
-      // handle promise rejection
-    }
+    } catch (error) {}
     return cb();
   });
   colorizeVisibleTextEditors();
@@ -614,4 +334,15 @@ export function deactivate() {
   CacheManager.clearCache();
 }
 
-export { canColorize };
+export {
+  canColorize,
+  ColorizeContext,
+  colorize,
+  config,
+  extension,
+  q,
+  updateContextDecorations,
+  generateDecorations,
+  removeDuplicateDecorations,
+  cleanDecorationList
+};

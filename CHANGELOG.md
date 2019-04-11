@@ -1,6 +1,29 @@
 # Changelog
 
-## [current] 0.8.5
+## [current] 0.8.10
+
+- [FEATURE] #226 Add colorization for ARGB colors
+
+## 0.8.9
+
+- [FIX] Some bugfixes and crashfixes for `colorize_only_visible_beta`
+
+## 0.8.8
+
+- [FIX] Some bugfixes for `colorize_only_visible_beta`
+
+## 0.8.7
+
+- [FIX] Don't try to colorize one more line than the visible range when it's the end of the file
+- [CHANGE] Remove the wait time before generating decorations on scroll
+
+## 0.8.6
+
+- [FEATURE] Add a new feature to colorize/update only the visible text. The feature is in beta and activable using the new setting `colorize_only_visible_beta`.
+- [FIX] Remove the warning message about variables search as it's not a problem anymore.
+- [FIX] Set property `rangeBehavior` to `ClosedClosed` to make sure a decoration never expand
+
+## 0.8.5
 
 - [FIX] No more ram pick at boot time
 - [FIX] Stylus variables with underscore are now detected
