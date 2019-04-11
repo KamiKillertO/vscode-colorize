@@ -207,6 +207,6 @@
     "vscode": "1.1.33"
   },
   "dependencies": {
-    "glob-to-regexp": "^0.4.0"
+    "glob-to-regexp": "^0.4.1"
   }
 }
