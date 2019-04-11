@@ -8,12 +8,10 @@ import {
   TextDocumentChangeEvent,
   TextDocumentContentChangeEvent,
 } from 'vscode';
-import Variable from './lib/variables/variable';
 import ColorUtil, { IDecoration, DocumentLine, LineExtraction } from './lib/util/color-util';
 import VariablesManager from './lib/variables/variables-manager';
 import EditorManager from './lib/editor-manager';
 import { mapKeysToArray } from './lib/util/array';
-import VariableDecoration from './lib/variables/variable-decoration';
 import { mutEditedLIne } from './lib/util/mut-edited-line';
 import { extension, q, ColorizeContext, updateContextDecorations, generateDecorations, removeDuplicateDecorations, cleanDecorationList } from './extension';
 
