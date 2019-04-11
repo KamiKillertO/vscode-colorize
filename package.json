@@ -165,7 +165,8 @@
               "BROWSERS_COLORS",
               "HEXA",
               "RGB",
-              "HSL"
+              "HSL",
+              "ARGB"
             ],
             "description": "You should enter a valid extractor",
             "uniqueItems": true
