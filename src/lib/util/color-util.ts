@@ -1,5 +1,6 @@
 import Color, {IColor} from '../colors/color';
 import '../colors/strategies/hexa-strategy';
+import '../colors/strategies/argb-strategy';
 import '../colors/strategies/rgb-strategy';
 import '../colors/strategies/browser-strategy';
 import '../colors/strategies/hsl-strategy';

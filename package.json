@@ -165,14 +165,15 @@
               "BROWSERS_COLORS",
               "HEXA",
               "RGB",
-              "HSL"
+              "HSL",
+              "ARGB"
             ],
             "description": "You should enter a valid extractor",
             "uniqueItems": true
           },
           "title": "Colorize these type of color",
           "type": "array",
-          "markdownDescription": "You can specified the type of color that should be colorized by the extension."
+          "markdownDescription": "You can specified the type of color that should be colorized by the extension.\nAvailable colors are:\n* `HEXA`: for hexadecimal colors: `#RGB`, `#RGBA`, `#RRGGBB`, `#RRGGBBAA`, `0xRGB`, `0xRGBA`, `0xRRGGBB` or `0xRRGGBBAA`\n* `ARGB`: for argb colors: `#RGB`, `#ARGB`, `#RRGGBB` or `#AARRGGBB`\n* `RGB`: for rgb colors: `rgb(r,g,b)` or `rgba(r,g,b,a)`\n* `HSL`: for HSL colors: `hsl(h,s,l)` or `hsla(h,s,l,a)`\n* `BROWSERS_COLORS`: for native browser's colors like `white`, `red`, `blue`..."
         },
         "colorize.colorize_only_visible_beta": {
           "default": false,
