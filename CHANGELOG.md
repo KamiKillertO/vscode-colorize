@@ -1,6 +1,10 @@
 # Changelog
 
-## [current] 0.8.9
+## [current] 0.8.10
+
+- [FEATURE] #226 Add colorization for ARGB colors
+
+## 0.8.9
 
 - [FIX] Some bugfixes and crashfixes for `colorize_only_visible_beta`
 
