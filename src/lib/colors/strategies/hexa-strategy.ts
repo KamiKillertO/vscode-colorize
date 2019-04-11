@@ -1,6 +1,5 @@
 import Color from './../color';
 import ColorExtractor, { IColorStrategy } from '../color-extractor';
-import color from './../color';
 import { LineExtraction, DocumentLine } from '../../util/color-util';
 import { EOL, HEXA_VALUE } from '../../util/regexp';
 
