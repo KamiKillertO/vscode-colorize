@@ -9,3 +9,36 @@
 - Checkout vscode Custom Activity Bar views
 
 - Fix background update for variables uses after position change (line added/removed before)
+
+Multi-extension debugging
+In this milestone, we've added support for debugging more than one extension at a time. This is useful if you are developing a set of tightly coupled or interdependent extensions.
+
+Previously this feature was only surfaced via the command-line interface of VS Code, now the argument --extensionDevelopmentPath can be specified more than once. Typically --extensionDevelopmentPath is used in the launch configuration of an extension. When developing more than one extension, we recommend combining the individual extension projects into a multi-folder workspace and create a new launch configuration (stored in the workspace .code-workspace file) that uses multiple --extensionDevelopmentPath arguments for the individual extensions.
+
+Here is an example workspace .code-workspace file with two extensions, hello1 and hello2, and a single launch configuration for both extensions:
+
+{
+  "folders": [
+    { "path": "hello1" },
+    { "path": "hello2" }
+  ],
+  "launch": {
+    "configurations": [
+      {
+        "type": "extensionHost",
+        "request": "launch",
+        "name": "Launch Two Extensions",
+        "args": [
+          "--extensionDevelopmentPath=${workspaceFolder:hello1}",
+          "--extensionDevelopmentPath=${workspaceFolder:hello2}",
+        ],
+        "outFiles": [
+          "${workspaceFolder:hello1}/out/**/*.js",
+          "${workspaceFolder:hello2}/out/**/*.js"
+        ]
+      }
+    ]
+  }
+}
+Please note that in this release, it is not possible to create a preLaunchTask that builds both extensions by combining the preLaunchTasks of the individual extension projects.
+
