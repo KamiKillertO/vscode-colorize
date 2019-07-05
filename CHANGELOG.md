@@ -1,6 +1,10 @@
 # Changelog
 
-## [current] 0.8.10
+## 0.8.11
+
+- [FIX] #264 Colorize hexa colors starting with `0x`
+
+## 0.8.10
 
 - [FEATURE] #226 Add colorization for ARGB colors
 
