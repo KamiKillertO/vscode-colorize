@@ -41,7 +41,7 @@ and [colorize.files_extensions](##deprecated-colorizefiles_extensions-array)) an
 
 ### colorize.languages _ARRAY_
 
-Configure a list of languages that should be colorized. You can learn about languages at <https://code.visualstudio.com/docs/languages/overview.>
+Configure a list of languages that should be colorized. You can learn about languages at <https://code.visualstudio.com/docs/languages/overview>.
 
 For example, if you want to colorize colors in `javascript` files, you just need to include it:
 
