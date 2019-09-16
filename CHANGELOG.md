@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.13
+
+- [FIX] #291 Remove Alpha value in ARGB only if alpha is defined
+
 ## 0.8.11
 
 - [FIX] #264 Colorize hexa colors starting with `0x`
