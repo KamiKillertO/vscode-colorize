@@ -12,10 +12,16 @@ class ARGBColorExtractor implements IColorStrategy {
 
   private extractRGBValue(value): number[] {
     let rgb: any = /#(.+)/gi.exec(value);
-    if (rgb[1].length === 3 || rgb[1].length === 4) {
+    if (rgb[1].length === 3) {
+      return rgb[1].split('').map(_ => parseInt(_ + _, 16));
+    }
+    if (rgb[1].length === 4) {
       return rgb[1].split('').slice(1, 4).map(_ => parseInt(_ + _, 16));
     }
-    rgb = rgb[1].split('').slice(2, 8).map(_ => parseInt(_, 16));
+    if (rgb[1].length === 8) {
+      rgb[1] = rgb[1].slice(2);
+    }
+    rgb = rgb[1].split('').map(_ => parseInt(_, 16));
     return [16 * rgb[0] + rgb[1], 16 * rgb[2] + rgb[3], 16 * rgb[4] + rgb[5]];
   }
   private extractAlphaValue(value): number {
