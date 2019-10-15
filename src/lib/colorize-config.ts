@@ -51,10 +51,9 @@ function getColorizeConfig(): ColorizeConfig {
 
 
 function inferFilesToInclude(languagesConfig, filesExtensionsConfig) {
-  let ext: Extension<any>[] = extensions.all;
   let filesExtensions = [];
 
-  ext.forEach(extension => {
+  extensions.all.forEach(extension => {
     if (extension.packageJSON && extension.packageJSON.contributes && extension.packageJSON.contributes.languages) {
       extension.packageJSON.contributes.languages.forEach(language => {
         if (languagesConfig.indexOf(language.id) !== -1) {
