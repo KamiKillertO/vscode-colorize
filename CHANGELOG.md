@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.14
+
+- [IMPROVE] Colorize argb colors with 0x prefix
+
 ## 0.8.13
 
 - [FIX] #291 Remove Alpha value in ARGB only if alpha is defined
