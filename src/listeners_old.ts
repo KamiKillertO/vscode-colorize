@@ -155,7 +155,8 @@ async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEve
 function handleChangeTextDocument(event: TextDocumentChangeEvent) {
   if (extension.editor && event.document.fileName === extension.editor.document.fileName) {
     extension.editor = window.activeTextEditor;
-    q.push((cb) => updateDecorations(event.contentChanges, extension, cb));
+    const editedLine = event.contentChanges.map(_ => _);
+    q.push((cb) => updateDecorations(editedLine, extension, cb));
     q.push((cb) => cleanDecorationList(extension, cb));
   }
 }

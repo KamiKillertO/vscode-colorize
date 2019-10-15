@@ -126,7 +126,7 @@ function handleChangeTextDocument(event: TextDocumentChangeEvent) {
   }
   if (extension.editor && event.document.fileName === extension.editor.document.fileName) {
     extension.editor = window.activeTextEditor;
-    let editedLine = event.contentChanges;
+    let editedLine = event.contentChanges.map(_ => _);
 
     let diffLine = extension.editor.document.lineCount - extension.nbLine;
     if (diffLine !== 0) {
