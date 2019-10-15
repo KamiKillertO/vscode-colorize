@@ -11,7 +11,7 @@ class ARGBColorExtractor implements IColorStrategy {
   public name: string = 'ARGB';
 
   private extractRGBValue(value): number[] {
-    let rgb: any = /#(.+)/gi.exec(value);
+    let rgb: any = /(?:#|0x)(.+)/gi.exec(value);
     if (rgb[1].length === 3) {
       return rgb[1].split('').map(_ => parseInt(_ + _, 16));
     }
@@ -25,7 +25,7 @@ class ARGBColorExtractor implements IColorStrategy {
     return [16 * rgb[0] + rgb[1], 16 * rgb[2] + rgb[3], 16 * rgb[4] + rgb[5]];
   }
   private extractAlphaValue(value): number {
-    let rgb: any = /#(.+)/gi.exec(value);
+    let rgb: any = /(?:#|0x)(.+)/gi.exec(value);
     if (rgb[1].length === 4) {
       let alpha = rgb[1][0];
       return (parseInt(`${alpha}${alpha}`, 16) / 255);
