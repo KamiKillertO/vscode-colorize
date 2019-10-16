@@ -203,7 +203,7 @@
     "chai": "4.2.0",
     "typescript": "3.3.3",
     "mocha": "5.2.0",
-    "tslint": "5.12.1",
+    "tslint": "5.20.0",
     "vscode": "1.1.36"
   },
   "dependencies": {
