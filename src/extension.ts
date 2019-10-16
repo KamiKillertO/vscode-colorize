@@ -235,7 +235,7 @@ function handleChangeActiveTextEditor(editor: TextEditor) {
     extension.deco.forEach(decorations => decorations.forEach(deco => deco.hide()));
     CacheManager.saveDecorations(extension.editor.document, extension.deco);
   }
-  window.visibleTextEditors.filter(e => e !== editor).forEach(e => {
+  getVisibleFileEditors().filter(e => e !== editor).forEach(e => {
     q.push(cb => colorize(e, cb));
   });
   q.push(cb => colorize(editor, cb));
@@ -302,9 +302,12 @@ function initEventListeners(context: ExtensionContext) {
     OldListeners.setupEventListeners(context);
   }
 }
+function getVisibleFileEditors(): TextEditor[]  {
+  return window.visibleTextEditors.filter(editor => editor.document.uri.scheme === 'file');
+}
 
 function colorizeVisibleTextEditors() {
-  window.visibleTextEditors.forEach(editor => {
+  getVisibleFileEditors().forEach(editor => {
     q.push(cb => colorize(editor, cb));
   });
 }
