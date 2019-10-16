@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.15
+
+- [FIX] Exclude terminal from the list of text editors.
+
 ## 0.8.14
 
 - [IMPROVE] Colorize argb colors with 0x prefix
