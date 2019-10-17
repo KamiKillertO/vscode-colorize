@@ -1,58 +1,48 @@
-import Color from './../color';
-import ColorExtractor, { IColorStrategy } from '../color-extractor';
-import { LineExtraction, DocumentLine } from '../../util/color-util';
+import ColorExtractor from '../color-extractor';
+import ColorStrategy from './__strategy-base';
 import { EOL, HEXA_VALUE } from '../../util/regexp';
+import Color from '../color';
 
 const HEXA_PREFIX = '(?:#|0x)';
 export const REGEXP = new RegExp(`(${HEXA_PREFIX}(?:${HEXA_VALUE}{3,4}|${HEXA_VALUE}{6}|${HEXA_VALUE}{8}))${EOL}`, 'gi');
 export const REGEXP_ONE = new RegExp(`^(${HEXA_PREFIX}(?:${HEXA_VALUE}{3,4}|${HEXA_VALUE}{6}|${HEXA_VALUE}{8}))${EOL}`, 'i');
 
-class HexaColorExtractor implements IColorStrategy {
-  public name: string = 'HEXA';
 
-  private extractRGBValue(value): number[] {
-    let rgb: any = /(?:#|0x)(.+)/gi.exec(value);
-    if (rgb[1].length === 3 || rgb[1].length === 4) {
-      return rgb[1].split('').slice(0, 3).map(_ => parseInt(_ + _, 16));
-    }
-    rgb = rgb[1].split('').slice(0, 6).map(_ => parseInt(_, 16));
-    return [16 * rgb[0] + rgb[1], 16 * rgb[2] + rgb[3], 16 * rgb[4] + rgb[5]];
+function extractRGB(values: number[]): number[] {
+  let rgb = values.slice(0, 6);
+  if (values.length === 3 || values.length === 4) {
+    const _rgb = values.slice(0, 3);
+    rgb = [_rgb[0], _rgb[0], _rgb[1], _rgb[1], _rgb[2], _rgb[2]];
   }
-  private extractAlphaValue(value): number {
-    let rgb: any = /(?:#|0x)(.+)/gi.exec(value);
-    if (rgb[1].length === 4) {
-      let alpha = rgb[1][3];
-      return (parseInt(`${alpha}${alpha}`, 16) / 255);
-    }
-    if (rgb[1].length === 8) {
-      let alpha = rgb[1].slice(6, 8);
-      return (parseInt(alpha, 16) / 255);
-    }
-    return 1;
-  }
-  public async extractColors(fileLines: DocumentLine[]): Promise < LineExtraction[] > {
-    return fileLines.map(({line, text}) => {
-      let match = null;
-      let colors: Color[] = [];
-
-      while ((match = REGEXP.exec(text)) !== null) {
-        const m = match[1];
-        colors.push(new Color(m, match.index, this.extractRGBValue(m), this.extractAlphaValue(m)));
-      }
-      return {
-        line,
-        colors
-      };
-    });
-  }
-  public extractColor(text: string, fileName = null): Color {
-    let match: RegExpMatchArray = text.match(REGEXP_ONE);
-    if (match) {
-      return new Color(match[1], match.index, this.extractRGBValue(match[1]));
-    }
-    return null;
-  }
+  return [16 * rgb[0] + rgb[1], 16 * rgb[2] + rgb[3], 16 * rgb[4] + rgb[5]];
 }
 
-ColorExtractor.registerStrategy(new HexaColorExtractor());
-export default HexaColorExtractor;
+function extractAlpha(values: number[]): number {
+  if (values.length === 4) {
+    let alpha = values[3];
+    return ((16 * alpha) + alpha) / 255;
+  }
+  if (values.length === 8) {
+    let alpha = values.slice(6, 8);
+    return ((16 * alpha[0]) + alpha[1]) / 255;
+  }
+  return 1;
+}
+
+function removePrefix(argb: string): RegExpExecArray {
+  return /(?:#|0x)(.+)/gi.exec(argb);
+}
+function hexaToInt(argb: string): number[] {
+  return argb.split('').map(_ => parseInt(_, 16));
+}
+function getColor(match: RegExpExecArray): Color {
+  const value = match[1];
+  const str: string = removePrefix(value)[1];
+  const values: number[] = hexaToInt(str);
+  const rgb: number[] = extractRGB(values);
+  const alpha: number = extractAlpha(values);
+  return new Color(value, match.index, rgb, alpha);
+}
+const strategy = new ColorStrategy('HEXA', REGEXP, REGEXP_ONE, getColor);
+ColorExtractor.registerStrategy(strategy);
+export default strategy;
