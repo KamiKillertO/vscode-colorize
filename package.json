@@ -199,7 +199,7 @@
   "devDependencies": {
     "@types/chai": "4.1.7",
     "@types/mocha": "5.2.6",
-    "@types/node": "8.5.2",
+    "@types/node": "12.12.16",
     "chai": "4.2.0",
     "typescript": "3.3.3",
     "mocha": "5.2.0",
