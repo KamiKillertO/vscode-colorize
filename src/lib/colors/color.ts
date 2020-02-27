@@ -49,7 +49,7 @@ class Color implements IColor {
   public constructor(value: string, positionInText: number = 0, rgb: number[], alpha?: number) {
     this.value = value;
     this.positionInText = positionInText;
-    this.alpha = alpha || 1;
+    this.alpha = Number.isNaN(alpha) ? 1 : alpha;
     this.rgb = rgb;
   }
   /**
