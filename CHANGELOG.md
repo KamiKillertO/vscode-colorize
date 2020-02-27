@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.16
+
+- [IMPROVE] Better argb colors support
+
 ## 0.8.15
 
 - [FIX] Exclude terminal from the list of text editors.
