@@ -3,7 +3,9 @@ import {
   TextEditorDecorationType,
   Position,
   window,
-  DecorationRangeBehavior
+  DecorationRangeBehavior,
+  workspace,
+  ConfigurationTarget
 } from 'vscode';
 
 import { generateOptimalTextColor, IDecoration } from '../util/color-util';
@@ -100,9 +102,11 @@ class ColorDecoration implements IDecoration {
   }
 
   private _generateDecorator() {
+    const editorSettings = workspace.getConfiguration('editor', ConfigurationTarget.Global);
     let backgroundDecorationType = window.createTextEditorDecorationType({
       borderWidth: '1px',
       borderStyle: 'solid',
+      borderRadius: editorSettings.get('roundedSelection') ? '3px' : 0,
       borderColor: this.color.toRgbString(),
       backgroundColor: this.color.toRgbString(),
       color: generateOptimalTextColor(this.color),
