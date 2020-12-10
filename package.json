@@ -192,7 +192,6 @@
   "scripts": {
     "vscode:prepublish": "tsc -p ./",
     "compile": "tsc -watch -p ./",
-    "postinstall": "node ./node_modules/vscode/bin/install",
     "lint": "node ./node_modules/.bin/tslint -c tslint.json --project tsconfig.json",
     "test": "node ./node_modules/vscode/bin/test"
   },
@@ -200,11 +199,12 @@
     "@types/chai": "^4.2.14",
     "@types/mocha": "^8.2.0",
     "@types/node": "^10.0.0",
+    "@types/vscode": "^1.39.0",
     "chai": "^4.2.0",
     "typescript": "3.3.3",
     "mocha": "^8.2.1",
     "tslint": "5.12.1",
-    "vscode": "1.1.36"
+    "vscode-test": "^1.4.1"
   },
   "dependencies": {
     "glob-to-regexp": "^0.4.1"
