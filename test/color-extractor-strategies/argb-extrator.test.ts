@@ -1,4 +1,6 @@
 import { assert } from 'chai';
+import { describe, it } from 'mocha';
+
 import ARGBStrategy from '../../src/lib/colors/strategies/argb-strategy';
 
 // Defines a Mocha test suite to group tests of similar kind together

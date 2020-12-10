@@ -2,6 +2,7 @@ import { assert } from 'chai';
 
 import { REGEXP } from '../../src/lib/colors/strategies/browser-strategy';
 import { regex_exec } from '../test-util';
+import { describe, it } from 'mocha';
 
 // Defines a Mocha test suite to group tests of similar kind together
 describe('Test browser predefined color Regex', () => {

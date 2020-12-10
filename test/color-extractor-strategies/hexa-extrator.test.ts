@@ -1,4 +1,5 @@
 import { assert } from 'chai';
+import { describe, it } from 'mocha';
 
 import { REGEXP } from '../../src/lib/colors/strategies/hexa-strategy';
 import { regex_exec } from '../test-util';

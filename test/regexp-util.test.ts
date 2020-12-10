@@ -1,6 +1,7 @@
 import { assert } from 'chai';
 import { ALPHA, DOT_VALUE } from '../src/lib/util/regexp';
 import { regex_exec } from './test-util';
+import { describe, it } from 'mocha';
 
 describe('Util regexp (util/regexp.ts)', () => {
   it('Should extract a dot value', () => {

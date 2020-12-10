@@ -1,4 +1,5 @@
 import { assert } from 'chai';
+import { describe, it } from 'mocha';
 
 import { REGEXP, DECLARATION_REGEXP } from '../../src/lib/variables/strategies/css-strategy';
 import CssExtractor from  '../../src/lib/variables/strategies/css-strategy';

@@ -4,6 +4,7 @@ import {
 
 import ColorUtil, { colorLuminance, convertHslaToRgba, convertRgbaToHsla } from '../src/lib/util/color-util';
 import Color from '../src/lib/colors/color';
+import { describe, it } from 'mocha';
 
 describe('Test utility fonction', () => {
   it('Should not extract invalid colors from a text', async () => {
