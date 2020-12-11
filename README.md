@@ -36,8 +36,7 @@ These can be set in user preferences `(cmd+,)` or workspace settings `(.vscode/s
 
 ### colorize.enable_search_variables _BOOLEAN_ _default: true
 
-By default colorize read and parse all files, in your workspace, that are targeted by the settings [colorize.languages](colorizelanguages), [colorize.include](#colorizeinclude), [colorize.exlude](#colorizeexclude)
-and [colorize.files_extensions](##deprecated-colorizefiles_extensions-array)) and extract all variables. Thanks to this behavior all variables will have colored background even if you never open the file containing the declaration. _⚠️ This setting can slown down vscode at opening_
+By default colorize read and parse all files, in your workspace, that are targeted by the settings [colorize.languages](#colorizelanguages), [colorize.include](#colorizeinclude), and [colorize.exlude](#colorizeexclude) to extract extract all variables. Thanks to this behavior all variables will have colored background even if you never open the file containing the declaration. _⚠️ This setting can slown down vscode at opening_
 
 ### colorize.languages _ARRAY_
 
@@ -59,19 +58,6 @@ Configure glob patterns for including files and folders. By default Colorize is 
 ### colorize.exclude
 
 Configure glob patterns for excluding files and folders. Colorize will not colorized colors in these files and folders and it'll also not search for variables inside. Read more about glob patterns [here](https://code.visualstudio.com/docs/editor/codebasics#_advanced-search-options).
-
-### [DEPRECATED] colorize.files_extensions _ARRAY_
-
-_⚠️ this setting is deprecated, you should use [colorize.include](#colorizeinclude) instead_
-Modified this option to activate colorize for files with the matching extension.
-
-For example if you want to colorize `.diff` files:
-
-```json
-  "colorize.files_extensions": [
-    ".diff"
-  ]
-```
 
 ### colorize.hide_current_line_decorations _BOOLEAN_ _default: true_
 
@@ -108,6 +94,7 @@ For example if you use less in your project you setup the option like this
     "LESS"
   ]
 ```
+
 
 _This way all @variables will be colorized_
 

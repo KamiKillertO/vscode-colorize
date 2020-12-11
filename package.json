@@ -55,24 +55,6 @@
           "type": "array",
           "markdownDescription": "Configure a list of languages that should be colorized. A list of languages can be find at https://code.visualstudio.com/docs/languages/identifiers. You can learn about languages at https://code.visualstudio.com/docs/languages/overview."
         },
-        "colorize.files_extensions": {
-          "$schema": "http://json-schema.org/draft-07/schema#",
-          "default": [],
-          "title": "Colorize files with these extensions",
-          "type": "array",
-          "items": {
-            "type": "string",
-            "pattern": "\\.\\w+$",
-            "uniqueItems": true,
-            "description": "You should enter a valid file extension"
-          },
-          "markdownDescription": "[deprecated] Specified a list of files extension that should be colorized. This setting is deprecated and will be removed soon, you should use the setting `colorize.include` instead."
-        },
-        "colorize.ignore_files_extensions_deprecation": {
-          "default": false,
-          "type": "boolean",
-          "markdownDescription": "Ignore the warning for `colorize.files_extensions`."
-        },
         "colorize.include": {
           "type": "array",
           "markdownDescription": "Configure glob patterns for including files and folders. By default Colorize is enable for files matching one the languages defined in the `colorize.languages` config, with this config you can enable colorize for other files or folders. Read more about glob patterns [here](https://code.visualstudio.com/docs/editor/codebasics#_advanced-search-options).",
@@ -184,7 +166,7 @@
           "title": "Enable the search for variables at opening time",
           "default": true,
           "type": "boolean",
-          "markdownDescription": "When vscode starts, Colorize fetch all files targeted by the settings `colorize.include`, `colorize.languages` and `colorize.files_extensions` but not the ones targeted by the setting `colorize.exclude`. When the fetch is done, colorize open and parse all files searching for variables. That way variables will be colorized in every files. _⚠️ this setting can slown down your editor a little at opening time, read this [issue](https://github.com/KamiKillertO/vscode-colorize/issues/174) to learn more about it._"
+          "markdownDescription": "When vscode starts, Colorize fetch all files targeted by the settings `colorize.include` and `colorize.languages` but not the ones targeted by the setting `colorize.exclude`. When the fetch is done, colorize open and parse all files searching for variables. That way variables will be colorized in every files. _⚠️ this setting can slown down your editor a little at opening time, read this [issue](https://github.com/KamiKillertO/vscode-colorize/issues/174) to learn more about it._"
         }
       }
     }

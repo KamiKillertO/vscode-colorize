@@ -26,7 +26,6 @@ import NewListeners from './listeners_new';
 
 let config: ColorizeConfig = {
   languages: [],
-  filesExtensions: [],
   isHideCurrentLineDecorations: true,
   colorizedVariables: [],
   colorizedColors: [],
@@ -136,16 +135,6 @@ function isLanguageSupported(languageId: string): boolean {
 }
 
 /**
- * Check if COLORIZE support a file extension
- *
- * @param {string} fileName A valid filename (path to the file)
- * @returns {boolean}
- */
-function isFileExtensionSupported(fileName: string): boolean {
-  return config.filesExtensions.some((ext: RegExp) => ext.test(fileName));
-}
-
-/**
  * Check if the file is the `colorize.include` setting
  *
  * @param {string} fileName A valid filename (path to the file)
@@ -162,7 +151,7 @@ function isIncludedFile(fileName: string): boolean {
  * @returns {boolean}
  */
 function canColorize(document: TextDocument) { // update to use filesToExcludes. Remove `isLanguageSupported` ? checking path with file extension or include glob pattern should be enough
-  return isLanguageSupported(document.languageId) || isFileExtensionSupported(document.fileName) || isIncludedFile(document.fileName);
+  return isLanguageSupported(document.languageId) || isIncludedFile(document.fileName);
 }
 
 function handleTextSelectionChange(event: TextEditorSelectionChangeEvent, cb: Function) {
