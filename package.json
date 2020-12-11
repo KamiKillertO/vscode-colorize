@@ -193,7 +193,7 @@
     "vscode:prepublish": "tsc -p ./",
     "compile": "tsc -watch -p ./",
     "lint": "node ./node_modules/.bin/tslint -c tslint.json --project tsconfig.json",
-    "test": "node ./out/test/runTest.js"
+    "test": " npm run vscode:prepublish; node ./out/test/runTest.js"
   },
   "devDependencies": {
     "@types/chai": "^4.2.14",
