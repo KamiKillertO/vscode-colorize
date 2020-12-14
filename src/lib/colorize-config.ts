@@ -17,7 +17,6 @@ interface ColorizeConfig {
   filesToIncludes: string[];
   inferedFilesToInclude: string[];
   searchVariables: boolean;
-  betaCWYS: boolean;
 }
 
 function getColorizeConfig(): ColorizeConfig {
@@ -36,7 +35,6 @@ function getColorizeConfig(): ColorizeConfig {
 
   const searchVariables = configuration.get('enable_search_variables', false);
 
-  const betaCWYS = configuration.get('colorize_only_visible_beta', false);
   return {
     languages,
     isHideCurrentLineDecorations: configuration.get('hide_current_line_decorations'),
@@ -45,8 +43,7 @@ function getColorizeConfig(): ColorizeConfig {
     filesToIncludes,
     filesToExcludes,
     inferedFilesToInclude,
-    searchVariables,
-    betaCWYS
+    searchVariables
   };
 }
 

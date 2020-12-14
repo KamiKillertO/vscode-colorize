@@ -21,8 +21,7 @@ import * as globToRegexp from 'glob-to-regexp';
 import VariableDecoration from './lib/variables/variable-decoration';
 import { getColorizeConfig, ColorizeConfig } from './lib/colorize-config';
 
-import OldListeners from './listeners_old';
-import NewListeners from './listeners_new';
+import Listeners from './listeners';
 
 let config: ColorizeConfig = {
   languages: [],
@@ -32,8 +31,7 @@ let config: ColorizeConfig = {
   filesToExcludes: [],
   filesToIncludes: [],
   inferedFilesToInclude: [],
-  searchVariables: false,
-  betaCWYS: false
+  searchVariables: false
 };
 
 class ColorizeContext {
@@ -52,13 +50,10 @@ async function initDecorations(context: ColorizeContext) {
   const text = context.editor.document.getText();
   const fileLines: DocumentLine[] = ColorUtil.textToFileLines(text);
   let lines: DocumentLine[] = [];
-  if (config.betaCWYS) {
-    context.editor.visibleRanges.forEach((range: Range) => {
-      lines = lines.concat(fileLines.slice(range.start.line, range.end.line + 2));
-    });
-  } else {
-    lines = fileLines;
-  }
+
+  context.editor.visibleRanges.forEach((range: Range) => {
+    lines = lines.concat(fileLines.slice(range.start.line, range.end.line + 2));
+  });
   // removeDuplicateDecorations(context);
   await VariablesManager.findVariablesDeclarations(context.editor.document.fileName, fileLines);
   const variables: LineExtraction[] = await VariablesManager.findVariables(context.editor.document.fileName, lines);
@@ -278,11 +273,8 @@ function initEventListeners(context: ExtensionContext) {
   window.onDidChangeActiveTextEditor(handleChangeActiveTextEditor, null, context.subscriptions);
   workspace.onDidChangeConfiguration(handleConfigurationChanged, null, context.subscriptions);
 
-  if (config.betaCWYS) {
-    NewListeners.setupEventListeners(context);
-  } else {
-    OldListeners.setupEventListeners(context);
-  }
+  Listeners.setupEventListeners(context);
+
 }
 function getVisibleFileEditors(): TextEditor[]  {
   return window.visibleTextEditors.filter(editor => editor.document.uri.scheme === 'file');
