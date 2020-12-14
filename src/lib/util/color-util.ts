@@ -19,7 +19,7 @@ interface LineExtraction {
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-const flattenLineExtractionsFlatten = arr => arr.reduce((a, b) => a.concat(Array.isArray(b) ? flattenLineExtractionsFlatten(b) : b), []).filter(_ => _.colors.length !== 0);
+const flattenLineExtractionsFlatten = arr => arr.flat(2).filter(_ => _.colors.length !== 0);
 
 const WHITE = '#FFFFFF',
   BLACK = '#000000';

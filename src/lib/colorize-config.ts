@@ -1,12 +1,5 @@
-import {
-  flatten,
-  unique
-} from './util/array';
-import {
-  WorkspaceConfiguration,
-  workspace,
-  extensions
-} from 'vscode';
+import { unique } from './util/array';
+import { WorkspaceConfiguration, workspace, extensions } from 'vscode';
 
 interface ColorizeConfig {
   languages: string[];
@@ -60,8 +53,7 @@ function inferFilesToInclude(languagesConfig: string[]): string[] {
       });
     }
   });
-  filesExtensions = flatten(filesExtensions); // get all languages with their files extensions ^^. No need to filter with the one set in config
-  return unique(filesExtensions);
+  return unique(filesExtensions.flat());
 }
 
 export { ColorizeConfig, getColorizeConfig };

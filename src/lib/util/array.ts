@@ -1,9 +1,5 @@
 type callbackFn<V> = (value: V, index: number, array: Array<V>) => V;
 
-function flatten<T>(arr: Array<T>): Array<T> {
-  return Array.prototype.concat.apply([], arr);
-}
-
 function unique<T>(arr: Array<T>, f?: callbackFn<T>): Array<T> {
   let vArr = arr;
   if (f) {
@@ -32,4 +28,4 @@ function equals<T>(arr1: Array<T>, arr2: Array<T>) : boolean {
   return true;
 }
 
-export { flatten, unique, mapKeysToArray, equals };
+export { unique, equals };
