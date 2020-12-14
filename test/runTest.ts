@@ -12,7 +12,7 @@ async function main() {
     // Passed to --extensionTestsPath
     const extensionTestsPath = path.resolve(__dirname, './index.js');
 
-    const vscodeVersion = '1.39.0';
+    const vscodeVersion = '1.52.0';
     // Download VS Code, unzip it and run the integration test
     await runTests({ extensionDevelopmentPath, extensionTestsPath, version: vscodeVersion });
   } catch (err) {
