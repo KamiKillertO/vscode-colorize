@@ -9,13 +9,6 @@ import {
   TextDocumentChangeEvent,
   TextDocumentContentChangeEvent,
 } from 'vscode';
-import ColorUtil, { IDecoration, DocumentLine, LineExtraction } from './lib/util/color-util';
-import VariablesManager from './lib/variables/variables-manager';
-import EditorManager from './lib/editor-manager';
-import { mutEditedLine } from './lib/util/mut-edited-line';
-import { equals, mapKeysToArray } from './lib/util/array';
-
-import TasksRunner from './lib/tasks-runner';
 import {
   extension,
   updateContextDecorations,
@@ -23,21 +16,33 @@ import {
   removeDuplicateDecorations,
   ColorizeContext
 } from './extension';
+import ColorUtil, { IDecoration, DocumentLine, LineExtraction } from './lib/util/color-util';
+import VariablesManager from './lib/variables/variables-manager';
+import EditorManager from './lib/editor-manager';
+import { mutEditedLine } from './lib/util/mut-edited-line';
+import { equals } from './lib/util/array';
+import TasksRunner from './lib/tasks-runner';
 
 const taskRuner: TasksRunner = new TasksRunner();
 
+const clearDecoration = (decoration: IDecoration) => decoration.dispose();
 
-function filterPositions(position, deco, diffLine) {
-  if (position.newPosition === null) {
-    deco.get(position.oldPosition).forEach(decoration => decoration.dispose());
+interface DecoPositionUpdate {
+  old: number;
+  updated: number;
+}
+
+function filterPositions(position: DecoPositionUpdate, deco: Map<number, IDecoration[]>, diffLine: number) {
+  if (position.updated === null) {
+    deco.get(position.old).forEach(clearDecoration);
     return false;
   }
-  if (position.newPosition === 0 && extension.editor.document.lineCount === 1 && extension.editor.document.lineAt(0).text === '') {
-    deco.get(position.oldPosition).forEach(decoration => decoration.dispose());
+  if (position.updated === 0 && extension.editor.document.lineCount === 1 && extension.editor.document.lineAt(0).text === '') {
+    deco.get(position.old).forEach(clearDecoration);
     return false;
   }
-  if (Math.abs(position.oldPosition - position.newPosition) > Math.abs(diffLine)) {
-    position.newPosition = position.oldPosition + diffLine;
+  if (Math.abs(position.old - position.updated) > Math.abs(diffLine)) {
+    position.updated = position.old + diffLine;
   }
   return true;
 }
@@ -46,34 +51,32 @@ function disposeDecorationsForEditedLines(editedLine: TextDocumentContentChangeE
   editedLine.map(({range}: TextDocumentContentChangeEvent) => {
     const line = range.start.line;
     if (context.deco.has(line)) {
-      context.deco.get(line).forEach(decoration => {
-        decoration.dispose();
-      });
+      context.deco.get(line).forEach(clearDecoration);
     }
   });
 }
 
-function updatePositionsDeletion(range, positions) {
+function updatePositionsDeletion(range: Range, positions: DecoPositionUpdate[]) {
   let rangeLength = range.end.line - range.start.line;
   positions.forEach(position => {
-    if (position.newPosition === null) {
+    if (position.updated === null) {
       return;
     }
-    if (position.oldPosition > range.start.line && position.oldPosition <= range.end.line) {
-      position.newPosition = null;
+    if (position.old > range.start.line && position.old <= range.end.line) {
+      position.updated = null;
       return;
     }
-    if (position.oldPosition >= range.end.line) {
-      position.newPosition = position.newPosition - rangeLength;
+    if (position.old >= range.end.line) {
+      position.updated = position.updated - rangeLength;
     }
-    if (position.newPosition < 0) {
-      position.newPosition = 0;
+    if (position.updated < 0) {
+      position.updated = 0;
     }
   });
   return positions;
 }
 
-function handleLineRemoved(editedLine: TextDocumentContentChangeEvent[], positions, context: ColorizeContext) {
+function getRemovedLines(editedLine: TextDocumentContentChangeEvent[], positions: DecoPositionUpdate[]) {
   editedLine.reverse();
   editedLine.forEach((line: TextDocumentContentChangeEvent) => {
     for (let i = line.range.start.line; i <= line.range.end.line; i++) {
@@ -86,12 +89,12 @@ function handleLineRemoved(editedLine: TextDocumentContentChangeEvent[], positio
   return editedLine;
 }
 
-function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position, context: ColorizeContext) {
+function getAddedLines(editedLine: TextDocumentContentChangeEvent[], positions: DecoPositionUpdate[]) {
   editedLine = mutEditedLine(editedLine);
   editedLine.forEach((line) => {
-    position.forEach(position => {
-      if (position.newPosition >= line.range.start.line) {
-        position.newPosition = position.newPosition + 1;
+    positions.forEach(position => {
+      if (position.updated >= line.range.start.line) {
+        position.updated = position.updated + 1;
       }
     });
   });
@@ -99,35 +102,37 @@ function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position,
   return editedLine;
 }
 
-function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, diffLine: number) {
-  let positions = mapKeysToArray(context.deco).map(position => Object({
-    oldPosition: position,
-    newPosition: position
-  }));
+function getEditedLines(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, diffLine: number) {
+  let positions: DecoPositionUpdate[] = Array
+    .from(context.deco.keys())
+    .map(position => ({
+      old: position,
+      updated: position
+    }));
 
   if (diffLine < 0) {
-    editedLine = handleLineRemoved(editedLine, positions, context);
+    editedLine = getRemovedLines(editedLine, positions);
   } else {
-    editedLine = handleLineAdded(editedLine, positions, context);
+    editedLine = getAddedLines(editedLine, positions);
   }
   positions = positions.filter(position => filterPositions(position, context.deco, diffLine));
   context.deco = positions.reduce((decorations, position) => {
-    if (decorations.has(position.newPosition)) {
-      const decos: IDecoration[] = decorations.get(position.newPosition).concat(context.deco.get(position.oldPosition));
-      decos.forEach(deco => deco.generateRange(position.newPosition));
-      return decorations.set(position.newPosition, decos);
+    if (decorations.has(position.updated)) {
+      const decos: IDecoration[] = decorations.get(position.updated).concat(context.deco.get(position.old));
+      decos.forEach(deco => deco.generateRange(position.updated));
+      return decorations.set(position.updated, decos);
     }
-    const decos: IDecoration[] = context.deco.get(position.oldPosition);
-    decos.forEach(deco => deco.generateRange(position.newPosition));
-    return decorations.set(position.newPosition, context.deco.get(position.oldPosition));
+    const decos: IDecoration[] = context.deco.get(position.old);
+    decos.forEach(deco => deco.generateRange(position.updated));
+    return decorations.set(position.updated, context.deco.get(position.old));
   }, new Map());
   return editedLine;
 }
 
-function getDecorationsToColorize(colors, variables): Map<number, IDecoration[]> {
+function getDecorationsToColorize(colors: LineExtraction[], variables: LineExtraction[]): Map<number, IDecoration[]> {
   let decorations = generateDecorations(colors, variables, new Map());
 
-  function filterDuplicated(A, B) {
+  function filterDuplicated(A: IDecoration[], B: IDecoration[]) {
     return A.filter((decoration: IDecoration) => {
       const exist = B.findIndex((_: IDecoration) => {
         let position = decoration.currentRange.isEqual(_.currentRange);
@@ -152,7 +157,7 @@ function getDecorationsToColorize(colors, variables): Map<number, IDecoration[]>
 
       if (extension.deco.has(i) && !decorations.has(i)) {
         // dispose decorations
-        extension.deco.get(i).forEach(decoration => decoration.dispose());
+        extension.deco.get(i).forEach(clearDecoration);
       }
     }
   });
@@ -208,12 +213,12 @@ function* updateDecorations() {
   const colors: LineExtraction[] = yield ColorUtil.findColors(lines, fileName);
   let decorations = getDecorationsToColorize(colors, variables);
   // removeDuplicateDecorations(decorations);
-  // EditorManager.decorate(context.editor, decorations, context.currentSelection);
   EditorManager.decorate(extension.editor, decorations, extension.currentSelection);
   updateContextDecorations(decorations, extension);
   removeDuplicateDecorations(extension);
 }
 
+// Return new map?
 function cleanDecorationMap(decorations: Map<number, IDecoration[]>) {
   let it = decorations.entries();
   let tmp = it.next();
@@ -225,7 +230,7 @@ function cleanDecorationMap(decorations: Map<number, IDecoration[]>) {
   }
 }
 
-function handleChangeTextDocument(event: TextDocumentChangeEvent) {
+function textDocumentUpdated(event: TextDocumentChangeEvent) {
   if (event.contentChanges.length === 0) {
     return;
   }
@@ -235,7 +240,7 @@ function handleChangeTextDocument(event: TextDocumentChangeEvent) {
 
     let diffLine = extension.editor.document.lineCount - extension.nbLine;
     if (diffLine !== 0) {
-      editedLine = handleLineDiff(editedLine, extension, diffLine);
+      editedLine = getEditedLines(editedLine, extension, diffLine);
       extension.nbLine = extension.editor.document.lineCount;
     }
     disposeDecorationsForEditedLines(editedLine, extension);
@@ -245,7 +250,7 @@ function handleChangeTextDocument(event: TextDocumentChangeEvent) {
 
 function setupEventListeners(context: ExtensionContext) {
   // window.onDidChangeTextEditorSelection((event) => q.push((cb) => handleTextSelectionChange(event, cb)), null, context.subscriptions);
-  workspace.onDidChangeTextDocument(handleChangeTextDocument, null, context.subscriptions);
+  workspace.onDidChangeTextDocument(textDocumentUpdated, null, context.subscriptions);
   window.onDidChangeTextEditorVisibleRanges(() => taskRuner.run(handleVisibleRangeEvent), null, context.subscriptions);
   // window.onDidChangeTextEditorVisibleRanges(handleVisibleRangeEvent, null, context.subscriptions);
 }

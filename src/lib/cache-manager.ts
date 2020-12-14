@@ -2,8 +2,8 @@ import { IDecoration } from './util/color-util';
 import { TextDocument } from 'vscode';
 
 class CacheManager {
-  private _dirtyCache: Map < string, Map < number, IDecoration[] > >;
-  private _decorationsCache: Map < string, Map < number, IDecoration[] > >;
+  private _dirtyCache: Map<string, Map<number, IDecoration[]>>;
+  private _decorationsCache: Map<string, Map<number, IDecoration[]>>;
 
   constructor() {
     this._dirtyCache = new Map();
@@ -42,6 +42,7 @@ class CacheManager {
   private _saveSavedDecorations(fileName: string, decorations: Map<number, IDecoration[]>) {
     return this._decorationsCache.set(fileName, decorations);
   }
+
   public clearCache() {
     this._dirtyCache.clear();
     this._decorationsCache.clear();

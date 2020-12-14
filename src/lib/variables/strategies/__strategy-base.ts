@@ -59,6 +59,7 @@ export default class VariableStrategy {
     });
     return flattenLineExtractionsFlatten(variables);
   }
+
   extractVariable(fileName: string, text: string): Color | undefined {
     const match: RegExpMatchArray = text.match(this.USE_REGEXP);
     let variable;

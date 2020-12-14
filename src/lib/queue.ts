@@ -21,6 +21,7 @@ class Queue {
     }
     return this; // for chaining fun!
   }
+
   private _next() {
     this._running = false;
     const action = this._queue.shift();

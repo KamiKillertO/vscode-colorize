@@ -246,4 +246,13 @@ function executeHSLProperFormula(tmp_1: number, tmp_2: number, value: number): n
 
 export default ColorUtil;
 
-export { IDecoration, convertHslaToRgba, colorLuminance, convertRgbaToHsla, generateOptimalTextColor, flattenLineExtractionsFlatten, LineExtraction, DocumentLine };
+export {
+  IDecoration,
+  convertHslaToRgba,
+  colorLuminance,
+  convertRgbaToHsla,
+  generateOptimalTextColor,
+  flattenLineExtractionsFlatten,
+  LineExtraction,
+  DocumentLine
+};

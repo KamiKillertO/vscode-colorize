@@ -1,5 +1,5 @@
 import { unique } from './util/array';
-import { WorkspaceConfiguration, workspace, extensions } from 'vscode';
+import { WorkspaceConfiguration, workspace, extensions, Extension } from 'vscode';
 
 interface ColorizeConfig {
   languages: string[];
@@ -22,7 +22,6 @@ function getColorizeConfig(): ColorizeConfig {
   const languages = configuration.get('languages', []);
 
   const inferedFilesToInclude = inferFilesToInclude(languages).map(extension => `**/*${extension}`);
-
   const filesToIncludes = Array.from(new Set(configuration.get('include', [])));
   const filesToExcludes = Array.from(new Set(configuration.get('exclude', [])));
 
@@ -42,17 +41,19 @@ function getColorizeConfig(): ColorizeConfig {
 
 
 function inferFilesToInclude(languagesConfig: string[]): string[] {
-  let filesExtensions = [];
-
-  extensions.all.forEach(extension => {
-    if (extension.packageJSON && extension.packageJSON.contributes && extension.packageJSON.contributes.languages) {
+  let filesExtensions = extensions.all.reduce((acc, extension: Extension<any>) => {
+    if (extension.packageJSON?.contributes?.languages) {
       extension.packageJSON.contributes.languages.forEach(language => {
         if (languagesConfig.indexOf(language.id) !== -1) {
-          filesExtensions = filesExtensions.concat(language.extensions);
+          acc = [
+            ...acc,
+            ...language.extensions
+          ];
         }
       });
     }
-  });
+    return acc;
+  }, []);
   return unique(filesExtensions.flat());
 }
 
