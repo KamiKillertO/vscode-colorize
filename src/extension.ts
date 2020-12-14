@@ -37,19 +37,12 @@ let config: ColorizeConfig = {
   betaCWYS: false
 };
 
-interface ColorizeContext {
-  editor: TextEditor;
-  nbLine: number;
-  deco: Map < number, IDecoration[] >;
-  currentSelection: number[];
+class ColorizeContext {
+  editor: TextEditor = null;
+  nbLine: number = 0;
+  deco: Map < number, IDecoration[] > = new Map();
+  currentSelection: number[] = null;
 }
-
-let extension: ColorizeContext = {
-  editor: window.activeTextEditor,
-  nbLine: 0,
-  deco: new Map(),
-  currentSelection: null
-};
 
 const q = new Queue();
 
@@ -307,12 +300,16 @@ function getVisibleFileEditors(): TextEditor[]  {
 }
 
 function colorizeVisibleTextEditors() {
+  extension.nbLine = 65;
   getVisibleFileEditors().forEach(editor => {
     q.push(cb => colorize(editor, cb));
   });
 }
 
+let extension: ColorizeContext;
+
 export function activate(context: ExtensionContext) {
+  extension = new ColorizeContext();
   config = getColorizeConfig();
   ColorUtil.setupColorsExtractors(config.colorizedColors);
   VariablesManager.setupVariablesExtractors(config.colorizedVariables);
@@ -326,6 +323,7 @@ export function activate(context: ExtensionContext) {
     return cb();
   });
   colorizeVisibleTextEditors();
+  return extension;
 }
 
 // this method is called when your extension is deactivated
