@@ -16,7 +16,7 @@ import { mutEditedLIne } from './lib/util/mut-edited-line';
 import { extension, q, ColorizeContext, updateContextDecorations, generateDecorations, removeDuplicateDecorations, cleanDecorationList } from './extension';
 
 function updatePositionsDeletion(range, positions) {
-  let rangeLength = range.end.line - range.start.line;
+  const rangeLength = range.end.line - range.start.line;
   positions.forEach(position => {
     if (position.newPosition === null) {
       return;
@@ -102,7 +102,7 @@ function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context: C
 }
 
 function updateDecorations(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, cb: Function) {
-  let diffLine = context.editor.document.lineCount - context.nbLine;
+  const diffLine = context.editor.document.lineCount - context.nbLine;
   if (diffLine !== 0) {
     editedLine = handleLineDiff(editedLine, context, diffLine);
     context.nbLine = context.editor.document.lineCount;

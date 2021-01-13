@@ -22,7 +22,7 @@ class Queue {
   }
   private _next() {
     this._running = false;
-    let action = this._queue.shift();
+    const action = this._queue.shift();
     if (action) {
       this._running = true;
       try {

@@ -38,7 +38,7 @@ let config: ColorizeConfig = {
 
 class ColorizeContext {
   editor: TextEditor = null;
-  nbLine: number = 0;
+  nbLine = 0;
   deco: Map < number, IDecoration[] > = new Map();
   currentSelection: number[] = null;
 }
@@ -49,7 +49,7 @@ async function initDecorations(context: ColorizeContext) {
   if (!context.editor) {
     return;
   }
-  let text = context.editor.document.getText();
+  const text = context.editor.document.getText();
   const fileLines: DocumentLine[] = ColorUtil.textToFileLines(text);
   let lines: DocumentLine[] = [];
   if (config.betaCWYS) {
@@ -61,16 +61,16 @@ async function initDecorations(context: ColorizeContext) {
   }
   // removeDuplicateDecorations(context);
   await VariablesManager.findVariablesDeclarations(context.editor.document.fileName, fileLines);
-  let variables: LineExtraction[] = await VariablesManager.findVariables(context.editor.document.fileName, lines);
+  const variables: LineExtraction[] = await VariablesManager.findVariables(context.editor.document.fileName, lines);
   const colors: LineExtraction[] = await ColorUtil.findColors(lines);
   generateDecorations(colors, variables, context.deco);
   return EditorManager.decorate(context.editor, context.deco, context.currentSelection);
 }
 function updateContextDecorations(decorations: Map<number, IDecoration[]>, context: ColorizeContext) {
-  let it = decorations.entries();
+  const it = decorations.entries();
   let tmp = it.next();
   while (!tmp.done) {
-    let line = tmp.value[0];
+    const line = tmp.value[0];
     if (context.deco.has(line)) {
       context.deco.set(line, context.deco.get(line).concat(decorations.get(line)));
     } else {
@@ -81,13 +81,13 @@ function updateContextDecorations(decorations: Map<number, IDecoration[]>, conte
 }
 
 function removeDuplicateDecorations(context: ColorizeContext) {
-  let it = context.deco.entries();
-  let m: Map<number, IDecoration[]> = new Map();
+  const it = context.deco.entries();
+  const m: Map<number, IDecoration[]> = new Map();
   let tmp = it.next();
 
   while (!tmp.done) {
-    let line = tmp.value[0];
-    let decorations = tmp.value[1];
+    const line = tmp.value[0];
+    const decorations = tmp.value[1];
     let newDecorations = [];
     decorations.forEach((deco: VariableDecoration, i) => {
       deco.generateRange(line);
@@ -168,7 +168,7 @@ function handleTextSelectionChange(event: TextEditorSelectionChangeEvent, cb: Fu
   }
   extension.currentSelection =  [];
   event.selections.forEach((selection: Selection) => {
-    let decorations = extension.deco.get(selection.active.line);
+    const decorations = extension.deco.get(selection.active.line);
     if (decorations) {
       decorations.forEach(_ => _.hide());
     }
@@ -224,11 +224,11 @@ function handleChangeActiveTextEditor(editor: TextEditor) {
 }
 
 function cleanDecorationList(context: ColorizeContext, cb) {
-  let it = context.deco.entries();
+  const it = context.deco.entries();
   let tmp = it.next();
   while (!tmp.done) {
-    let line = tmp.value[0];
-    let decorations = tmp.value[1];
+    const line = tmp.value[0];
+    const decorations = tmp.value[1];
     context.deco.set(line, decorations.filter(decoration => !decoration.disposed));
     tmp = it.next();
   }

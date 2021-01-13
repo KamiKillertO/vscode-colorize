@@ -28,7 +28,7 @@ function getColor(match: RegExpExecArray): Color {
   const value = match[0];
   const [h, s, l, a] = extractHSLValue(value);
   if (s <= 100 && l <= 100) {
-    let [r, g, b] = convertHslaToRgba(h, s, l, a);
+    const [r, g, b] = convertHslaToRgba(h, s, l, a);
     return new Color(match[1], match.index, [r, g, b]);
   }
   return null;

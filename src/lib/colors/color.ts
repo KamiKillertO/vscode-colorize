@@ -46,7 +46,7 @@ class Color implements IColor {
    *
    * @memberOf Color
    */
-  public constructor(value: string, positionInText: number = 0, rgb: number[], alpha?: number) {
+  public constructor(value: string, positionInText = 0, rgb: number[], alpha?: number) {
     this.value = value;
     this.positionInText = positionInText;
     this.alpha = Number.isNaN(alpha) ? 1 : alpha;

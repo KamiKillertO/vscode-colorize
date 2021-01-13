@@ -31,7 +31,7 @@ export default class VariableStrategy {
     let match = null;
     while ((match = this.DECLARATION_REGEXP.exec(text)) !== null) {
       const varName = this.regexpExtractor.getVariableNameFromDeclaration(match);
-      let color = ColorExtractor.extractOneColor(text.slice(match.index + match[0].length).trim()) || this.extractVariable(fileName, text.slice(match.index + match[0].length).trim());
+      const color = ColorExtractor.extractOneColor(text.slice(match.index + match[0].length).trim()) || this.extractVariable(fileName, text.slice(match.index + match[0].length).trim());
       if (this.store.has(varName, fileName, line)) {
         const decoration = this.store.findDeclaration(varName, fileName, line);
         decoration.update(<Color>color);
@@ -45,14 +45,14 @@ export default class VariableStrategy {
   public extractVariables(fileName: string, fileLines: DocumentLine[]): Promise<LineExtraction[]> {
     const variables = fileLines.map(({line, text}) => {
       let match: RegExpExecArray = null;
-      let colors: Variable[] = [];
+      const colors: Variable[] = [];
       while ((match = this.USES_REGEXP.exec(text)) !== null) {
-        let [varName, extendedVarName, spaces] = this.regexpExtractor.getVariableNameFromUses(match);
+        const [varName, extendedVarName, spaces] = this.regexpExtractor.getVariableNameFromUses(match);
 
         const spacesCount = ( spaces || '').length;
 
         const location: VariableLocation = { fileName, line, position: spacesCount + match.index };
-        let variable = new Variable(varName, new Color(extendedVarName || varName, spacesCount + match.index, null, null), location, this.name);
+        const variable = new Variable(varName, new Color(extendedVarName || varName, spacesCount + match.index, null, null), location, this.name);
         colors.push(variable);
       }
       return {line, colors};
@@ -60,12 +60,12 @@ export default class VariableStrategy {
     return flattenLineExtractionsFlatten(variables);
   }
   extractVariable(fileName: string, text: string): Color | undefined {
-    let match: RegExpMatchArray = text.match(this.USE_REGEXP);
+    const match: RegExpMatchArray = text.match(this.USE_REGEXP);
     let variable;
     if (match) {
-        const varName = this.regexpExtractor.getVariableNameFromUse(match);
-        variable = this.store.findClosestDeclaration(varName, fileName);
-        // variable = this.store.findClosestDeclaration(match[2], fileName);
+      const varName = this.regexpExtractor.getVariableNameFromUse(match);
+      variable = this.store.findClosestDeclaration(varName, fileName);
+      // variable = this.store.findClosestDeclaration(match[2], fileName);
       return variable ? variable.color : undefined;
     }
   }

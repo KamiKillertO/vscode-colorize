@@ -26,9 +26,9 @@ class VariableDecoration implements IDecoration {
    * @public
    * @memberOf ColorDecoration
    */
-  public disposed: boolean = false;
+  public disposed = false;
 
-  private hidden: boolean = false;
+  private hidden = false;
 
   public currentRange: Range;
   private _decoration: TextEditorDecorationType;
@@ -94,7 +94,7 @@ class VariableDecoration implements IDecoration {
   }
 
   public shouldGenerateDecoration(): boolean {
-    let color: Color | null = VariablesManager.findVariable(this.variable);
+    const color: Color | null = VariablesManager.findVariable(this.variable);
 
     if (this.disposed === true || color === null ) {
       return false;
@@ -104,13 +104,13 @@ class VariableDecoration implements IDecoration {
   }
 
   private _generateDecorator() {
-    let color = VariablesManager.findVariable(this.variable);
+    const color = VariablesManager.findVariable(this.variable);
     if (color && this.variable.color !== color) {
       this.variable.color = color;
     }
 
     if (this.variable.color && this.variable.color.rgb) {
-      let backgroundDecorationType = window.createTextEditorDecorationType({
+      const backgroundDecorationType = window.createTextEditorDecorationType({
         borderWidth: '1px',
         borderStyle: 'solid',
         borderColor: this.variable.color.toRgbString(),

@@ -19,11 +19,11 @@ function extractRGB(values: number[]): number[] {
 
 function extractAlpha(values: number[]): number {
   if (values.length === 4) {
-    let alpha = values[3];
+    const alpha = values[3];
     return ((16 * alpha) + alpha) / 255;
   }
   if (values.length === 8) {
-    let alpha = values.slice(6, 8);
+    const alpha = values.slice(6, 8);
     return ((16 * alpha[0]) + alpha[1]) / 255;
   }
   return 1;

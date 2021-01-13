@@ -16,10 +16,10 @@ export default class ColorStrategy implements IColorStrategy {
   async extractColors(fileLines: DocumentLine[]): Promise<LineExtraction[]> {
     return fileLines.map(({line, text}) => {
       let match = null;
-      let colors: Color[] = [];
+      const colors: Color[] = [];
 
       while ((match = this.REGEXP.exec(text)) !== null) {
-        let color = this.colorFromRegexp(match);
+        const color = this.colorFromRegexp(match);
         if (color) {
           colors.push(color);
         }
@@ -31,7 +31,7 @@ export default class ColorStrategy implements IColorStrategy {
     });
   }
   extractColor(text: string): Color {
-    let match: RegExpExecArray = this.REGEXP_ONE.exec(text);
+    const match: RegExpExecArray = this.REGEXP_ONE.exec(text);
     if (match) {
       return this.colorFromRegexp(match);
     }

@@ -18,11 +18,11 @@ function extractRGB(argb: number[]): number[] {
 
 function extractAlpha(argb: number[]): number {
   if (argb.length === 4) {
-    let alpha = argb[0];
+    const alpha = argb[0];
     return ((16 * alpha) + alpha) / 255;
   }
   if (argb.length === 8) {
-    let alpha = argb.slice(0, 2);
+    const alpha = argb.slice(0, 2);
     return ((16 * alpha[0]) + alpha[1]) / 255;
   }
   return 1;

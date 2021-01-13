@@ -8,7 +8,7 @@ export class Extractor {
   public enableStrategies(strategiesToEnable: string[]) {
     this.enabledStrategies = this.strategies.filter(strategy => {
       if (strategiesToEnable.find(_ => _ === strategy.name)) {
-        let constructor: any = strategy.constructor;
+        const constructor: any = strategy.constructor;
         return new constructor();
       }
     });

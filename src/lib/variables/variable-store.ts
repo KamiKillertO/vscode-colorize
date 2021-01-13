@@ -46,7 +46,7 @@ class VariablesStore {
   // not sure it should be here ><
   private getColor(match, fileName, line): Color {
     let color = null;
-    let varName = match[1] || match[2];
+    const varName = match[1] || match[2];
     let variables: Variable[] = [].concat(this.get(varName, fileName, line));
     if (variables.length === 0) {
       variables = [].concat(this.get(varName));
@@ -124,7 +124,7 @@ class VariablesStore {
   private filterDecorations(decorations, dir) {
     const folder = dirname(dir);
     const r = new RegExp(`^${encodeURI(folder)}`);
-    let decorationsFound = decorations.filter((deco: Variable) => r.test(encodeURI(deco.location.fileName)));
+    const decorationsFound = decorations.filter((deco: Variable) => r.test(encodeURI(deco.location.fileName)));
     if (decorationsFound.length !== 0 || folder === dir) {
       return decorationsFound;
     }

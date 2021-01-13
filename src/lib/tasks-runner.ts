@@ -29,10 +29,10 @@ class TasksRunner {
   }
 
   _run() {
-    let it: IterableIterator<any> = this._currentTask;
+    const it: IterableIterator<any> = this._currentTask;
     function run(args?: any) {
       try {
-        let result: IteratorResult<any> = it.next(args); // deal with errors in generators
+        const result: IteratorResult<any> = it.next(args); // deal with errors in generators
         if (result.done) {
           return result.value;
         } else {

@@ -14,7 +14,7 @@ class EditorManager {
    * @memberof EditorManager
    */
   public static decorate(editor: TextEditor, decorations: Map<number, IDecoration[]>, skipLines: number[]) {
-    let it = decorations.entries();
+    const it = decorations.entries();
     let tmp = it.next();
     while (!tmp.done) {
       const line = tmp.value[0];

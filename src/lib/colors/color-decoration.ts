@@ -25,8 +25,8 @@ class ColorDecoration implements IDecoration {
    * @public
    * @memberOf ColorDecoration
    */
-  public disposed: boolean = false;
-  public hidden: boolean = false;
+  public disposed = false;
+  public hidden = false;
 
   public currentRange: Range;
   private _decoration: TextEditorDecorationType;
@@ -100,7 +100,7 @@ class ColorDecoration implements IDecoration {
   }
 
   private _generateDecorator() {
-    let backgroundDecorationType = window.createTextEditorDecorationType({
+    const backgroundDecorationType = window.createTextEditorDecorationType({
       borderWidth: '1px',
       borderStyle: 'solid',
       borderColor: this.color.toRgbString(),
