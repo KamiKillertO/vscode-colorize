@@ -27,12 +27,11 @@ import { TextDocumentContentChangeEvent, Range, Position } from 'vscode';
 // }]
 //
 function mutEditedLIne(editedLine: TextDocumentContentChangeEvent[]): TextDocumentContentChangeEvent[] {
-  let newEditedLine: TextDocumentContentChangeEvent[] = [];
+  const newEditedLine: TextDocumentContentChangeEvent[] = [];
   let startLine = 0;
   let before = 0;
   editedLine.reverse();
   editedLine.forEach(line => {
-    let a = line.text.match(/\n/g);
     startLine = line.range.start.line + before;
     line.text.split(/\n/).map((text, i, array) => {
       if (i === 0 && text === '' && array.length === 1) {

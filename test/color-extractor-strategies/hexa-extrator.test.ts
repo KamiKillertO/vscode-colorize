@@ -53,7 +53,7 @@ describe('Test CSS hexa color Regex', () => {
   it('Sould match inside a string', function() {
     assert.equal(regex_exec('"#ffffff"', REGEXP)[1], '#ffffff');
     // tslint:disable-next-line
-    assert.equal(regex_exec("'#ffffff'", REGEXP)[1], '#ffffff');
+    assert.equal(regex_exec('\'#ffffff\'', REGEXP)[1], '#ffffff');
     assert.equal(regex_exec('`#ffffff`', REGEXP)[1], '#ffffff');
   });
   it('Should match with different characters at the end', function () {

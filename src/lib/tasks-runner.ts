@@ -1,5 +1,5 @@
-class TasksRunner {
-  private _currentTask: IterableIterator<any> = null;
+class TasksRunner<T> {
+  private _currentTask: IterableIterator<T> = null;
 
   /**
    * Add a task to run.
@@ -9,7 +9,7 @@ class TasksRunner {
    * @returns
    * @memberOf TasksRunner
    */
-  run(f: () => IterableIterator<any>) {
+  run(f: () => IterableIterator<T>): TasksRunner<T> {
     if (this._currentTask) {
       this._currentTask.return();
     }
@@ -28,17 +28,20 @@ class TasksRunner {
     }
   }
 
-  _run() {
-    let it: IterableIterator<any> = this._currentTask;
+  _run(): void {
+    const it: IterableIterator<T> = this._currentTask;
+    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     function run(args?: any) {
       try {
-        let result: IteratorResult<any> = it.next(args); // deal with errors in generators
+        const result: IteratorResult<T> = it.next(args); // deal with errors in generators
         if (result.done) {
           return result.value;
         } else {
           return Promise.resolve(result.value).then(run);
         }
-      } catch (error) {}
+      } catch (error) {
+        // do something
+      }
     }
     run();
   }

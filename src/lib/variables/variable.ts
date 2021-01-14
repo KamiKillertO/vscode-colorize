@@ -39,7 +39,7 @@ class Variable implements IColor {
     return this.color.toRgbString();
   }
 
-  public update(color: Color) {
+  public update(color: Color): void {
     this.color = color;
   }
 }

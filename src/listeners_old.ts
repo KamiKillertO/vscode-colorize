@@ -16,7 +16,7 @@ import { mutEditedLIne } from './lib/util/mut-edited-line';
 import { extension, q, ColorizeContext, updateContextDecorations, generateDecorations, removeDuplicateDecorations, cleanDecorationList } from './extension';
 
 function updatePositionsDeletion(range, positions) {
-  let rangeLength = range.end.line - range.start.line;
+  const rangeLength = range.end.line - range.start.line;
   positions.forEach(position => {
     if (position.newPosition === null) {
       return;
@@ -35,7 +35,7 @@ function updatePositionsDeletion(range, positions) {
   return positions;
 }
 
-function handleLineRemoved(editedLine: TextDocumentContentChangeEvent[], positions, context: ColorizeContext) {
+function handleLineRemoved(editedLine: TextDocumentContentChangeEvent[], positions) {
   editedLine.reverse();
   editedLine.forEach((line: TextDocumentContentChangeEvent) => {
     for (let i = line.range.start.line; i <= line.range.end.line; i++) {
@@ -48,7 +48,7 @@ function handleLineRemoved(editedLine: TextDocumentContentChangeEvent[], positio
   return editedLine;
 }
 
-function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position, context: ColorizeContext) {
+function handleLineAdded(editedLine: TextDocumentContentChangeEvent[], position) {
   editedLine = mutEditedLIne(editedLine);
   editedLine.forEach((line) => {
     position.forEach(position => {
@@ -76,16 +76,16 @@ function filterPositions(position, deco, diffLine) {
   return true;
 }
 
-function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, diffLine: number) {
+function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, diffLine: number): TextDocumentContentChangeEvent[] {
   let positions = mapKeysToArray(context.deco).map(position => Object({
     oldPosition: position,
     newPosition: position
   }));
 
   if (diffLine < 0) {
-    editedLine = handleLineRemoved(editedLine, positions, context);
+    editedLine = handleLineRemoved(editedLine, positions);
   } else {
-    editedLine = handleLineAdded(editedLine, positions, context);
+    editedLine = handleLineAdded(editedLine, positions);
   }
   positions = positions.filter(position => filterPositions(position, context.deco, diffLine));
   context.deco = positions.reduce((decorations, position) => {
@@ -101,8 +101,8 @@ function handleLineDiff(editedLine: TextDocumentContentChangeEvent[], context: C
   return editedLine;
 }
 
-function updateDecorations(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, cb: Function) {
-  let diffLine = context.editor.document.lineCount - context.nbLine;
+function updateDecorations(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, cb: () => void) {
+  const diffLine = context.editor.document.lineCount - context.nbLine;
   if (diffLine !== 0) {
     editedLine = handleLineDiff(editedLine, context, diffLine);
     context.nbLine = context.editor.document.lineCount;
@@ -110,7 +110,7 @@ function updateDecorations(editedLine: TextDocumentContentChangeEvent[], context
   checkDecorationForUpdate(editedLine, context, cb);
 }
 
-function disposeDecorationsForEditedLines(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext) {
+function disposeDecorationsForEditedLines(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext): void {
   editedLine.map(({range}: TextDocumentContentChangeEvent) => {
     const line = range.start.line;
     if (context.deco.has(line)) {
@@ -127,7 +127,7 @@ function getTextForEditedLines(editedLine: TextDocumentContentChangeEvent[], con
 }
 
 
-async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, cb) {
+async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEvent[], context: ColorizeContext, cb: () => void) {
 
   disposeDecorationsForEditedLines(editedLine, context);
   const fileLines: DocumentLine[] = getTextForEditedLines(editedLine, context);
@@ -139,7 +139,7 @@ async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEve
     await VariablesManager.findVariablesDeclarations(context.editor.document.fileName, lines);
     variables = await VariablesManager.findVariables(context.editor.document.fileName, lines);
 
-    const colors: LineExtraction[] = await ColorUtil.findColors(fileLines, context.editor.document.fileName);
+    const colors: LineExtraction[] = await ColorUtil.findColors(fileLines);
 
     const decorations = generateDecorations(colors, variables, new Map());
 
@@ -148,6 +148,7 @@ async function checkDecorationForUpdate(editedLine: TextDocumentContentChangeEve
     updateContextDecorations(decorations, context);
     removeDuplicateDecorations(context);
   } catch (error) {
+    // do something
   }
   return cb();
 }
@@ -161,7 +162,7 @@ function handleChangeTextDocument(event: TextDocumentChangeEvent) {
   }
 }
 
-function setupEventListeners(context: ExtensionContext) {
+function setupEventListeners(context: ExtensionContext): void {
   // window.onDidChangeTextEditorSelection((event) => q.push((cb) => handleTextSelectionChange(event, cb)), null, context.subscriptions);
   workspace.onDidChangeTextDocument(handleChangeTextDocument, null, context.subscriptions);
 }

@@ -19,7 +19,7 @@ function getColor(match: RegExpExecArray): Color {
   const value = match[1];
   const rgba = extractRGBA(value);
   const alpha = rgba[3] || 1;
-  const rgb = rgba.slice(0, 3);
+  const rgb = rgba.slice(0, 3) as [number, number, number];
   // Check if it's a valid rgb(a) color
   if (rgb.every(c => c <= 255)) {
     return new Color(match[1], match.index, rgb, alpha);

@@ -12,7 +12,7 @@ class ColorExtractor extends Extractor {
     return flattenLineExtractionsFlatten(colors); // should regroup per lines?
   }
   public extractOneColor(text: string): IColor {
-    let colors = this.enabledStrategies.map(strategy => (<IColorStrategy> strategy).extractColor(text));
+    const colors = this.enabledStrategies.map(strategy => (<IColorStrategy> strategy).extractColor(text));
     return colors.find(color => color !== null);
   }
 }

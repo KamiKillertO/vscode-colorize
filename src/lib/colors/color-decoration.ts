@@ -25,8 +25,8 @@ class ColorDecoration implements IDecoration {
    * @public
    * @memberOf ColorDecoration
    */
-  public disposed: boolean = false;
-  public hidden: boolean = false;
+  public disposed = false;
+  public hidden = false;
 
   public currentRange: Range;
   private _decoration: TextEditorDecorationType;
@@ -44,7 +44,7 @@ class ColorDecoration implements IDecoration {
     this._decoration = deco;
   }
 
-  get rgb() {
+  get rgb(): [number, number, number] {
     return this.color.rgb;
   }
 
@@ -63,7 +63,9 @@ class ColorDecoration implements IDecoration {
     try {
       this._decoration.dispose();
       this.disposed = true;
-    } catch (error) {}
+    } catch (error) {
+      // do something
+    }
   }
   /**
    * Hide the TextEditorDecorationType.
@@ -71,7 +73,7 @@ class ColorDecoration implements IDecoration {
    * @public
    * @memberOf ColorDecoration
    */
-  public hide() {
+  public hide(): void {
     if (this._decoration) {
       this._decoration.dispose();
     }
@@ -100,7 +102,7 @@ class ColorDecoration implements IDecoration {
   }
 
   private _generateDecorator() {
-    let backgroundDecorationType = window.createTextEditorDecorationType({
+    const backgroundDecorationType = window.createTextEditorDecorationType({
       borderWidth: '1px',
       borderStyle: 'solid',
       borderColor: this.color.toRgbString(),

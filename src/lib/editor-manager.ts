@@ -13,8 +13,8 @@ class EditorManager {
    * @returns
    * @memberof EditorManager
    */
-  public static decorate(editor: TextEditor, decorations: Map<number, IDecoration[]>, skipLines: number[]) {
-    let it = decorations.entries();
+  public static decorate(editor: TextEditor, decorations: Map<number, IDecoration[]>, skipLines: number[]): void {
+    const it = decorations.entries();
     let tmp = it.next();
     while (!tmp.done) {
       const line = tmp.value[0];
@@ -37,7 +37,7 @@ class EditorManager {
    * @param {number} line
    * @memberof EditorManager
    */
-  public static decorateOneLine(editor: TextEditor, decorations: IDecoration[], line: number) {
+  public static decorateOneLine(editor: TextEditor, decorations: IDecoration[], line: number): void {
     decorations.forEach((decoration: IDecoration) => {
       if (decoration.shouldGenerateDecoration() === true) {
         editor.setDecorations(decoration.decoration, [decoration.generateRange(line)]);

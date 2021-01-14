@@ -18,10 +18,11 @@ interface LineExtraction {
   colors: IColor[];
 }
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const flattenLineExtractionsFlatten = arr => arr.reduce((a, b) => a.concat(Array.isArray(b) ? flattenLineExtractionsFlatten(b) : b), []).filter(_ => _.colors.length !== 0);
 
 const WHITE = '#FFFFFF',
-      BLACK = '#000000';
+  BLACK = '#000000';
 
 interface IDecoration {
   decoration: TextEditorDecorationType;
@@ -75,10 +76,10 @@ interface IDecoration {
 class ColorUtil {
   public static textToFileLines(text: string): DocumentLine[] {
     return text.split(/\n/)
-                .map((text, index) => Object({
-                  'text': text,
-                  'line': index
-                }));
+      .map((text, index) => Object({
+        'text': text,
+        'line': index
+      }));
   }
   /**
    * Extract all colors from a text
@@ -89,11 +90,11 @@ class ColorUtil {
    *
    * @memberOf ColorUtil
    */
-  public static findColors(fileContent: DocumentLine[], fileName = null): Promise < LineExtraction[] > {
+  public static findColors(fileContent: DocumentLine[]): Promise<LineExtraction[]> {
     return ColorExtractor.extract(fileContent);
   }
 
-  public static setupColorsExtractors(extractors: string[]) {
+  public static setupColorsExtractors(extractors: string[]): void {
     ColorExtractor.enableStrategies(extractors);
   }
 
@@ -103,7 +104,7 @@ class ColorUtil {
 }
 
 
-  /**
+/**
    * Generate the color luminance.
    * The luminance value is between 0 and 1
    * - 1 means that the color is light
@@ -114,8 +115,7 @@ class ColorUtil {
    * @returns {number}
    */
 function colorLuminance(color: Color): number {
-  let rgb = color.rgb;
-  rgb = rgb.map(c => {
+  const rgb = color.rgb.map(c => {
     c = c / 255;
     if (c < 0.03928) {
       c = c / 12.92;
@@ -143,7 +143,7 @@ function generateOptimalTextColor(color: Color): string {
   }
   return WHITE;
 }
-  /**
+/**
  * Converts an RGB color value to HSL. Conversion formula
  * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
  *
@@ -154,22 +154,29 @@ function generateOptimalTextColor(color: Color): string {
  *
  * @return  {[number, number, number, number]} [h,s,l,a] - The HSLa representation
  */
-function convertRgbaToHsla (r: number, g: number, b: number, a: number = 1): [number, number, number, number] {
+function convertRgbaToHsla (r: number, g: number, b: number, a = 1): [number, number, number, number] {
   r /= 255, g /= 255, b /= 255;
 
   const max = Math.max(r, g, b), min = Math.min(r, g, b);
-  let h, s, l = (max + min) / 2;
+  let h;
+  const l = (max + min) / 2;
 
   if (max === min) {
     return [0, 0, Math.round(l * 100), a]; // achromatic
   }
   const d = max - min;
-  s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
 
   switch (max) {
-    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-    case g: h = (b - r) / d + 2; break;
-    case b: h = (r - g) / d + 4; break;
+    case r:
+      h = (g - b) / d + (g < b ? 6 : 0);
+      break;
+    case g:
+      h = (b - r) / d + 2;
+      break;
+    case b:
+      h = (r - g) / d + 4;
+      break;
   }
   h /= 6;
   return [ Math.round(360 * h), Math.round(100 * s), Math.round(l * 100), a ];
@@ -185,7 +192,7 @@ function convertRgbaToHsla (r: number, g: number, b: number, a: number = 1): [nu
  *
  * @return  {[number, number, number, number]} [r,g,b,a] - The RGBa representation
  */
-function convertHslaToRgba(h: number, s: number, l: number, a: number = 1): [number, number, number, number] {
+function convertHslaToRgba(h: number, s: number, l: number, a = 1): [number, number, number, number] {
   let r: number, g: number, b: number;
   if (s === 0) {
     r = g = b = Math.round((l / 100) * 255);
@@ -193,13 +200,13 @@ function convertHslaToRgba(h: number, s: number, l: number, a: number = 1): [num
   }
   l = l / 100;
   s = s / 100;
-  let tmp_1 = (l < 0.5) ? l * (1.0 + s) : l + s - l * s;
+  const tmp_1 = (l < 0.5) ? l * (1.0 + s) : l + s - l * s;
 
-  let temp_2 = 2 * l - tmp_1;
+  const temp_2 = 2 * l - tmp_1;
   h = (h % 360) / 360;
 
-  let tmp_r = (h + 0.333) % 1;
-  let tmp_g = h;
+  const tmp_r = (h + 0.333) % 1;
+  const tmp_g = h;
   let tmp_b = h - 0.333;
   if (tmp_b < 0) {
     tmp_b = tmp_b + 1;
@@ -223,7 +230,7 @@ function convertHslaToRgba(h: number, s: number, l: number, a: number = 1): [num
  * @memberof HSLColorExtractor
  */
 function executeHSLProperFormula(tmp_1: number, tmp_2: number, value: number): number {
-  let res = tmp_2;
+  const res = tmp_2;
   if (6 * value < 1) {
     return tmp_2 + (tmp_1 - tmp_2) * 6 * value;
   }

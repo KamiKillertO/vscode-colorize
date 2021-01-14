@@ -11,7 +11,7 @@ import * as colorize from '../src/extension';
 import * as path from 'path';
 
 const ext: vscode.Extension<colorize.ColorizeContext> = vscode.extensions.getExtension('kamikillerto.vscode-colorize');
-let fixtureSourcePath = path.join(__dirname, '..', '..', 'test', 'fixtures');
+const fixtureSourcePath = path.join(__dirname, '..', '..', 'test', 'fixtures');
 
 describe('Extension', () => {
   it('is activated successfully upon opening a scss file', async() => {

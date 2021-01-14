@@ -5,7 +5,7 @@ import { dirname } from 'path';
 class VariablesStore {
   private entries: Map < string, Variable[] > = new Map();
 
-  public has(variable: string = null, fileName: string = null, line: number = null) {
+  public has(variable: string = null, fileName: string = null, line: number = null): boolean {
     const declarations = this.get(variable, fileName, line);
     return declarations && declarations.length > 0;
   }
@@ -19,7 +19,7 @@ class VariablesStore {
     }
     return decorations;
   }
-  private __delete(variable: string, fileName: string, line: number) {
+  private __delete(variable: string, fileName: string, line: number): void {
     let decorations = this.get(variable);
 
     if (line !== null) {
@@ -30,7 +30,7 @@ class VariablesStore {
     this.entries.set(variable, decorations);
     return;
   }
-  public delete(variable: string = null, fileName: string = null, line: number = null) {
+  public delete(variable: string = null, fileName: string = null, line: number = null): void {
     if (variable !== null) {
       return this.__delete(variable, fileName, line);
     }
@@ -46,7 +46,7 @@ class VariablesStore {
   // not sure it should be here ><
   private getColor(match, fileName, line): Color {
     let color = null;
-    let varName = match[1] || match[2];
+    const varName = match[1] || match[2];
     let variables: Variable[] = [].concat(this.get(varName, fileName, line));
     if (variables.length === 0) {
       variables = [].concat(this.get(varName));
@@ -57,7 +57,7 @@ class VariablesStore {
     return color;
   }
 
-  public addEntry(key: string, value: Variable | Variable[]) {
+  public addEntry(key: string, value: Variable | Variable[]): void {
     const _value: Variable[] = Array.isArray(value) ? value : [value];
     if (this.entries.has(key)) {
       const decorations = this.entries.get(key);
@@ -88,7 +88,7 @@ class VariablesStore {
   //     }
   //   });
   // }
-  public get count() {
+  public get count(): number {
     return this.entries.size;
   }
 
@@ -124,7 +124,7 @@ class VariablesStore {
   private filterDecorations(decorations, dir) {
     const folder = dirname(dir);
     const r = new RegExp(`^${encodeURI(folder)}`);
-    let decorationsFound = decorations.filter((deco: Variable) => r.test(encodeURI(deco.location.fileName)));
+    const decorationsFound = decorations.filter((deco: Variable) => r.test(encodeURI(deco.location.fileName)));
     if (decorationsFound.length !== 0 || folder === dir) {
       return decorationsFound;
     }
