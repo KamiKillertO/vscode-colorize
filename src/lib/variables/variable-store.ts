@@ -5,7 +5,7 @@ import { dirname } from 'path';
 class VariablesStore {
   private entries: Map < string, Variable[] > = new Map();
 
-  public has(variable: string = null, fileName: string = null, line: number = null) {
+  public has(variable: string = null, fileName: string = null, line: number = null): boolean {
     const declarations = this.get(variable, fileName, line);
     return declarations && declarations.length > 0;
   }
@@ -19,7 +19,7 @@ class VariablesStore {
     }
     return decorations;
   }
-  private __delete(variable: string, fileName: string, line: number) {
+  private __delete(variable: string, fileName: string, line: number): void {
     let decorations = this.get(variable);
 
     if (line !== null) {
@@ -30,7 +30,7 @@ class VariablesStore {
     this.entries.set(variable, decorations);
     return;
   }
-  public delete(variable: string = null, fileName: string = null, line: number = null) {
+  public delete(variable: string = null, fileName: string = null, line: number = null): void {
     if (variable !== null) {
       return this.__delete(variable, fileName, line);
     }
@@ -57,7 +57,7 @@ class VariablesStore {
     return color;
   }
 
-  public addEntry(key: string, value: Variable | Variable[]) {
+  public addEntry(key: string, value: Variable | Variable[]): void {
     const _value: Variable[] = Array.isArray(value) ? value : [value];
     if (this.entries.has(key)) {
       const decorations = this.entries.get(key);
@@ -88,7 +88,7 @@ class VariablesStore {
   //     }
   //   });
   // }
-  public get count() {
+  public get count(): number {
     return this.entries.size;
   }
 

@@ -46,7 +46,7 @@ class VariableDecoration implements IDecoration {
     this._decoration = deco;
   }
 
-  get rgb() {
+  get rgb(): [number, number, number] {
     return this.variable.color.rgb;
   }
 
@@ -69,7 +69,9 @@ class VariableDecoration implements IDecoration {
     try {
       this._decoration.dispose();
       this.variable.color.rgb = null;
-    } catch (error) {}
+    } catch (error) {
+      // do something
+    }
     this.disposed = true;
   }
   public hide(): void {

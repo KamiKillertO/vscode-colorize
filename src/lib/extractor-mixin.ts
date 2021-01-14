@@ -5,9 +5,10 @@ export class Extractor {
   public strategies: IStrategy[];
   protected enabledStrategies: IStrategy[];
 
-  public enableStrategies(strategiesToEnable: string[]) {
+  public enableStrategies(strategiesToEnable: string[]): void {
     this.enabledStrategies = this.strategies.filter(strategy => {
       if (strategiesToEnable.find(_ => _ === strategy.name)) {
+        // eslint-disable-next-line  @typescript-eslint/no-explicit-any
         const constructor: any = strategy.constructor;
         return new constructor();
       }
@@ -17,7 +18,7 @@ export class Extractor {
   constructor() {
     this.strategies = [];
   }
-  public registerStrategy(strategy: IStrategy) {
+  public registerStrategy(strategy: IStrategy): void {
     if (!this.has(strategy)) {
       this.strategies.push(strategy);
     }

@@ -27,7 +27,7 @@ export default class VariableStrategy {
   public async extractDeclarations(fileName: string, fileLines: DocumentLine[]): Promise<number> {
     return fileLines.map(({text, line}) => this.__extractDeclarations(fileName, text, line)).length;
   }
-  public __extractDeclarations(fileName: string, text: string, line: number) {
+  public __extractDeclarations(fileName: string, text: string, line: number): void {
     let match = null;
     while ((match = this.DECLARATION_REGEXP.exec(text)) !== null) {
       const varName = this.regexpExtractor.getVariableNameFromDeclaration(match);
@@ -95,8 +95,8 @@ export default class VariableStrategy {
     return this.store.count;
   }
 
-  deleteVariable(fileName: string, line: number) {
-    return this.store.delete(null, fileName, line);
+  deleteVariable(fileName: string, line: number): void {
+    this.store.delete(null, fileName, line);
   }
 }
 

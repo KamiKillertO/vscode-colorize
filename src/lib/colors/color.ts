@@ -19,7 +19,7 @@ class Color implements IColor {
    * @public
    * @memberOf Color
    */
-  public rgb: number[];
+  public rgb: [number, number, number];
   /**
    *  The color alpha, the value should be between 0 and 1
    *
@@ -46,10 +46,10 @@ class Color implements IColor {
    *
    * @memberOf Color
    */
-  public constructor(value: string, positionInText = 0, rgb: number[], alpha?: number) {
+  public constructor(value: string, positionInText = 0, rgb: [number, number, number], alpha?: number) {
     this.value = value;
     this.positionInText = positionInText;
-    this.alpha = Number.isNaN(alpha) ? 1 : alpha;
+    this.alpha = Number.isNaN(alpha) ? 1 : alpha;
     this.rgb = rgb;
   }
   /**

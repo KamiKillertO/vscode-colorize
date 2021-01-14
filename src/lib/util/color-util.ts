@@ -18,6 +18,7 @@ interface LineExtraction {
   colors: IColor[];
 }
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 const flattenLineExtractionsFlatten = arr => arr.reduce((a, b) => a.concat(Array.isArray(b) ? flattenLineExtractionsFlatten(b) : b), []).filter(_ => _.colors.length !== 0);
 
 const WHITE = '#FFFFFF',
@@ -89,11 +90,11 @@ class ColorUtil {
    *
    * @memberOf ColorUtil
    */
-  public static findColors(fileContent: DocumentLine[], fileName = null): Promise < LineExtraction[] > {
+  public static findColors(fileContent: DocumentLine[]): Promise<LineExtraction[]> {
     return ColorExtractor.extract(fileContent);
   }
 
-  public static setupColorsExtractors(extractors: string[]) {
+  public static setupColorsExtractors(extractors: string[]): void {
     ColorExtractor.enableStrategies(extractors);
   }
 
@@ -114,8 +115,7 @@ class ColorUtil {
    * @returns {number}
    */
 function colorLuminance(color: Color): number {
-  let rgb = color.rgb;
-  rgb = rgb.map(c => {
+  const rgb = color.rgb.map(c => {
     c = c / 255;
     if (c < 0.03928) {
       c = c / 12.92;

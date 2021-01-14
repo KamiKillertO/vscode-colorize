@@ -2,7 +2,9 @@ import VariablesExtractor from '../variables-extractor';
 import { EOL } from '../../util/regexp';
 import VariableStrategy from './__strategy-base';
 
+// eslint-disable-next-line
 export const REGEXP = new RegExp(`(var\\((--(?:[a-z]+[\-_a-z\\d]*))\\))(?!:)${EOL}`, 'gi');
+// eslint-disable-next-line
 export const REGEXP_ONE = new RegExp(`^(var\\((--(?:[a-z]+[\-_a-z\\d]*))\\))(?!:)${EOL}`, 'i');
 export const DECLARATION_REGEXP = new RegExp(`(?:(--(?:[a-z]+[\\-_a-z\\d]*)\\s*):)${EOL}`, 'gi');
 

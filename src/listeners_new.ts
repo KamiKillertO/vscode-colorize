@@ -16,8 +16,7 @@ import TasksRunner from './lib/tasks-runner';
 import { extension, updateContextDecorations, generateDecorations, removeDuplicateDecorations } from './extension';
 import { handleLineDiff, disposeDecorationsForEditedLines } from './listeners_old';
 
-const taskRuner: TasksRunner = new TasksRunner();
-
+const taskRuner = new TasksRunner();
 
 function getDecorationsToColorize(colors, variables): Map<number, IDecoration[]> {
   const decorations = generateDecorations(colors, variables, new Map());
@@ -100,7 +99,7 @@ function* updateDecorations() {
 
   yield VariablesManager.findVariablesDeclarations(fileName, fileLines);
   const variables: LineExtraction[] = yield VariablesManager.findVariables(fileName, lines);
-  const colors: LineExtraction[] = yield ColorUtil.findColors(lines, fileName);
+  const colors: LineExtraction[] = yield ColorUtil.findColors(lines);
   const decorations = getDecorationsToColorize(colors, variables);
   // removeDuplicateDecorations(decorations);
   // EditorManager.decorate(context.editor, decorations, context.currentSelection);
@@ -138,7 +137,7 @@ function handleChangeTextDocument(event: TextDocumentChangeEvent) {
   }
 }
 
-function setupEventListeners(context: ExtensionContext) {
+function setupEventListeners(context: ExtensionContext): void {
   // window.onDidChangeTextEditorSelection((event) => q.push((cb) => handleTextSelectionChange(event, cb)), null, context.subscriptions);
   workspace.onDidChangeTextDocument(handleChangeTextDocument, null, context.subscriptions);
   window.onDidChangeTextEditorVisibleRanges(() => taskRuner.run(handleVisibleRangeEvent), null, context.subscriptions);

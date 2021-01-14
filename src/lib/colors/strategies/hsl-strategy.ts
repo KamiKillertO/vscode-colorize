@@ -1,5 +1,5 @@
 import Color from './../color';
-import ColorExtractor, { IColorStrategy } from '../color-extractor';
+import ColorExtractor from '../color-extractor';
 import { convertHslaToRgba } from '../../util/color-util';
 import { DOT_VALUE, ALPHA, EOL } from '../../util/regexp';
 import ColorStrategy from './__strategy-base';

@@ -32,7 +32,6 @@ function mutEditedLIne(editedLine: TextDocumentContentChangeEvent[]): TextDocume
   let before = 0;
   editedLine.reverse();
   editedLine.forEach(line => {
-    const a = line.text.match(/\n/g);
     startLine = line.range.start.line + before;
     line.text.split(/\n/).map((text, i, array) => {
       if (i === 0 && text === '' && array.length === 1) {

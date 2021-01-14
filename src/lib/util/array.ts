@@ -1,10 +1,10 @@
-type callbackFn = (value: any, index: number, array: any[]) => any;
+type callbackFn<V> = (value: V, index: number, array: Array<V>) => V;
 
-function flatten(arr: any[]): any[] {
+function flatten<T>(arr: Array<T>): Array<T> {
   return Array.prototype.concat.apply([], arr);
 }
 
-function unique(arr: any[], f?: callbackFn) {
+function unique<T>(arr: Array<T>, f?: callbackFn<T>): Array<T> {
   let vArr = arr;
   if (f) {
     vArr = arr.map(f);
@@ -13,11 +13,11 @@ function unique(arr: any[], f?: callbackFn) {
 }
 
 // Return all map's keys in an array
-function mapKeysToArray(map: Map < number, any > ) {
+function mapKeysToArray<T>(map: Map<number, T>): Array<number> {
   return Array.from(map.keys());
 }
 
-function equals(arr1: any[], arr2: any[]) {
+function equals<T>(arr1: Array<T>, arr2: Array<T>) : boolean {
   if (arr1 === null || arr2 === null) {
     return false;
   }

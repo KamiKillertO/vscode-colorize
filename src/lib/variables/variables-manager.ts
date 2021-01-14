@@ -6,7 +6,6 @@ import './strategies/css-strategy';
 import './strategies/less-strategy';
 import './strategies/sass-strategy';
 import './strategies/stylus-strategy';
-import * as path from 'path';
 import * as fs from 'fs';
 import { workspace, window, StatusBarAlignment, StatusBarItem, Uri, TextDocument } from 'vscode';
 import { DocumentLine, LineExtraction } from '../util/color-util';

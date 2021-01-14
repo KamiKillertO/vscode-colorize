@@ -8,7 +8,7 @@ export const REGEXP = new RegExp(`(${HEXA_PREFIX}(?:${HEXA_VALUE}{3,4}|${HEXA_VA
 export const REGEXP_ONE = new RegExp(`^(${HEXA_PREFIX}(?:${HEXA_VALUE}{3,4}|${HEXA_VALUE}{6}|${HEXA_VALUE}{8}))${EOL}`, 'i');
 
 
-function extractRGB(values: number[]): number[] {
+function extractRGB(values: number[]): [number, number, number] {
   let rgb = values.slice(0, 6);
   if (values.length === 3 || values.length === 4) {
     const _rgb = values.slice(0, 3);
@@ -37,10 +37,10 @@ function hexaToInt(argb: string): number[] {
 }
 function getColor(match: RegExpExecArray): Color {
   const value = match[1];
-  const str: string = removePrefix(value)[1];
-  const values: number[] = hexaToInt(str);
-  const rgb: number[] = extractRGB(values);
-  const alpha: number = extractAlpha(values);
+  const str = removePrefix(value)[1];
+  const values = hexaToInt(str);
+  const rgb = extractRGB(values);
+  const alpha = extractAlpha(values);
   return new Color(value, match.index, rgb, alpha);
 }
 const strategy = new ColorStrategy('HEXA', REGEXP, REGEXP_ONE, getColor);

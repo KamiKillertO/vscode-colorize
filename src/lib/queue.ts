@@ -1,8 +1,9 @@
+type QueueItem = (cb: () => void) => unknown
 class Queue {
 
   private _running = false;
 
-  private _queue: Function[] = [];
+  private _queue: Array<QueueItem> = [];
   /**
    * Add a action inside the queue.
    * The action should take a callback as first parameter and call it
@@ -12,7 +13,7 @@ class Queue {
    * @returns
    * @memberOf Queue
    */
-  public push(f: Function) {
+  public push(f: QueueItem): Queue {
     this._queue.push(f);
     if (!this._running) {
       // if nothing is running, then start the engines!

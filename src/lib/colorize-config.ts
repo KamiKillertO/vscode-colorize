@@ -1,5 +1,12 @@
-import { flatten, unique } from './util/array';
-import { WorkspaceConfiguration, workspace, Extension, extensions, window, commands } from 'vscode';
+import {
+  flatten,
+  unique
+} from './util/array';
+import {
+  WorkspaceConfiguration,
+  workspace,
+  extensions
+} from 'vscode';
 
 interface ColorizeConfig {
   languages: string[];
