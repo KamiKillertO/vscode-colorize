@@ -5,6 +5,10 @@ export class Extractor {
   public strategies: IStrategy[];
   protected enabledStrategies: IStrategy[];
 
+  constructor() {
+    this.strategies = [];
+  }
+
   public enableStrategies(strategiesToEnable: string[]): void {
     this.enabledStrategies = this.strategies.filter(strategy => {
       if (strategiesToEnable.find(_ => _ === strategy.name)) {
@@ -15,14 +19,12 @@ export class Extractor {
     });
   }
 
-  constructor() {
-    this.strategies = [];
-  }
   public registerStrategy(strategy: IStrategy): void {
     if (!this.has(strategy)) {
       this.strategies.push(strategy);
     }
   }
+
   public has(strategy: string | IStrategy): boolean {
     if (typeof strategy === 'string') {
       return this.strategies.some(_ => _.name === strategy);

@@ -21,8 +21,7 @@ import * as globToRegexp from 'glob-to-regexp';
 import VariableDecoration from './lib/variables/variable-decoration';
 import { getColorizeConfig, ColorizeConfig } from './lib/colorize-config';
 
-import OldListeners from './listeners_old';
-import NewListeners from './listeners_new';
+import Listeners from './listeners';
 
 let config: ColorizeConfig = {
   languages: [],
@@ -32,8 +31,7 @@ let config: ColorizeConfig = {
   filesToExcludes: [],
   filesToIncludes: [],
   inferedFilesToInclude: [],
-  searchVariables: false,
-  betaCWYS: false
+  searchVariables: false
 };
 
 class ColorizeContext {
@@ -51,14 +49,14 @@ async function initDecorations(context: ColorizeContext) {
   }
   const text = context.editor.document.getText();
   const fileLines: DocumentLine[] = ColorUtil.textToFileLines(text);
-  let lines: DocumentLine[] = [];
-  if (config.betaCWYS) {
-    context.editor.visibleRanges.forEach((range: Range) => {
-      lines = lines.concat(fileLines.slice(range.start.line, range.end.line + 2));
-    });
-  } else {
-    lines = fileLines;
-  }
+
+  const lines: DocumentLine[] = context.editor.visibleRanges.reduce((acc: DocumentLine[], range: Range) => {
+    return [
+      ...acc,
+      ...fileLines.slice(range.start.line, range.end.line + 2)
+    ];
+  }, []);
+
   // removeDuplicateDecorations(context);
   await VariablesManager.findVariablesDeclarations(context.editor.document.fileName, fileLines);
   const variables: LineExtraction[] = await VariablesManager.findVariables(context.editor.document.fileName, lines);
@@ -66,6 +64,7 @@ async function initDecorations(context: ColorizeContext) {
   generateDecorations(colors, variables, context.deco);
   return EditorManager.decorate(context.editor, context.deco, context.currentSelection);
 }
+
 function updateContextDecorations(decorations: Map<number, IDecoration[]>, context: ColorizeContext): void {
   const it = decorations.entries();
   let tmp = it.next();
@@ -89,6 +88,7 @@ function removeDuplicateDecorations(context: ColorizeContext): void {
     const line = tmp.value[0];
     const decorations = tmp.value[1];
     let newDecorations = [];
+    // TODO; use reduce?
     decorations.forEach((deco: VariableDecoration) => {
       deco.generateRange(line);
       const exist = newDecorations.findIndex((_: IDecoration) => deco.currentRange.isEqual(_.currentRange));
@@ -111,8 +111,8 @@ function updateDecorationMap(map: Map<number, IDecoration[]>, line: number, deco
     map.set(line, [decoration]);
   }
 }
-function generateDecorations(colors: LineExtraction[], variables: LineExtraction[], decorations: Map<number, IDecoration[]>): Map<number, IDecoration[]> {
 
+function generateDecorations(colors: LineExtraction[], variables: LineExtraction[], decorations: Map<number, IDecoration[]>): Map<number, IDecoration[]> {
   colors.map(({line, colors}) => colors.forEach((color) => {
     const decoration = ColorUtil.generateDecoration(color, line);
     updateDecorationMap(decorations, line, decoration);
@@ -177,7 +177,7 @@ function handleTextSelectionChange(event: TextEditorSelectionChangeEvent, cb: ()
   return cb();
 }
 
-function handleCloseOpen(document) {
+function handleCloseOpen(document: TextDocument) {
   q.push((cb) => {
     if (extension.editor && extension.editor.document.fileName === document.fileName) {
       CacheManager.saveDecorations(document, extension.deco);
@@ -278,12 +278,9 @@ function initEventListeners(context: ExtensionContext) {
   window.onDidChangeActiveTextEditor(handleChangeActiveTextEditor, null, context.subscriptions);
   workspace.onDidChangeConfiguration(handleConfigurationChanged, null, context.subscriptions);
 
-  if (config.betaCWYS) {
-    NewListeners.setupEventListeners(context);
-  } else {
-    OldListeners.setupEventListeners(context);
-  }
+  Listeners.setupEventListeners(context);
 }
+
 function getVisibleFileEditors(): TextEditor[]  {
   return window.visibleTextEditors.filter(editor => editor.document.uri.scheme === 'file');
 }

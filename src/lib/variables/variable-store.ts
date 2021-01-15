@@ -9,6 +9,7 @@ class VariablesStore {
     const declarations = this.get(variable, fileName, line);
     return declarations && declarations.length > 0;
   }
+
   public get(variable: string, fileName: string = null, line: number = null): Variable[] {
     let decorations = this.entries.get(variable) || [];
     if (fileName !== null) {
@@ -19,6 +20,7 @@ class VariablesStore {
     }
     return decorations;
   }
+
   private __delete(variable: string, fileName: string, line: number): void {
     let decorations = this.get(variable);
 
@@ -30,6 +32,7 @@ class VariablesStore {
     this.entries.set(variable, decorations);
     return;
   }
+
   public delete(variable: string = null, fileName: string = null, line: number = null): void {
     if (variable !== null) {
       return this.__delete(variable, fileName, line);
@@ -88,6 +91,7 @@ class VariablesStore {
   //     }
   //   });
   // }
+
   public get count(): number {
     return this.entries.size;
   }

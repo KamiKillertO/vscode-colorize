@@ -1,12 +1,5 @@
-import {
-  flatten,
-  unique
-} from './util/array';
-import {
-  WorkspaceConfiguration,
-  workspace,
-  extensions
-} from 'vscode';
+import { unique } from './util/array';
+import { WorkspaceConfiguration, workspace, extensions, Extension } from 'vscode';
 
 interface ColorizeConfig {
   languages: string[];
@@ -17,7 +10,6 @@ interface ColorizeConfig {
   filesToIncludes: string[];
   inferedFilesToInclude: string[];
   searchVariables: boolean;
-  betaCWYS: boolean;
 }
 
 function getColorizeConfig(): ColorizeConfig {
@@ -30,13 +22,11 @@ function getColorizeConfig(): ColorizeConfig {
   const languages = configuration.get('languages', []);
 
   const inferedFilesToInclude = inferFilesToInclude(languages).map(extension => `**/*${extension}`);
-
   const filesToIncludes = Array.from(new Set(configuration.get('include', [])));
   const filesToExcludes = Array.from(new Set(configuration.get('exclude', [])));
 
   const searchVariables = configuration.get('enable_search_variables', false);
 
-  const betaCWYS = configuration.get('colorize_only_visible_beta', false);
   return {
     languages,
     isHideCurrentLineDecorations: configuration.get('hide_current_line_decorations'),
@@ -45,26 +35,26 @@ function getColorizeConfig(): ColorizeConfig {
     filesToIncludes,
     filesToExcludes,
     inferedFilesToInclude,
-    searchVariables,
-    betaCWYS
+    searchVariables
   };
 }
 
 
 function inferFilesToInclude(languagesConfig: string[]): string[] {
-  let filesExtensions = [];
-
-  extensions.all.forEach(extension => {
-    if (extension.packageJSON && extension.packageJSON.contributes && extension.packageJSON.contributes.languages) {
+  const filesExtensions = extensions.all.reduce((acc, extension: Extension<unknown>) => {
+    if (extension.packageJSON?.contributes?.languages) {
       extension.packageJSON.contributes.languages.forEach(language => {
         if (languagesConfig.indexOf(language.id) !== -1) {
-          filesExtensions = filesExtensions.concat(language.extensions);
+          acc = [
+            ...acc,
+            ...language.extensions
+          ];
         }
       });
     }
-  });
-  filesExtensions = flatten(filesExtensions); // get all languages with their files extensions ^^. No need to filter with the one set in config
-  return unique(filesExtensions);
+    return acc;
+  }, []);
+  return unique(filesExtensions.flat());
 }
 
 export { ColorizeConfig, getColorizeConfig };

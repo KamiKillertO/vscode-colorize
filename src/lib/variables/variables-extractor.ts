@@ -17,16 +17,22 @@ export interface IVariableStrategy extends IStrategy {
 class VariablesExtractor extends Extractor {
 
   public async extractVariables(fileName: string, fileLines: DocumentLine[]): Promise < LineExtraction[] > {
-    const colors = await Promise.all(this.enabledStrategies.map(strategy => (<IVariableStrategy> strategy).extractVariables(fileName, fileLines)));
+    const colors = await Promise.all(
+      this.enabledStrategies
+        .map(strategy => (<IVariableStrategy> strategy)
+          .extractVariables(fileName, fileLines))
+    );
     return flattenLineExtractionsFlatten(colors); // should regroup per lines?
   }
 
   public deleteVariableInLine(fileName: string, line: number) {
     this.enabledStrategies.forEach(strategy => (<IVariableStrategy> strategy).deleteVariable(fileName, line));
   }
+
   public async extractDeclarations(fileName: string, fileLines: DocumentLine[]): Promise<number[]> {
     return Promise.all(this.enabledStrategies.map(strategy => (<IVariableStrategy> strategy).extractDeclarations(fileName, fileLines)));
   }
+
   public getVariablesCount(): number {
     return this.enabledStrategies.reduce((cv, strategy) => cv + (<IVariableStrategy> strategy).variablesCount(), 0);
   }

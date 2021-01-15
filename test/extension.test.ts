@@ -32,28 +32,8 @@ describe('Extension', () => {
     assert.equal(ext.exports.deco.size, 1);
   });
 
-  it('Generate decorations for all colors in the document', async() => {
+  it('Only generate decorations for visible part of the document', async() => {
     const fileName = `${fixtureSourcePath}/long_style.scss`;
-
-    const config = vscode.workspace.getConfiguration('colorize');
-    await config.update('colorize_only_visible_beta', false, true); // Should be at false by default (need to find a way to clean local settings)
-
-    const doc = await vscode.workspace.openTextDocument(fileName);
-    const editor = await vscode.window.showTextDocument(doc);
-    await new Promise((resolve) => setTimeout(resolve, 200)); // mandatory because of the queue ><
-    assert.equal(vscode.window.visibleTextEditors.length, 1);
-
-    assert.equal(ext.exports.nbLine, 200);
-    assert.equal(ext.exports.editor, editor);
-    assert.equal(ext.exports.deco.size, 2);
-  });
-
-
-  it('Only generate decorations for visible part of the document when "setting colorize_only_visible_beta" is true', async() => {
-    const fileName = `${fixtureSourcePath}/long_style.scss`;
-
-    const config = vscode.workspace.getConfiguration('colorize');
-    await config.update('colorize_only_visible_beta', true, true);
 
     const doc = await vscode.workspace.openTextDocument(fileName);
     const editor = await vscode.window.showTextDocument(doc);

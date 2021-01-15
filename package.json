@@ -7,7 +7,7 @@
   "license": "Apache-2.0",
   "icon": "assets/logo.png",
   "engines": {
-    "vscode": "1.52.0"
+    "vscode": "^1.52.0"
   },
   "categories": [
     "Other"
@@ -156,11 +156,6 @@
           "title": "Colorize these type of color",
           "type": "array",
           "markdownDescription": "You can specified the type of color that should be colorized by the extension.\nAvailable colors are:\n* `HEXA`: for hexadecimal colors: `#RGB`, `#RGBA`, `#RRGGBB`, `#RRGGBBAA`, `0xRGB`, `0xRGBA`, `0xRRGGBB` or `0xRRGGBBAA`\n* `ARGB`: for argb colors: `#RGB`, `#ARGB`, `#RRGGBB` or `#AARRGGBB`\n* `RGB`: for rgb colors: `rgb(r,g,b)` or `rgba(r,g,b,a)`\n* `HSL`: for HSL colors: `hsl(h,s,l)` or `hsla(h,s,l,a)`\n* `BROWSERS_COLORS`: for native browser's colors like `white`, `red`, `blue`..."
-        },
-        "colorize.colorize_only_visible_beta": {
-          "default": false,
-          "type": "boolean",
-          "markdownDescription": "By default all colors in a file are colorized and updated when needed, with this feature only what you see will be colorized/updated. ⚠️ This feature is still in beta, please report any bug [here](https://github.com/KamiKillertO/vscode-colorize/issues). ⚠️ A reload is required after any change to this setting."
         },
         "colorize.enable_search_variables": {
           "title": "Enable the search for variables at opening time",
