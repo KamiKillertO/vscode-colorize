@@ -20,7 +20,7 @@ class VariablesExtractor extends Extractor {
     const colors = await Promise.all(
       this.enabledStrategies
         .map(strategy => (<IVariableStrategy> strategy)
-        .extractVariables(fileName, fileLines))
+          .extractVariables(fileName, fileLines))
     );
     return flattenLineExtractionsFlatten(colors); // should regroup per lines?
   }

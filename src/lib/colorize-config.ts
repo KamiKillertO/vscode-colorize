@@ -41,7 +41,7 @@ function getColorizeConfig(): ColorizeConfig {
 
 
 function inferFilesToInclude(languagesConfig: string[]): string[] {
-  let filesExtensions = extensions.all.reduce((acc, extension: Extension<any>) => {
+  const filesExtensions = extensions.all.reduce((acc, extension: Extension<unknown>) => {
     if (extension.packageJSON?.contributes?.languages) {
       extension.packageJSON.contributes.languages.forEach(language => {
         if (languagesConfig.indexOf(language.id) !== -1) {

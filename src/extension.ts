@@ -50,7 +50,7 @@ async function initDecorations(context: ColorizeContext) {
   const text = context.editor.document.getText();
   const fileLines: DocumentLine[] = ColorUtil.textToFileLines(text);
 
-  let lines: DocumentLine[] = context.editor.visibleRanges.reduce((acc: DocumentLine[], range: Range) => {
+  const lines: DocumentLine[] = context.editor.visibleRanges.reduce((acc: DocumentLine[], range: Range) => {
     return [
       ...acc,
       ...fileLines.slice(range.start.line, range.end.line + 2)
@@ -65,8 +65,8 @@ async function initDecorations(context: ColorizeContext) {
   return EditorManager.decorate(context.editor, context.deco, context.currentSelection);
 }
 
-function updateContextDecorations(decorations: Map<number, IDecoration[]>, context: ColorizeContext) {
-  let it = decorations.entries();
+function updateContextDecorations(decorations: Map<number, IDecoration[]>, context: ColorizeContext): void {
+  const it = decorations.entries();
   let tmp = it.next();
   while (!tmp.done) {
     const line = tmp.value[0];
@@ -112,7 +112,7 @@ function updateDecorationMap(map: Map<number, IDecoration[]>, line: number, deco
   }
 }
 
-function generateDecorations(colors: LineExtraction[], variables: LineExtraction[], decorations: Map<number, IDecoration[]>) {
+function generateDecorations(colors: LineExtraction[], variables: LineExtraction[], decorations: Map<number, IDecoration[]>): Map<number, IDecoration[]> {
   colors.map(({line, colors}) => colors.forEach((color) => {
     const decoration = ColorUtil.generateDecoration(color, line);
     updateDecorationMap(decorations, line, decoration);
