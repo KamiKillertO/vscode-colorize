@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.9.0
+
+### Breaking
+
+#### Remove deprecated setting `colorize.files_extension`
+
+Now the extension will only use the values of the settings `colorize.languages`, `colorize.include` and `colorize.exclude` to decide whether or colors should be decorated in a file.
+
+#### Make `colorize.colorize_only_visible_beta` the default behavior
+
+The purpose of this option was to only generate a colored background for colors that are on the visible part of the editor. This has a huge perf impact especially for big files with a lot of colors.
+
+The setting `colorize.colorize_only_visible_beta` was introduced a long time ago without any issues. So it's now the default behavior.
+
+### Fix
+
+Correct a typo preventing the browser color `burlywood` from being colorized.
+
+### BUILD
+  
+Update extension to latest target latest version of vscode.
+
 ## 0.8.16
 
 - [IMPROVE] Better argb colors support

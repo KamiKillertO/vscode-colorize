@@ -21,22 +21,20 @@ This extension  your styles files looking for colors and generate a colored back
 
 ## Features
 
-- Generate colored background for css variables
-- Generate colored background for preprocessor variables
-- Generate colored background for hsl/hsla colors
-- Generate colored background for cross browsers colors
-- Generate colored background for css hexa color
-- Generate colored background for rgb/rgba color
+- Generate colored background for
+  - css variables
+  - preprocessor variables
+  - hsl/hsla colors
+  - cross browsers colors (_red, blue, green..._)
+  - css hexa color
+  - rgb/rgba color
+  - argb color
 - Color background live update
 
 ## Options (settings)
 
 The following Visual Studio Code settings are available for the Colorize extension.
 These can be set in user preferences `(cmd+,)` or workspace settings `(.vscode/settings.json)`.
-
-### colorize.enable_search_variables _BOOLEAN_ _default: true
-
-By default colorize read and parse all files, in your workspace, that are targeted by the settings [colorize.languages](#colorizelanguages), [colorize.include](#colorizeinclude), and [colorize.exlude](#colorizeexclude) to extract extract all variables. Thanks to this behavior all variables will have colored background even if you never open the file containing the declaration. _⚠️ This setting can slown down vscode at opening_
 
 ### colorize.languages _ARRAY_
 
@@ -50,6 +48,10 @@ For example, if you want to colorize colors in `javascript` files, you just need
     // ...
   ]
 ```
+
+### colorize.enable_search_variables _BOOLEAN_ _default: true
+
+By default colorize read and parse all files, in your workspace, that are targeted by the settings [colorize.languages](#colorizelanguages), [colorize.include](#colorizeinclude), and [colorize.exlude](#colorizeexclude) to extract extract all variables. Thanks to this behavior all variables will have colored background even if you never open the file containing the declaration. _⚠️ This setting can slown down vscode at opening_
 
 ### colorize.include
 
@@ -69,11 +71,11 @@ This options allow you to enable/disable colorization for a type of colors.
 
 Available colors are :
 
-* `HEXA`: for hexadecimal colors: `#RGB`, `#RGBA`, `#RRGGBB`, `#RRGGBBAA`, `0xRGB`, `0xRGBA`, `0xRRGGBB` or `0xRRGGBBAA`
-* `ARGB`: for argb colors: `#RGB`, `#ARGB`, `#RRGGBB` or `#AARRGGBB`
-* `RGB`: for rgb colors: `rgb(r,g,b)` or `rgba(r,g,b,a)`
-* `HSL`: for HSL colors: `hsl(h,s,l)` or `hsla(h,s,l,a)`
-* `BROWSERS_COLORS`: for native browser's colors like `white`, `red`, `blue`...
+- `HEXA`: for hexadecimal colors: `#RGB`, `#RGBA`, `#RRGGBB`, `#RRGGBBAA`, `0xRGB`, `0xRGBA`, `0xRRGGBB` or `0xRRGGBBAA`
+- `ARGB`: for argb colors: `#RGB`, `#ARGB`, `#RRGGBB` or `#AARRGGBB`
+- `RGB`: for rgb colors: `rgb(r,g,b)` or `rgba(r,g,b,a)`
+- `HSL`: for HSL colors: `hsl(h,s,l)` or `hsla(h,s,l,a)`
+- `BROWSERS_COLORS`: for native browser's colors like `white`, `red`, `blue`...
 
 For example, if you want to only colorize hexa colors (`#fff, #ffffff, 0xFFF`) in your files you can update the option like this :
 
@@ -94,7 +96,6 @@ For example if you use less in your project you setup the option like this
     "LESS"
   ]
 ```
-
 
 _This way all @variables will be colorized_
 
