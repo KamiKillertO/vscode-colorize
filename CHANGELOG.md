@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.1
+
+### Fix
+
+Add default values for setting `colorize.include` to ensure CSS, SASS and LESS variables are extracted by default on windows10. For some reason, For some reason, vscode does not behave the same on windows 10 as on Linux/macOS. As a result, the extension cannot auto-extract variables from css/scss/sass files using only the list of languages listed on the `colorize.languages` setting.
+
 ## 0.9.0
 
 ### Breaking
