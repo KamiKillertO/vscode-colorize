@@ -44,7 +44,7 @@ function inferFilesToInclude(languagesConfig: string[]): string[] {
   const filesExtensions = extensions.all.reduce((acc, extension: Extension<unknown>) => {
     if (extension.packageJSON?.contributes?.languages) {
       extension.packageJSON.contributes.languages.forEach(language => {
-        if (languagesConfig.indexOf(language.id) !== -1) {
+        if (languagesConfig.indexOf(language.id) !== -1 && language.extensions) {
           acc = [
             ...acc,
             ...language.extensions
