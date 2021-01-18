@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.2
+
+### Fix
+
+Check an issue preventing the extension form working with the Tabnine extension.
+
 ## 0.9.1
 
 ### Fix
