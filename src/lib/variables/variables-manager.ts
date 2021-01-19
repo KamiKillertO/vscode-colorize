@@ -7,7 +7,7 @@ import './strategies/less-strategy';
 import './strategies/sass-strategy';
 import './strategies/stylus-strategy';
 import * as fs from 'fs';
-import { workspace, window, StatusBarAlignment, StatusBarItem, Uri, TextDocument } from 'vscode';
+import { workspace, window, StatusBarAlignment, StatusBarItem, Uri, ThemeColor } from 'vscode';
 import { DocumentLine, LineExtraction } from '../util/color-util';
 
 class VariablesManager {
@@ -18,19 +18,19 @@ class VariablesManager {
   }
 
   public async getWorkspaceVariables(includePattern: string[] = [], excludePattern: string[] = []) {
-    this.statusBar.text = 'Fetching files...';
     this.statusBar.show();
+    this.statusBar.text = 'Colorize: $(loading~spin) Searching for color variables...';
     try {
       const INCLUDE_PATTERN = `{${includePattern.join(',')}}`;
       const EXCLUDE_PATTERN = `{${excludePattern.join(',')}}`;
       const files: Uri[] = await workspace.findFiles(INCLUDE_PATTERN, EXCLUDE_PATTERN);
-      this.statusBar.text = `Found ${files.length} files`;
 
       await Promise.all(this.extractFilesVariable(files));
       const variablesCount: number = VariablesExtractor.getVariablesCount();
-      this.statusBar.text = `Found ${variablesCount} variables`;
+      this.statusBar.text = `Colorize: ${variablesCount} variables`;
     } catch (error) {
-      this.statusBar.text = 'Variables extraction fail';
+      this.statusBar.color = new ThemeColor('errorForeground');
+      this.statusBar.text = 'Colorize: $(circle-slash) Variables extraction fail';
     }
     return;
   }
@@ -43,21 +43,8 @@ class VariablesManager {
       }));
   }
 
-  private getFileContent(file: TextDocument): DocumentLine[] {
-    // here deal with files without contents or unreadable content (like images)
-    return file.getText()
-      .split(/\n/)
-      .map((text, index) => Object({
-        'text': text,
-        'line': index
-      }));
-  }
-
   private extractFilesVariable(files: Uri[]) {
     return files.map(async(file: Uri) => {
-
-      // const document: TextDocument =  await workspace.openTextDocument(file.path);
-      // const content: DocumentLine[] = this.getFileContent(document);
       const text = fs.readFileSync(file.fsPath, 'utf8');
       const content: DocumentLine[] = this.textToDocumentLine(text);
       return VariablesExtractor.extractDeclarations(file.fsPath, content);
