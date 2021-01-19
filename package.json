@@ -140,6 +140,15 @@
           "type": "array",
           "markdownDescription": "You can specified the type of variables that should be colorized by the extension."
         },
+        "colorize.decoration_type": {
+          "title": "Type of decoration",
+          "type": "string",
+          "enum": [
+            "background",
+            "underline"
+          ],
+          "default": "background"
+        },
         "colorize.colorized_colors": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "default": [

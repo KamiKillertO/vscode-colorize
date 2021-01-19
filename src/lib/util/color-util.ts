@@ -98,11 +98,10 @@ class ColorUtil {
     ColorExtractor.enableStrategies(extractors);
   }
 
-  public static generateDecoration(color: IColor, line: number): IDecoration {
-    return new ColorDecoration(<Color>color, line);
+  public static generateDecoration(color: IColor, line: number, decorationFn): IDecoration {
+    return new ColorDecoration(<Color>color, line, decorationFn);
   }
 }
-
 
 /**
    * Generate the color luminance.

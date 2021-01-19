@@ -2,10 +2,8 @@ import {
   Range,
   TextEditorDecorationType,
   Position,
-  window,
-  DecorationRangeBehavior
 } from 'vscode';
-import { generateOptimalTextColor, IDecoration } from '../util/color-util';
+import { IDecoration } from '../util/color-util';
 import Variable from './variable';
 import VariablesManager from './variables-manager';
 import Color from '../colors/color';
@@ -30,6 +28,8 @@ class VariableDecoration implements IDecoration {
 
   private hidden = false;
 
+  private decorationFn: (Color) => TextEditorDecorationType
+
   public currentRange: Range;
   private _decoration: TextEditorDecorationType;
   /**
@@ -50,8 +50,9 @@ class VariableDecoration implements IDecoration {
     return this.variable.color.rgb;
   }
 
-  public constructor(variable: Variable, line: number) {
+  public constructor(variable: Variable, line: number, decorationFn) {
     this.variable = variable;
+    this.decorationFn = decorationFn;
     if (this.variable.color) {
       this.generateRange(line);
     } else {
@@ -112,15 +113,7 @@ class VariableDecoration implements IDecoration {
     }
 
     if (this.variable.color && this.variable.color.rgb) {
-      const backgroundDecorationType = window.createTextEditorDecorationType({
-        borderWidth: '1px',
-        borderStyle: 'solid',
-        borderColor: this.variable.color.toRgbString(),
-        backgroundColor: this.variable.color.toRgbString(),
-        color: generateOptimalTextColor(this.variable.color),
-        rangeBehavior: DecorationRangeBehavior.ClosedClosed
-      });
-      this._decoration = backgroundDecorationType;
+      this._decoration = this.decorationFn(this.variable.color);
     }
   }
 }
