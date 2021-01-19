@@ -9,7 +9,10 @@ import {
   TextDocument,
   TextEditorSelectionChangeEvent,
   Selection,
-  Range
+  Range,
+  StatusBarAlignment,
+  StatusBarItem,
+  ThemeColor
 } from 'vscode';
 import Variable from './lib/variables/variable';
 import ColorUtil, { IDecoration, DocumentLine, LineExtraction } from './lib/util/color-util';
@@ -39,6 +42,28 @@ class ColorizeContext {
   nbLine = 0;
   deco: Map < number, IDecoration[] > = new Map();
   currentSelection: number[] = null;
+  statusBar: StatusBarItem;
+
+  constructor() {
+    this.statusBar = window.createStatusBarItem(StatusBarAlignment.Right);
+  }
+
+  updateStatusBar(activated: boolean):void {
+    // List of icons can be found here https://code.visualstudio.com/api/references/icons-in-labels
+    const icon = activated
+      ? '$(check)'
+      : '$(circle-slash)';
+    const color = activated
+      ? undefined
+      : new ThemeColor('errorForeground');
+    const hoverMessage = activated
+      ? 'Colorize is activated for this file'
+      : 'Colorize is not activated for this file';
+    this.statusBar.text = `${icon} Colorize`;
+    this.statusBar.color = color;
+    this.statusBar.tooltip = hoverMessage;
+    this.statusBar.show();
+  }
 }
 
 const q = new Queue();
@@ -191,8 +216,10 @@ async function colorize(editor: TextEditor, cb: () => void): Promise<void> {
   extension.editor = null;
   extension.deco = new Map();
   if (!editor || !canColorize(editor.document)) {
+    extension.updateStatusBar(false);
     return cb();
   }
+  extension.updateStatusBar(true);
   extension.editor = editor;
   extension.currentSelection = editor.selections.map((selection: Selection) => selection.active.line);
   const deco = CacheManager.getCachedDecorations(editor.document);
@@ -235,14 +262,6 @@ function cleanDecorationList(context: ColorizeContext, cb: () => void): void {
   return cb();
 }
 
-// function handleChangeTextDocument(event: TextDocumentChangeEvent) {
-//   if (extension.editor && event.document.fileName === extension.editor.document.fileName) {
-//     extension.editor = window.activeTextEditor;
-//     q.push((cb) => updateDecorations(event.contentChanges, extension, cb));
-//     q.push((cb) => cleanDecorationList(extension, cb));
-//   }
-// }
-
 function clearCache() {
   extension.deco.clear();
   extension.deco = new Map();
@@ -269,7 +288,6 @@ function handleConfigurationChanged() {
 }
 
 function initEventListeners(context: ExtensionContext) {
-  // workspace.onDidChangeTextDocument(handleChangeTextDocument, null, context.subscriptions);
 
   window.onDidChangeTextEditorSelection((event) => q.push((cb) => handleTextSelectionChange(event, cb)), null, context.subscriptions);
 
