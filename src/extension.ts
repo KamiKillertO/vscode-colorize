@@ -34,7 +34,8 @@ let config: ColorizeConfig = {
   filesToExcludes: [],
   filesToIncludes: [],
   inferedFilesToInclude: [],
-  searchVariables: false
+  searchVariables: false,
+  decorationFn: null
 };
 
 class ColorizeContext {
@@ -139,11 +140,11 @@ function updateDecorationMap(map: Map<number, IDecoration[]>, line: number, deco
 
 function generateDecorations(colors: LineExtraction[], variables: LineExtraction[], decorations: Map<number, IDecoration[]>): Map<number, IDecoration[]> {
   colors.map(({line, colors}) => colors.forEach((color) => {
-    const decoration = ColorUtil.generateDecoration(color, line);
+    const decoration = ColorUtil.generateDecoration(color, line, config.decorationFn);
     updateDecorationMap(decorations, line, decoration);
   }));
   variables.map(({line, colors}) => colors.forEach((variable) => {
-    const decoration = VariablesManager.generateDecoration(<Variable>variable, line);
+    const decoration = VariablesManager.generateDecoration(<Variable>variable, line, config.decorationFn);
     updateDecorationMap(decorations, line, decoration);
   }));
   return decorations;
@@ -294,7 +295,7 @@ function initEventListeners(context: ExtensionContext) {
   workspace.onDidCloseTextDocument(handleCloseOpen, null, context.subscriptions);
   workspace.onDidSaveTextDocument(handleCloseOpen, null, context.subscriptions);
   window.onDidChangeActiveTextEditor(handleChangeActiveTextEditor, null, context.subscriptions);
-  workspace.onDidChangeConfiguration(handleConfigurationChanged, null, context.subscriptions);
+  workspace.onDidChangeConfiguration(handleConfigurationChanged, null, context.subscriptions); // Does not update when local config file is edited manualy ><
 
   Listeners.setupEventListeners(context);
 }

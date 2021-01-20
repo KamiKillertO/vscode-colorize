@@ -1,5 +1,7 @@
 import { unique } from './util/array';
-import { WorkspaceConfiguration, workspace, extensions, Extension } from 'vscode';
+import { WorkspaceConfiguration, workspace, extensions, Extension, window, DecorationRangeBehavior, TextEditorDecorationType } from 'vscode';
+import { generateOptimalTextColor } from './util/color-util';
+import Color from './colors/color';
 
 interface ColorizeConfig {
   languages: string[];
@@ -10,10 +12,11 @@ interface ColorizeConfig {
   filesToIncludes: string[];
   inferedFilesToInclude: string[];
   searchVariables: boolean;
+  decorationFn: (Color) => TextEditorDecorationType
 }
 
 function getColorizeConfig(): ColorizeConfig {
-  const configuration: WorkspaceConfiguration = workspace.getConfiguration('colorize');
+  const configuration: WorkspaceConfiguration = workspace.getConfiguration('colorize', window.activeTextEditor?.document);
 
   // remove duplicates (if duplicates)
   const colorizedVariables = Array.from(new Set(configuration.get('colorized_variables', []))); // [...new Set(array)] // works too
@@ -26,7 +29,6 @@ function getColorizeConfig(): ColorizeConfig {
   const filesToExcludes = Array.from(new Set(configuration.get('exclude', [])));
 
   const searchVariables = configuration.get('enable_search_variables', false);
-
   return {
     languages,
     isHideCurrentLineDecorations: configuration.get('hide_current_line_decorations'),
@@ -35,8 +37,35 @@ function getColorizeConfig(): ColorizeConfig {
     filesToIncludes,
     filesToExcludes,
     inferedFilesToInclude,
-    searchVariables
+    searchVariables,
+    decorationFn: generateDecorationType(configuration.get('decoration_type'))
   };
+}
+
+function generateDecorationType(decorationType = 'background'): (Color) => TextEditorDecorationType {
+  switch (decorationType) {
+    case 'underline':
+      return function (color: Color) {
+        return window.createTextEditorDecorationType({
+          borderWidth: '0 0 2px 0',
+          borderStyle: 'solid',
+          borderColor: color.toRgbString(),
+          rangeBehavior: DecorationRangeBehavior.ClosedClosed
+        });
+      };
+    case 'background':
+    default:
+      return function (color: Color) {
+        return window.createTextEditorDecorationType({
+          borderWidth: '1px',
+          borderStyle: 'solid',
+          borderColor: color.toRgbString(),
+          backgroundColor: color.toRgbString(),
+          color: generateOptimalTextColor(color),
+          rangeBehavior: DecorationRangeBehavior.ClosedClosed
+        });
+      };
+  }
 }
 
 

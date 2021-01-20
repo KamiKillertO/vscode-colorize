@@ -63,8 +63,8 @@ class VariablesManager {
     return VariablesExtractor.findVariable(variable);
   }
 
-  public generateDecoration(variable: Variable, line: number): VariableDecoration {
-    const deco = new VariableDecoration(variable, line);
+  public generateDecoration(variable: Variable, line: number, decorationFn): VariableDecoration {
+    const deco = new VariableDecoration(variable, line, decorationFn);
     return deco;
   }
 
