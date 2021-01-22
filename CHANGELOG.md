@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.10.0
+
+### Features
+
+#### Colorize status in status bar
+
+Now, there's an item in the status bar indicating if colorize is activated for the current file or not.
+
+![Status bar item when colorize is activated](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/colorize-activated.png)
+![Status bar item when colorize is not activated](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/colorize-not-activated.png)
+
+#### New decoration type
+
+It's now possible to render colors as a line below the color.
+To change the way colors are displayed, change the value of the setting `colorize.decoration_type`.
+This setting accepts the two values `background` and `underline`:
+
+- `background`, colors are rendered as a background for the text.
+
+![color displayed as background](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/decoration-background.png)
+
+- `underline`, colors are displayed as a line below the text.
+
+![color displayed as underline](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/decoration-underline.png)
+
 ## 0.9.2
 
 ### Fix
