@@ -197,7 +197,7 @@
     "chai": "^4.2.0",
     "eslint": "^7.10.0",
     "mocha": "^8.2.1",
-    "typescript": "^3.9.3",
+    "typescript": "^4.1.5",
     "vscode-test": "^1.4.1"
   },
   "dependencies": {
