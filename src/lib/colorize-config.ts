@@ -56,11 +56,19 @@ function generateDecorationType(decorationType = 'background'): (Color) => TextE
     case 'background':
     default:
       return function (color: Color) {
+        const rgbaString = color.toRgbString();
         return window.createTextEditorDecorationType({
           borderWidth: '1px',
           borderStyle: 'solid',
-          borderColor: color.toRgbString(),
-          backgroundColor: color.toRgbString(),
+          borderColor: rgbaString,
+          backgroundColor: `transparent;
+            background-image:
+              linear-gradient(${rgbaString}, ${rgbaString}),
+              repeating-linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black),
+              repeating-linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black); 
+            background-size: 10px 10px;
+            background-position: 0 0, 5px 5px;
+          `,
           color: generateOptimalTextColor(color),
           rangeBehavior: DecorationRangeBehavior.ClosedClosed
         });
