@@ -104,9 +104,9 @@ _This way all @variables will be colorized_
 - [x] Generate background for hexa colors
 - [x] Update background on color updates
 - [x] Generate background for rgb colors
-- [x] Generate background for rgba colors (~ missing transparency)
+- [x] Generate background for rgba colors
 - [x] Generate background for hsl colors
-- [x] Generate background for hsla colors (~ missing transparency)
+- [x] Generate background for hsla colors
 - [x] Generate background for Predefined/Cross-browser colors
 - [x] Generate background for preprocessor variables
 - [x] Generate background for css variables
