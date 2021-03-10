@@ -29,7 +29,7 @@ function getColor(match: RegExpExecArray): Color {
   const [h, s, l, a] = extractHSLValue(value);
   if (s <= 100 && l <= 100) {
     const [r, g, b] = convertHslaToRgba(h, s, l, a);
-    return new Color(match[1], match.index, [r, g, b]);
+    return new Color(match[1], match.index, [r, g, b], a);
   }
   return null;
 }

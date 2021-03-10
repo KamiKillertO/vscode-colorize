@@ -55,7 +55,8 @@ class VariablesStore {
       variables = [].concat(this.get(varName));
     }
     if (variables.length !== 0) {
-      color = new Color(varName, match.index, variables.pop().color.rgb);
+      const variable = variables.pop();
+      color = new Color(varName, match.index, variable.color.rgb, variable.color.alpha);
     }
     return color;
   }
