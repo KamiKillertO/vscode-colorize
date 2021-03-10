@@ -63,9 +63,21 @@ class Color implements IColor {
    * @memberOf Color
    */
   public toRgbString(): string {
+    return `rgb(${this.rgb.join(', ')})`;
+  }
+  /**
+   * Generate the color string rgb representation
+   * example :
+   *  #fff => rgb(255, 255, 255)
+   *  rgba(1, 34, 12, .1) => rgb(1, 34, 12)
+   *
+   * @returns {string}
+   * @public
+   * @memberOf Color
+   */
+  public toRgbaString(): string {
     return `rgba(${this.rgb.join(', ')}, ${this.alpha})`;
   }
-
 }
 export default Color;
 
