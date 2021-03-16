@@ -192,7 +192,7 @@
     "@types/mocha": "^8.2.0",
     "@types/node": "^12.0.0",
     "@types/vscode": "^1.54.0",
-    "@typescript-eslint/eslint-plugin": "^4.17.0",
+    "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.17.0",
     "chai": "^4.3.3",
     "eslint": "^7.21.0",
