@@ -17,7 +17,7 @@ This extension  your styles files looking for colors and generate a colored back
 
 ![](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/demo_variables.gif)
 
-💡 [How to enable variables support](#colorizeactivate_variables_support_beta-boolean-default-false)
+💡 [How to enable variables support](#colorizecolorized_variables)
 
 ## Features
 
