@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.11.1
+
+### Fix
+
+Extract browser colors surrounded by quotes.
+
 ## 0.11.0
 
 ### Features
