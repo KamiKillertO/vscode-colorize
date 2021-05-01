@@ -747,7 +747,7 @@ export const COLORS = Object({
 });
 
 const REGEXP_BASE = Object.keys(COLORS).map((color) => `(?:${color.toLowerCase()})`).join('|');
-export const REGEXP = (() => RegExp(`(?:,| |\\(|:)(${REGEXP_BASE})${EOL}`, 'i'))();
+export const REGEXP = (() => RegExp(`(?:,| |'|"|\\(|:)(${REGEXP_BASE})${EOL}`, 'i'))();
 // export const REGEXP_ONE = (() => RegExp(`^(?:,| |\\(|:)(${Object.keys(COLORS).map((color) => `(?:${color.toLowerCase()})`).join('|')})(?:$|,| |;|\\)|\\r|\\n)`, 'i'))();
 // Checking for beginning beginning allow to catch stylus var value
 // eslint-disable-next-line
