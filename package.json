@@ -188,7 +188,7 @@
     "test": "npm run vscode:prepublish; node ./out/test/runTest.js"
   },
   "devDependencies": {
-    "@types/chai": "^4.2.15",
+    "@types/chai": "^4.2.17",
     "@types/mocha": "^8.2.0",
     "@types/node": "^12.0.0",
     "@types/vscode": "^1.54.0",
