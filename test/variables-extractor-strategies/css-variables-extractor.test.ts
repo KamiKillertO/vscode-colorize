@@ -6,6 +6,7 @@ import CssExtractor from  '../../src/lib/variables/strategies/css-strategy';
 import VariablesManager from  '../../src/lib/variables/variables-manager';
 import Variable from '../../src/lib/variables/variable';
 import { regex_exec } from '../test-util';
+import { generateDecorationType } from '../../src/lib/colorize-config';
 // Defines a Mocha test suite to group tests of similar kind together
 describe('Test variables declaration Regex', () => {
   // css variables (works for postcss too)
@@ -60,7 +61,7 @@ describe('Test decoration generation', () => {
     const variables = await CssExtractor.extractVariables('fileName', [{line: 0, text: 'var(--darken);'}]);
     assert.lengthOf(variables, 1);
     assert.lengthOf(variables[0].colors, 1);
-    const decoration = VariablesManager.generateDecoration(<Variable>variables[0].colors[0], 0);
+    const decoration = VariablesManager.generateDecoration(<Variable>variables[0].colors[0], 0, generateDecorationType());
     assert.equal(decoration.currentRange.start.line, 0);
     assert.equal(decoration.currentRange.start.character, 0);
     assert.equal(decoration.currentRange.end.line, 0);
@@ -73,7 +74,7 @@ describe('Test decoration generation', () => {
     const variables = await CssExtractor.extractVariables('fileName', [{line: 0, text: 'color: var(--darken);'}]);
     assert.lengthOf(variables, 1);
     assert.lengthOf(variables[0].colors, 1);
-    const decoration = VariablesManager.generateDecoration(<Variable>variables[0].colors[0], 0);
+    const decoration = VariablesManager.generateDecoration(<Variable>variables[0].colors[0], 0, generateDecorationType());
     assert.equal(decoration.currentRange.start.line, 0);
     assert.equal(decoration.currentRange.start.character, 7);
     assert.equal(decoration.currentRange.end.line, 0);

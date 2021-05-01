@@ -96,4 +96,4 @@ function inferFilesToInclude(languagesConfig: string[]): string[] {
   return unique(filesExtensions.flat());
 }
 
-export { ColorizeConfig, getColorizeConfig };
+export { ColorizeConfig, getColorizeConfig, generateDecorationType };

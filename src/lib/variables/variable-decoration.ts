@@ -50,7 +50,7 @@ class VariableDecoration implements IDecoration {
     return this.variable.color.rgb;
   }
 
-  public constructor(variable: Variable, line: number, decorationFn) {
+  public constructor(variable: Variable, line: number, decorationFn: (Color) => TextEditorDecorationType) {
     this.variable = variable;
     this.decorationFn = decorationFn;
     if (this.variable.color) {

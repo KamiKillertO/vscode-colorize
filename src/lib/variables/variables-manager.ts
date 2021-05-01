@@ -7,7 +7,7 @@ import './strategies/less-strategy';
 import './strategies/sass-strategy';
 import './strategies/stylus-strategy';
 import * as fs from 'fs';
-import { workspace, window, StatusBarAlignment, StatusBarItem, Uri, ThemeColor } from 'vscode';
+import { workspace, window, StatusBarAlignment, StatusBarItem, Uri, ThemeColor, TextEditorDecorationType } from 'vscode';
 import { DocumentLine, LineExtraction } from '../util/color-util';
 
 class VariablesManager {
@@ -63,9 +63,8 @@ class VariablesManager {
     return VariablesExtractor.findVariable(variable);
   }
 
-  public generateDecoration(variable: Variable, line: number, decorationFn): VariableDecoration {
-    const deco = new VariableDecoration(variable, line, decorationFn);
-    return deco;
+  public generateDecoration(variable: Variable, line: number, decorationFn: (Color) => TextEditorDecorationType): VariableDecoration {
+    return new VariableDecoration(variable, line, decorationFn);
   }
 
   public setupVariablesExtractors(extractors: string[]) {
