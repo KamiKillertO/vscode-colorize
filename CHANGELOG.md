@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.11.1
+
+### Fix
+
+Extract browser colors surrounded by quotes.
+
+## 0.11.0
+
+### Features
+
+#### Use color's alpha value to generate background
+
+Now colorize render backgrounds with alpha value 🎉.
+
 ## 0.10.0
 
 ### Features

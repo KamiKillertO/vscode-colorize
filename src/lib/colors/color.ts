@@ -49,7 +49,7 @@ class Color implements IColor {
   public constructor(value: string, positionInText = 0, rgb: [number, number, number], alpha?: number) {
     this.value = value;
     this.positionInText = positionInText;
-    this.alpha = Number.isNaN(alpha) ? 1 : alpha;
+    this.alpha = alpha ?? 1;
     this.rgb = rgb;
   }
   /**
@@ -65,7 +65,19 @@ class Color implements IColor {
   public toRgbString(): string {
     return `rgb(${this.rgb.join(', ')})`;
   }
-
+  /**
+   * Generate the color string rgb representation
+   * example :
+   *  #fff => rgb(255, 255, 255)
+   *  rgba(1, 34, 12, .1) => rgb(1, 34, 12)
+   *
+   * @returns {string}
+   * @public
+   * @memberOf Color
+   */
+  public toRgbaString(): string {
+    return `rgba(${this.rgb.join(', ')}, ${this.alpha})`;
+  }
 }
 export default Color;
 
