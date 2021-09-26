@@ -49,15 +49,21 @@ For example, if you want to colorize colors in `javascript` files, you just need
   ]
 ```
 
+If you wish to enable `colorize` for all languages, you can instead use the `colorize.include` setting:
+
+```json
+  "colorize.include": [ "*" ]
+```
+
 ### colorize.enable_search_variables _BOOLEAN_ _default: true
 
 By default colorize read and parse all files, in your workspace, that are targeted by the settings [colorize.languages](#colorizelanguages), [colorize.include](#colorizeinclude), and [colorize.exlude](#colorizeexclude) to extract extract all variables. Thanks to this behavior all variables will have colored background even if you never open the file containing the declaration. _⚠️ This setting can slown down vscode at opening_
 
-### colorize.include
+### colorize.include _ARRAY_
 
 Configure glob patterns for including files and folders. By default Colorize is enable for files matching one the languages defined in the `colorize.languages` config, with this config you can enable colorize for other files or folders. Read more about glob patterns [here](https://code.visualstudio.com/docs/editor/codebasics#_advanced-search-options).
 
-### colorize.exclude
+### colorize.exclude _ARRAY_
 
 Configure glob patterns for excluding files and folders. Colorize will not colorized colors in these files and folders and it'll also not search for variables inside. Read more about glob patterns [here](https://code.visualstudio.com/docs/editor/codebasics#_advanced-search-options).
 
