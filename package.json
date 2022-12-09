@@ -191,7 +191,7 @@
     "@types/chai": "^4.2.17",
     "@types/mocha": "^8.2.2",
     "@types/node": "^12.0.0",
-    "@types/vscode": "^1.54.0",
+    "@types/vscode": "^1.74.0",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
     "chai": "^4.3.4",
