@@ -4,12 +4,12 @@ import { convertHslaToRgba } from '../../util/color-util';
 import { DOT_VALUE, ALPHA, EOL } from '../../util/regexp';
 import ColorStrategy from './__strategy-base';
 
-const R_HUE = `\\d*${DOT_VALUE}?`;
+const R_HUE = `(?:\\d*${DOT_VALUE}?)(deg)?`;
 const R_SATURATION = `(?:\\d{1,3}${DOT_VALUE}?|${DOT_VALUE})%`;
 const R_LUMINANCE = R_SATURATION;
 
-export const REGEXP = new RegExp(`((?:hsl\\(\\s*${R_HUE}\\s*,\\s*${R_SATURATION}\\s*,\\s*${R_LUMINANCE}\\s*\\))|(?:hsla\\(\\s*${R_HUE}\\s*,\\s*${R_SATURATION}\\s*,\\s*${R_LUMINANCE}\\s*,\\s*${ALPHA}\\s*\\)))${EOL}`, 'gi');
-export const REGEXP_ONE = new RegExp(`^((?:hsl\\(\\s*${R_HUE}\\s*,\\s*${R_SATURATION}\\s*,\\s*${R_LUMINANCE}\\s*\\))|(?:hsla\\(\\s*${R_HUE}\\s*,\\s*${R_SATURATION}\\s*,\\s*${R_LUMINANCE}\\s*,\\s*${ALPHA}\\s*\\)))${EOL}`, 'i');
+export const REGEXP = new RegExp(`((?:hsl\\(\\s*${R_HUE}\\s*[ ,]\\s*${R_SATURATION}\\s*[ ,]\\s*${R_LUMINANCE}\\s*\\))|(?:hsla\\(\\s*${R_HUE}\\s*[ ,]\\s*${R_SATURATION}\\s*[ ,]\\s*${R_LUMINANCE}\\s*[ ,]\\s*${ALPHA}\\s*\\)))`, "gi");
+export const REGEXP_ONE = new RegExp(`^((?:hsl\\(\\s*${R_HUE}\\s*[ ,]\\s*${R_SATURATION}\\s*[ ,]\\s*${R_LUMINANCE}\\s*\\))|(?:hsla\\(\\s*${R_HUE}\\s*[ ,]\\s*${R_SATURATION}\\s*[ ,]\\s*${R_LUMINANCE}\\s*[ ,]\\s*${ALPHA}\\s*\\)))`, "i");
 // export const REGEXP_ONE = /^((?:hsl\(\d*\s*,\s*\d{1,3}%\s*,\s*\d{1,3}%\))|(?:hsla\(\d*\s*,\s*(?:\d{1,3}%\s*,\s*){2}(?:[0-1]|1\.0|[0](?:\.\d+){0,1}|(?:\.\d+))\)))(?:$|"|'|,| |;|\)|\r|\n)/i;
 
 /**
@@ -20,7 +20,7 @@ export const REGEXP_ONE = new RegExp(`^((?:hsl\\(\\s*${R_HUE}\\s*,\\s*${R_SATURA
  * @memberof HSLColorExtractor
  */
 function extractHSLValue(value) {
-  const [h, s, l, a]: number[] = value.replace(/hsl(a){0,1}\(/, '').replace(/\)/, '').replace(/%/g, '').split(/,/gi).map(c => parseFloat(c));
+  const [h, s, l, a]: number[] = value.replace(/hsl(a){0,1}\(/, '').replace(/\)/, '').replace(/%/g, '').replace(/deg/, '').split(/[ ,]+/gi).map(c => parseFloat(c));
   return [h, s, l, a];
 }
 
