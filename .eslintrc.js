@@ -1,39 +1,27 @@
-/* eslint-disable */
 module.exports = {
-  "env": {
-    "es2020": true,
-    "node": true
+  env: {
+    es2020: true,
+    node: true,
   },
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended"
-  ],
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "ecmaVersion": 11,
-    "sourceType": "module"
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    project: ['./tsconfig.json'],
+    tsconfigRootDir: __dirname,
   },
-  "plugins": [
-    "@typescript-eslint"
+  plugins: ['@typescript-eslint'],
+  extends: [
+    'plugin:@typescript-eslint/recommended-type-checked',
+    'plugin:prettier/recommended',
   ],
-  "rules": {
-    "indent": [
-      "error",
-      2,
-      { "SwitchCase": 1 }
-    ],
-    "quotes": [
-      "error",
-      "single"
-    ],
-    "semi": [
-      "error",
-      "always"
-    ],
-    "no-unsafe-finally": "error",
-    "eqeqeq": [
-      "error",
-      "always"
-    ]
-  }
+  rules: {
+    '@typescript-eslint/ban-ts-comment': 'warn',
+    '@typescript-eslint/consistent-type-imports': 'error',
+  },
+  rules: {
+    indent: ['error', 2, { SwitchCase: 1 }],
+    quotes: ['error', 'single'],
+    semi: ['error', 'always'],
+    'no-unsafe-finally': 'error',
+    eqeqeq: ['error', 'always'],
+  },
 };
