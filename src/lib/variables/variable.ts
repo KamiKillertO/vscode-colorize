@@ -7,18 +7,20 @@ interface VariableLocation {
 }
 
 class Variable implements IColor {
-
   public name: string;
 
   public color: Color;
 
   public location: VariableLocation;
 
-  public id: number;
-
   public type: string;
 
-  public constructor(name: string, color: Color, location: VariableLocation, type: string) {
+  public constructor(
+    name: string,
+    color: Color,
+    location: VariableLocation,
+    type: string
+  ) {
     this.name = name;
     this.color = color;
     this.location = location;

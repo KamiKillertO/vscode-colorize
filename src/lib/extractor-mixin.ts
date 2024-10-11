@@ -3,15 +3,15 @@ export interface IStrategy {
 }
 export class Extractor {
   public strategies: IStrategy[];
-  protected enabledStrategies: IStrategy[];
+  protected enabledStrategies: IStrategy[] = [];
 
   constructor() {
     this.strategies = [];
   }
 
   public enableStrategies(strategiesToEnable: string[]): void {
-    this.enabledStrategies = this.strategies.filter(strategy => {
-      if (strategiesToEnable.find(_ => _ === strategy.name)) {
+    this.enabledStrategies = this.strategies.filter((strategy) => {
+      if (strategiesToEnable.find((_) => _ === strategy.name)) {
         // eslint-disable-next-line  @typescript-eslint/no-explicit-any
         const constructor: any = strategy.constructor;
         return new constructor();
@@ -27,16 +27,17 @@ export class Extractor {
 
   public has(strategy: string | IStrategy): boolean {
     if (typeof strategy === 'string') {
-      return this.strategies.some(_ => _.name === strategy);
+      return this.strategies.some((_) => _.name === strategy);
     }
-    return this.strategies.some(_ => _.name === strategy.name);
+    return this.strategies.some((_) => _.name === strategy.name);
   }
 
-  public get(strategy: string | IStrategy): IStrategy {
+  public get(strategy: string | IStrategy): IStrategy | undefined {
     if (this.has(strategy) === false) {
-      return null;
+      return undefined;
     }
-    return this.strategies.find(_ => _.name === strategy);
+
+    return this.strategies.find((_) => _.name === strategy);
   }
 }
 

@@ -3,26 +3,40 @@ import { EOL } from '../../util/regexp';
 import VariableStrategy from './__strategy-base';
 
 // eslint-disable-next-line
-export const REGEXP = new RegExp(`(var\\((--(?:[a-z]+[\-_a-z\\d]*))\\))(?!:)${EOL}`, 'gi');
-// eslint-disable-next-line
-export const REGEXP_ONE = new RegExp(`^(var\\((--(?:[a-z]+[\-_a-z\\d]*))\\))(?!:)${EOL}`, 'i');
-export const DECLARATION_REGEXP = new RegExp(`(?:(--(?:[a-z]+[\\-_a-z\\d]*)\\s*):)${EOL}`, 'gi');
+export const REGEXP = new RegExp(
+  `(var\\((--(?:[a-z]+[\\-_a-z\\d]*))\\))(?!:)${EOL}`,
+  'gi'
+);
+export const REGEXP_ONE = new RegExp(
+  `^(var\\((--(?:[a-z]+[\\-_a-z\\d]*))\\))(?!:)${EOL}`,
+  'i'
+);
+export const DECLARATION_REGEXP = new RegExp(
+  `(?:(--(?:[a-z]+[\\-_a-z\\d]*)\\s*):)${EOL}`,
+  'gi'
+);
 
 const RegexpExtractor = {
-  getVariableNameFromDeclaration(match: RegExpExecArray): string {
+  getVariableNameFromDeclaration(match: RegExpExecArray) {
     return (match[1] || match[2]).trim();
   },
 
-  getVariableNameFromUses(match: RegExpExecArray): string[] {
+  getVariableNameFromUses(match: RegExpExecArray) {
     return [match[2].trim(), match[1].trim()];
   },
 
-  getVariableNameFromUse(match: RegExpMatchArray): string {
+  getVariableNameFromUse(match: RegExpMatchArray) {
     return match[2].trim();
-  }
+  },
 };
 
-const CssExtractor = new VariableStrategy('CSS', DECLARATION_REGEXP, REGEXP, REGEXP_ONE, RegexpExtractor);
+const CssExtractor = new VariableStrategy(
+  'CSS',
+  DECLARATION_REGEXP,
+  REGEXP,
+  REGEXP_ONE,
+  RegexpExtractor
+);
 VariablesExtractor.registerStrategy(CssExtractor);
 export default CssExtractor;
 

@@ -1,5 +1,5 @@
-class TasksRunner<T> {
-  private _currentTask: IterableIterator<T> = null;
+class TasksRunner<T extends Generator<unknown>> {
+  private _currentTask: IterableIterator<T> | null = null;
 
   /**
    * Add a task to run.
@@ -11,7 +11,7 @@ class TasksRunner<T> {
    */
   run(f: () => IterableIterator<T>): TasksRunner<T> {
     if (this._currentTask) {
-      this._currentTask.return();
+      this._currentTask.return?.();
     }
     this._currentTask = f();
     this._run();
@@ -24,21 +24,22 @@ class TasksRunner<T> {
    */
   stop(): void {
     if (this._currentTask) {
-      this._currentTask.return();
+      this._currentTask.return?.();
     }
   }
 
   _run(): void {
-    const it: IterableIterator<T> = this._currentTask;
-    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-    function run(args?: any) {
+    // cannot be null here
+    const it = this._currentTask as IterableIterator<T>;
+
+    // TODO improve type
+    function run(args?: unknown): any | never {
       try {
-        const result: IteratorResult<T> = it.next(args); // deal with errors in generators
-        if (result.done) {
-          return result.value;
-        } else {
-          return Promise.resolve(result.value).then(run);
-        }
+        const result = it.next(args); // deal with errors in generators
+
+        return result.done
+          ? result.value
+          : Promise.resolve(result.value).then(run); // Weird
       } catch (error) {
         // do something
       }

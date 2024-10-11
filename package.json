@@ -189,6 +189,8 @@
   },
   "devDependencies": {
     "@types/chai": "^4.2.17",
+    "@types/glob": "^8.1.0",
+    "@types/glob-to-regexp": "^0.4.4",
     "@types/mocha": "^8.2.2",
     "@types/node": "^12.0.0",
     "@types/vscode": "^1.54.0",
@@ -196,10 +198,10 @@
     "@typescript-eslint/parser": "^4.22.0",
     "chai": "^4.3.4",
     "eslint": "^7.26.0",
+    "globby": "^14.0.2",
     "mocha": "^8.3.2",
     "typescript": "^5.6.2",
-    "vscode-test": "^1.6.1",
-    "globby": "^14.0.2"
+    "vscode-test": "^1.6.1"
   },
   "dependencies": {
     "glob-to-regexp": "^0.4.1"

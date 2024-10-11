@@ -1,6 +1,5 @@
-type QueueItem = (cb: () => void) => unknown
+type QueueItem = (cb: () => void) => unknown;
 class Queue {
-
   private _running = false;
 
   private _queue: Array<QueueItem> = [];

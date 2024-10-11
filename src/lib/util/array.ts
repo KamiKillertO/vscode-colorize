@@ -8,7 +8,7 @@ function unique<T>(arr: Array<T>, f?: callbackFn<T>): Array<T> {
   return arr.filter((_, i) => vArr.indexOf(vArr[i]) === i);
 }
 
-function equals<T>(arr1: Array<T>, arr2: Array<T>) : boolean {
+function equals<T>(arr1: Array<T>, arr2: Array<T>): boolean {
   if (arr1 === null || arr2 === null) {
     return false;
   }

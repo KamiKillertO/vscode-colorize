@@ -1,8 +1,4 @@
-import {
-  Range,
-  Position,
-  TextEditorDecorationType
-} from 'vscode';
+import { Range, Position, TextEditorDecorationType } from 'vscode';
 
 import { IDecoration } from '../util/color-util';
 import Color from './color';
@@ -26,10 +22,10 @@ class ColorDecoration implements IDecoration {
   public disposed = false;
   public hidden = false;
 
-  private decorationFn: (Color) => TextEditorDecorationType
+  private decorationFn: (color: Color) => TextEditorDecorationType;
 
-  public currentRange: Range;
-  private _decoration: TextEditorDecorationType;
+  public declare currentRange: Range;
+  private declare _decoration: TextEditorDecorationType;
   /**
    * The TextEditorDecorationType associated to the color
    *
@@ -48,7 +44,11 @@ class ColorDecoration implements IDecoration {
     return this.color.rgb;
   }
 
-  public constructor(color: Color, line: number, decorationFn) {
+  public constructor(
+    color: Color,
+    line: number,
+    decorationFn: (color: Color) => TextEditorDecorationType
+  ) {
     this.color = color;
     this.decorationFn = decorationFn;
     this.generateRange(line);
@@ -89,7 +89,10 @@ class ColorDecoration implements IDecoration {
    * @memberOf ColorDecoration
    */
   public generateRange(line: number): Range {
-    const range = new Range(new Position(line, this.color.positionInText), new Position(line, this.color.positionInText + this.color.value.length));
+    const range = new Range(
+      new Position(line, this.color.positionInText),
+      new Position(line, this.color.positionInText + this.color.value.length)
+    );
     this.currentRange = range;
     return range;
   }
@@ -99,7 +102,9 @@ class ColorDecoration implements IDecoration {
       return false;
     }
 
-    return this._decoration === null || this._decoration === undefined || this.hidden ;
+    return (
+      this._decoration === null || this._decoration === undefined || this.hidden
+    );
   }
 
   private _generateDecorator() {

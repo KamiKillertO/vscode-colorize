@@ -4,25 +4,29 @@ import * as glob from 'glob';
 
 export function run(): Promise<void> {
   // Create the mocha test
+  // @ts-expect-error TOFIX
   const mocha = new Mocha({
     ui: 'tdd',
-    color: true
+    color: true,
   });
 
   const testsRoot = path.resolve(__dirname, '..');
 
   return new Promise((c, e) => {
+    // @ts-expect-error TOFIX
     glob('**/**.test.js', { cwd: testsRoot }, (err, files) => {
       if (err) {
         return e(err);
       }
 
       // Add files to the test suite
-      files.forEach(f => mocha.addFile(path.resolve(testsRoot, f)));
+      // @ts-expect-error TOFIX
+      files.forEach((f) => mocha.addFile(path.resolve(testsRoot, f)));
 
       try {
         // Run the mocha test
-        mocha.run(failures => {
+        // @ts-expect-error TOFIX
+        mocha.run((failures) => {
           if (failures > 0) {
             e(new Error(`${failures} tests failed.`));
           } else {

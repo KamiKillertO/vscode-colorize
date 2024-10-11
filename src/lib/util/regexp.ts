@@ -1,4 +1,4 @@
-// eslint-disable-next-line
+// eslint-disable-next-line quotes,no-useless-escape
 const EOL = `(?:$|\`|"|'|,| |;|\\)|\\r|\\n|\}|<)`;
 
 const DOT_VALUE = '(?:\\.\\d+)'; // ['.x', '']

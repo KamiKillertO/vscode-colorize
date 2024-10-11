@@ -16,14 +16,16 @@ class CacheManager {
    * @param {TextEditor} editor
    * @returns {(Map<number, IDecoration[]> | null)}
    */
-  public getCachedDecorations(document: TextDocument): Map<number, IDecoration[]> | null  {
+  public getCachedDecorations(
+    document: TextDocument
+  ): Map<number, IDecoration[]> | undefined {
     if (!document.isDirty && this._decorationsCache.has(document.fileName)) {
       return this._decorationsCache.get(document.fileName);
     }
     if (this._dirtyCache.has(document.fileName)) {
       return this._dirtyCache.get(document.fileName);
     }
-    return null;
+    return undefined;
   }
   /**
    * Save a file decorations
@@ -31,15 +33,26 @@ class CacheManager {
    * @param {TextDocument} document
    * @param {Map<number, IDecoration[]>} deco
    */
-  public saveDecorations(document: TextDocument, deco: Map<number, IDecoration[]>) {
-    document.isDirty ? this._saveDirtyDecoration(document.fileName, deco) : this._saveSavedDecorations(document.fileName, deco);
+  public saveDecorations(
+    document: TextDocument,
+    deco: Map<number, IDecoration[]>
+  ) {
+    document.isDirty
+      ? this._saveDirtyDecoration(document.fileName, deco)
+      : this._saveSavedDecorations(document.fileName, deco);
   }
 
-  private _saveDirtyDecoration(fileName: string, decorations: Map<number, IDecoration[]>) {
+  private _saveDirtyDecoration(
+    fileName: string,
+    decorations: Map<number, IDecoration[]>
+  ) {
     return this._dirtyCache.set(fileName, decorations);
   }
 
-  private _saveSavedDecorations(fileName: string, decorations: Map<number, IDecoration[]>) {
+  private _saveSavedDecorations(
+    fileName: string,
+    decorations: Map<number, IDecoration[]>
+  ) {
     return this._decorationsCache.set(fileName, decorations);
   }
 

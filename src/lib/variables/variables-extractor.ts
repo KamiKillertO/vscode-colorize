@@ -1,48 +1,76 @@
 import Color from '../colors/color';
-import { DocumentLine, LineExtraction, flattenLineExtractionsFlatten } from '../util/color-util';
+import {
+  DocumentLine,
+  LineExtraction,
+  flattenLineExtractionsFlatten,
+} from '../util/color-util';
 import { IStrategy, Extractor } from '../extractor-mixin';
 import Variable from './variable';
 
 // export class IVariableStrategy { // class instead? // avoid duplication (variablesCount/deleteVariable same code for all extractors)
 export interface IVariableStrategy extends IStrategy {
-  extractDeclarations(fileName: string, fileLines: DocumentLine[]): Promise<number>;
+  extractDeclarations(
+    fileName: string,
+    fileLines: DocumentLine[]
+  ): Promise<number>;
 
-  extractVariables(fileName: string, fileLines: DocumentLine[]): Promise <LineExtraction[]>;
+  extractVariables(
+    fileName: string,
+    fileLines: DocumentLine[]
+  ): LineExtraction[];
   extractVariable(fileName: string, text: string): Color;
-  getVariableValue(variable): Color | null;
-  deleteVariable(fileName: string, line?: number);
+  getVariableValue(variable: Variable): Color | null;
+  deleteVariable(fileName: string, line?: number): void;
   variablesCount(): number;
 }
 
 class VariablesExtractor extends Extractor {
-
-  public async extractVariables(fileName: string, fileLines: DocumentLine[]): Promise < LineExtraction[] > {
+  public async extractVariables(
+    fileName: string,
+    fileLines: DocumentLine[]
+  ): Promise<LineExtraction[]> {
     const colors = await Promise.all(
-      this.enabledStrategies
-        .map(strategy => (<IVariableStrategy> strategy)
-          .extractVariables(fileName, fileLines))
+      this.enabledStrategies.map((strategy) =>
+        (<IVariableStrategy>strategy).extractVariables(fileName, fileLines)
+      )
     );
     return flattenLineExtractionsFlatten(colors); // should regroup per lines?
   }
 
   public deleteVariableInLine(fileName: string, line: number) {
-    this.enabledStrategies.forEach(strategy => (<IVariableStrategy> strategy).deleteVariable(fileName, line));
+    this.enabledStrategies.forEach((strategy) =>
+      (<IVariableStrategy>strategy).deleteVariable(fileName, line)
+    );
   }
 
-  public async extractDeclarations(fileName: string, fileLines: DocumentLine[]): Promise<number[]> {
-    return Promise.all(this.enabledStrategies.map(strategy => (<IVariableStrategy> strategy).extractDeclarations(fileName, fileLines)));
+  public async extractDeclarations(
+    fileName: string,
+    fileLines: DocumentLine[]
+  ): Promise<number[]> {
+    return Promise.all(
+      this.enabledStrategies.map((strategy) =>
+        (<IVariableStrategy>strategy).extractDeclarations(fileName, fileLines)
+      )
+    );
   }
 
   public getVariablesCount(): number {
-    return this.enabledStrategies.reduce((cv, strategy) => cv + (<IVariableStrategy> strategy).variablesCount(), 0);
+    return this.enabledStrategies.reduce(
+      (cv, strategy) => cv + (<IVariableStrategy>strategy).variablesCount(),
+      0
+    );
   }
 
   public findVariable(variable: Variable): Color | null {
-    return (<IVariableStrategy>this.get(variable.type)).getVariableValue(variable);
+    return (<IVariableStrategy>this.get(variable.type)).getVariableValue(
+      variable
+    );
   }
 
   public removeVariablesDeclarations(fileName: string) {
-    this.enabledStrategies.forEach(strategy => (<IVariableStrategy> strategy).deleteVariable(fileName));
+    this.enabledStrategies.forEach((strategy) =>
+      (<IVariableStrategy>strategy).deleteVariable(fileName)
+    );
   }
 }
 const instance = new VariablesExtractor();
@@ -102,7 +130,6 @@ export default instance;
 //
 // 1a= #fff
 
-
 // in sass order matter
 //
 // ```css
@@ -126,7 +153,6 @@ export default instance;
 //   color: @a
 // ```
 // here p.color === #ccc
-
 
 // What about stylus, postcss ???
 // should i always use the latest declaration in file?
