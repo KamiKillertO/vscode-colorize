@@ -28,7 +28,7 @@ class Queue {
       this._running = true;
       try {
         action(this._next.bind(this));
-      } catch (error) {
+      } catch {
         this._next.call(this);
       }
     }

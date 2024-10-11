@@ -33,14 +33,15 @@ class TasksRunner<T extends Generator<unknown>> {
     const it = this._currentTask as IterableIterator<T>;
 
     // TODO improve type
-    function run(args?: unknown): any | never {
+    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents, @typescript-eslint/no-explicit-any
+    function run(args?: unknown): never | any {
       try {
         const result = it.next(args); // deal with errors in generators
 
         return result.done
           ? result.value
           : Promise.resolve(result.value).then(run); // Weird
-      } catch (error) {
+      } catch {
         // do something
       }
     }

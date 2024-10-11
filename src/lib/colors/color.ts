@@ -19,7 +19,7 @@ class Color implements IColor {
    * @public
    * @memberOf Color
    */
-  public rgb: [number, number, number];
+  public rgb: readonly [number, number, number];
   /**
    *  The color alpha, the value should be between 0 and 1
    *
@@ -49,7 +49,7 @@ class Color implements IColor {
   public constructor(
     value: string,
     positionInText = 0,
-    rgb: [number, number, number],
+    rgb: readonly [number, number, number],
     alpha?: number,
   ) {
     this.value = value;

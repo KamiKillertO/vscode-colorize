@@ -1,3 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/prefer-promise-reject-errors */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+// eslint-disable @typescript-eslint/no-unsafe-argument
 import * as path from 'path';
 import * as Mocha from 'mocha';
 import * as glob from 'glob';

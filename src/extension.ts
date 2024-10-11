@@ -436,7 +436,7 @@ export function activate(context: ExtensionContext): ColorizeContext {
       }
       initEventListeners(context);
     } catch (error) {
-      // do something
+      console.log(error);
     }
     return cb();
   });

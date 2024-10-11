@@ -16,7 +16,7 @@ import {
   ThemeColor,
   TextEditorDecorationType,
 } from 'vscode';
-import { DocumentLine, LineExtraction } from '../util/color-util';
+import { DocumentLine } from '../util/color-util';
 import Color from '../colors/color';
 
 class VariablesManager {
@@ -44,7 +44,7 @@ class VariablesManager {
       await Promise.all(this.extractFilesVariable(files));
       const variablesCount: number = VariablesExtractor.getVariablesCount();
       this.statusBar.text = `Colorize: ${variablesCount} variables`;
-    } catch (error) {
+    } catch {
       this.statusBar.color = new ThemeColor('errorForeground');
       this.statusBar.text =
         'Colorize: $(circle-slash) Variables extraction fail';
@@ -53,12 +53,10 @@ class VariablesManager {
   }
 
   private textToDocumentLine(text: string): DocumentLine[] {
-    return text.split(/\n/).map((text, index) =>
-      Object({
-        text: text,
-        line: index,
-      }),
-    );
+    return text.split(/\n/).map((text, index) => ({
+      text: text,
+      line: index,
+    }));
   }
 
   private extractFilesVariable(files: Uri[]) {

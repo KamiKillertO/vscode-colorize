@@ -102,14 +102,19 @@ function generateDecorationType(
 function inferFilesToInclude(languagesConfig: string[]): string[] {
   const filesExtensions = extensions.all.reduce(
     (acc, extension: Extension<unknown>) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (extension.packageJSON?.contributes?.languages) {
         // TODO type extension
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
         extension.packageJSON.contributes.languages.forEach((language: any) => {
           if (
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
             languagesConfig.indexOf(language.id) !== -1 &&
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             language.extensions
           ) {
-            acc = [...acc, ...language.extensions];
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            acc = [...acc, ...(language.extensions as string[])];
           }
         });
       }

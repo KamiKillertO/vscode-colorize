@@ -66,6 +66,7 @@ class ColorDecoration implements IDecoration {
       this.disposed = true;
     } catch (error) {
       // do something
+      console.log(error);
     }
   }
   /**

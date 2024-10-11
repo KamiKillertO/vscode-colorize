@@ -28,9 +28,7 @@ import { mutEditedLine } from './lib/util/mut-edited-line';
 import { equals } from './lib/util/array';
 import TasksRunner from './lib/tasks-runner';
 
-// eslint-disable-next-line
-// @ts-ignore
-const taskRuner: TasksRunner = new TasksRunner();
+const taskRuner = new TasksRunner();
 
 const clearDecoration = (decoration: IDecoration) => decoration.dispose();
 
@@ -261,11 +259,12 @@ function* handleVisibleRangeEvent() {
     extension.editor?.document.fileName as string,
     fileLines,
   );
-  const variables: LineExtraction[] = yield VariablesManager.findVariables(
+  const variables = (yield VariablesManager.findVariables(
     extension.editor?.document.fileName as string,
     lines,
-  );
-  const colors: LineExtraction[] = yield ColorUtil.findColors(lines);
+  )) as LineExtraction[];
+
+  const colors = (yield ColorUtil.findColors(lines)) as LineExtraction[];
 
   const decorations = getDecorationsToColorize(colors, variables);
   EditorManager.decorate(
@@ -294,11 +293,11 @@ function* updateDecorations() {
   cleanDecorationMap(extension.deco);
 
   yield VariablesManager.findVariablesDeclarations(fileName, fileLines);
-  const variables: LineExtraction[] = yield VariablesManager.findVariables(
+  const variables = (yield VariablesManager.findVariables(
     fileName,
     lines,
-  );
-  const colors: LineExtraction[] = yield ColorUtil.findColors(lines);
+  )) as LineExtraction[];
+  const colors = (yield ColorUtil.findColors(lines)) as LineExtraction[];
   const decorations = getDecorationsToColorize(colors, variables);
   // removeDuplicateDecorations(decorations);
   EditorManager.decorate(
@@ -343,6 +342,8 @@ function textDocumentUpdated(event: TextDocumentChangeEvent) {
       extension.nbLine = extension.editor.document.lineCount;
     }
     disposeDecorationsForEditedLines(editedLine, extension);
+
+    // @ts-expect-error Improve TaskRunner types
     taskRuner.run(updateDecorations);
   }
 }
@@ -355,6 +356,7 @@ function setupEventListeners(context: ExtensionContext): void {
     context.subscriptions,
   );
   window.onDidChangeTextEditorVisibleRanges(
+    // @ts-expect-error Improve TaskRunner types
     () => taskRuner.run(handleVisibleRangeEvent),
     null,
     context.subscriptions,

@@ -76,12 +76,10 @@ interface IDecoration {
 
 class ColorUtil {
   public static textToFileLines(text: string): DocumentLine[] {
-    return text.split(/\n/).map((text, index) =>
-      Object({
-        text: text,
-        line: index,
-      }),
-    );
+    return text.split(/\n/).map((text, index) => ({
+      text: text,
+      line: index,
+    }));
   }
   /**
    * Extract all colors from a text
@@ -167,7 +165,9 @@ function convertRgbaToHsla(
   b: number,
   a = 1,
 ): [number, number, number, number] {
-  (r /= 255), (g /= 255), (b /= 255);
+  r /= 255;
+  g /= 255;
+  b /= 255;
 
   const max = Math.max(r, g, b),
     min = Math.min(r, g, b);

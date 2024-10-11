@@ -1,6 +1,6 @@
 import Color from './../color';
 import { IColorStrategy } from '../color-extractor';
-import { LineExtraction, DocumentLine } from '../../util/color-util';
+import { DocumentLine } from '../../util/color-util';
 
 type RegexpResultExtractor = (match: RegExpExecArray) => Color | null;
 
@@ -12,22 +12,24 @@ export default class ColorStrategy implements IColorStrategy {
     private colorFromRegexp: RegexpResultExtractor,
   ) {}
 
-  async extractColors(fileLines: DocumentLine[]): Promise<LineExtraction[]> {
-    return fileLines.map(({ line, text }) => {
-      let match = null;
-      const colors: Color[] = [];
+  extractColors(fileLines: DocumentLine[]) {
+    return Promise.resolve(
+      fileLines.map(({ line, text }) => {
+        let match = null;
+        const colors: Color[] = [];
 
-      while ((match = this.REGEXP.exec(text)) !== null) {
-        const color = this.colorFromRegexp(match);
-        if (color) {
-          colors.push(color);
+        while ((match = this.REGEXP.exec(text)) !== null) {
+          const color = this.colorFromRegexp(match);
+          if (color) {
+            colors.push(color);
+          }
         }
-      }
-      return {
-        line,
-        colors,
-      };
-    });
+        return {
+          line,
+          colors,
+        };
+      }),
+    );
   }
   extractColor(text: string): Color | null {
     const match = this.REGEXP_ONE.exec(text);

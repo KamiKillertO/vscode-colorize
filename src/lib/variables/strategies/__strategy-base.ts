@@ -32,10 +32,12 @@ export default class VariableStrategy {
   public async extractDeclarations(
     fileName: string,
     fileLines: DocumentLine[],
-  ): Promise<number> {
-    return fileLines.map(({ text, line }) =>
-      this.__extractDeclarations(fileName, text, line),
-    ).length;
+  ) {
+    return Promise.resolve(
+      fileLines.map(({ text, line }) =>
+        this.__extractDeclarations(fileName, text, line),
+      ).length,
+    );
   }
   public __extractDeclarations(
     fileName: string,

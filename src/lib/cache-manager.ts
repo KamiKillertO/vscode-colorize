@@ -37,9 +37,11 @@ class CacheManager {
     document: TextDocument,
     deco: Map<number, IDecoration[]>,
   ) {
-    document.isDirty
-      ? this._saveDirtyDecoration(document.fileName, deco)
-      : this._saveSavedDecorations(document.fileName, deco);
+    if (document.isDirty) {
+      this._saveDirtyDecoration(document.fileName, deco);
+    } else {
+      this._saveSavedDecorations(document.fileName, deco);
+    }
   }
 
   private _saveDirtyDecoration(

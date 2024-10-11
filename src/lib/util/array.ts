@@ -15,11 +15,11 @@ function equals<T>(arr1: Array<T>, arr2: Array<T>): boolean {
   if (arr1.length !== arr2.length) {
     return false;
   }
-  for (const i in arr1) {
+  arr1.forEach((_value, i) => {
     if (arr1[i] !== arr2[i]) {
       return false;
     }
-  }
+  });
   return true;
 }
 

@@ -14,6 +14,7 @@ export class Extractor {
       if (strategiesToEnable.find((_) => _ === strategy.name)) {
         // eslint-disable-next-line  @typescript-eslint/no-explicit-any
         const constructor: any = strategy.constructor;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         return new constructor();
       }
     });

@@ -1,9 +1,9 @@
 import Color from './../color';
 import ColorExtractor, { IColorStrategy } from '../color-extractor';
-import { LineExtraction, DocumentLine } from '../../util/color-util';
+import { DocumentLine } from '../../util/color-util';
 import { EOL } from '../../util/regexp';
 
-export const COLORS = Object({
+export const COLORS = {
   aliceblue: {
     value: '#F0F8FF',
     rgb: [240, 248, 255],
@@ -744,7 +744,7 @@ export const COLORS = Object({
     rgb: [154, 205, 50],
     luminace: 1,
   },
-});
+} as const;
 
 const REGEXP_BASE = Object.keys(COLORS)
   .map((color) => `(?:${color.toLowerCase()})`)
@@ -759,22 +759,28 @@ export const REGEXP_ONE = (() =>
 class BrowsersColorExtractor implements IColorStrategy {
   public name = 'BROWSERS_COLORS';
 
-  public async extractColors(fileLines: DocumentLine[]) {
-    return fileLines.map(({ line, text }) => {
-      let match = null;
-      const colors: Color[] = [];
-      let position = 0;
-      while ((match = text.match(REGEXP)) !== null) {
-        position += (match.index ?? 0) + 1;
-        const browserColor: string = match[1];
-        colors.push(
-          new Color(match[1], position, COLORS[browserColor.toLowerCase()].rgb),
-        );
-        text = text.slice((match.index ?? 0) + 1 + match[1].length);
-        position += match[1].length;
-      }
-      return { line, colors };
-    });
+  public extractColors(fileLines: DocumentLine[]) {
+    return Promise.resolve(
+      fileLines.map(({ line, text }) => {
+        let match = null;
+        const colors: Color[] = [];
+        let position = 0;
+        while ((match = text.match(REGEXP)) !== null) {
+          position += (match.index ?? 0) + 1;
+          const browserColor = match[1];
+          colors.push(
+            new Color(
+              match[1],
+              position,
+              COLORS[browserColor.toLowerCase() as keyof typeof COLORS].rgb,
+            ),
+          );
+          text = text.slice((match.index ?? 0) + 1 + match[1].length);
+          position += match[1].length;
+        }
+        return { line, colors };
+      }),
+    );
   }
 
   public extractColor(text: string) {
@@ -784,7 +790,7 @@ class BrowsersColorExtractor implements IColorStrategy {
       return new Color(
         match[1],
         match.index,
-        COLORS[browserColor.toLowerCase()].rgb,
+        COLORS[browserColor.toLowerCase() as keyof typeof COLORS].rgb,
       );
     }
 

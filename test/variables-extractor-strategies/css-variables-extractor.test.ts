@@ -82,7 +82,7 @@ describe('Test decoration generation', () => {
     await CssExtractor.extractDeclarations('fileName', [
       { line: 0, text: '--darken: blue' },
     ]);
-    const variables = await CssExtractor.extractVariables('fileName', [
+    const variables = CssExtractor.extractVariables('fileName', [
       { line: 0, text: 'var(--darken);' },
     ]);
     assert.lengthOf(variables, 1);
@@ -103,7 +103,7 @@ describe('Test decoration generation', () => {
     await CssExtractor.extractDeclarations('fileName', [
       { line: 0, text: '--darken: blue' },
     ]);
-    const variables = await CssExtractor.extractVariables('fileName', [
+    const variables = CssExtractor.extractVariables('fileName', [
       { line: 0, text: 'color: var(--darken);' },
     ]);
     assert.lengthOf(variables, 1);

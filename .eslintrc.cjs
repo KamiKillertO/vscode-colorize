@@ -1,14 +1,11 @@
 module.exports = {
-  env: {
-    es2020: true,
-    node: true,
-  },
+  root: true,
   parser: '@typescript-eslint/parser',
+  plugins: ['@typescript-eslint'],
   parserOptions: {
-    project: ['./tsconfig.json'],
+    project: true,
     tsconfigRootDir: __dirname,
   },
-  plugins: ['@typescript-eslint'],
   extends: [
     'plugin:@typescript-eslint/recommended-type-checked',
     'plugin:prettier/recommended',
