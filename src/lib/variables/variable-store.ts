@@ -28,7 +28,7 @@ class VariablesStore {
       decorations = decorations.filter(
         (_) =>
           _.location.fileName !== fileName ||
-          (_.location.fileName === fileName && _.location.line !== line)
+          (_.location.fileName === fileName && _.location.line !== line),
       );
     } else if (fileName !== null) {
       decorations = decorations.filter((_) => _.location.fileName !== fileName);
@@ -69,7 +69,7 @@ class VariablesStore {
   public findDeclaration(
     variable: string,
     file: string,
-    line: number
+    line: number,
   ): Variable {
     return this.findClosestDeclaration(variable, file, line);
   }
@@ -78,7 +78,7 @@ class VariablesStore {
   public findClosestDeclaration(
     variable: string,
     file: string,
-    line?: number
+    line?: number,
   ): Variable {
     let decorations = this.get(variable, file);
     if (decorations.length === 0) {
@@ -90,11 +90,11 @@ class VariablesStore {
     decorations = this.filterDecorations(decorations, file);
     if (line) {
       decorations = decorations.filter(
-        (decoration) => decoration.location.line === line
+        (decoration) => decoration.location.line === line,
       );
     } else {
       decorations = decorations.sort(
-        (a, b) => a.location.line - b.location.line
+        (a, b) => a.location.line - b.location.line,
       );
     }
 
@@ -111,7 +111,7 @@ class VariablesStore {
     const r = new RegExp(`^${encodeURI(folder)}`);
 
     const decorationsFound = decorations.filter((deco: Variable) =>
-      r.test(encodeURI(deco.location.fileName))
+      r.test(encodeURI(deco.location.fileName)),
     );
 
     if (decorationsFound.length !== 0 || folder === dir) {

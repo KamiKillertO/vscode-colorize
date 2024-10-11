@@ -4,15 +4,15 @@ import VariableStrategy from './__strategy-base';
 
 export const REGEXP = new RegExp(
   `(^|(?::|=)\\s*)((?:[\\-]*[$a-z_][\\-_\\d]*)+)(?!=)${EOL}`,
-  'gi'
+  'gi',
 );
 export const REGEXP_ONE = new RegExp(
   `(^|(?::|=)\\s*)((?:[\\-]*[$a-z_][\\-_\\d]*)+)(?!=)${EOL}`,
-  'i'
+  'i',
 );
 export const DECLARATION_REGEXP = new RegExp(
   `(?:(^(?:\\$|(?:[\\-_$]+[a-z\\d]+)|(?:[^\\d||\\-|@]+))(?:[_a-z\\d][\\-]*)*))\\s*=${EOL}`,
-  'gi'
+  'gi',
 );
 
 const RegexpExtractor = {
@@ -35,6 +35,6 @@ VariablesExtractor.registerStrategy(
     DECLARATION_REGEXP,
     REGEXP,
     REGEXP_ONE,
-    RegexpExtractor
-  )
+    RegexpExtractor,
+  ),
 );

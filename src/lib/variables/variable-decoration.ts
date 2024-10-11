@@ -49,7 +49,7 @@ class VariableDecoration implements IDecoration {
   public constructor(
     variable: Variable,
     line: number,
-    decorationFn: (color: Color) => TextEditorDecorationType
+    decorationFn: (color: Color) => TextEditorDecorationType,
   ) {
     this.variable = variable;
     this.decorationFn = decorationFn;
@@ -58,7 +58,7 @@ class VariableDecoration implements IDecoration {
     } else {
       this.currentRange = new Range(
         new Position(line, 0),
-        new Position(line, 0)
+        new Position(line, 0),
       );
     }
   }
@@ -98,8 +98,8 @@ class VariableDecoration implements IDecoration {
       new Position(line, this.variable.color.positionInText),
       new Position(
         line,
-        this.variable.color.positionInText + this.variable.color.value.length
-      )
+        this.variable.color.positionInText + this.variable.color.value.length,
+      ),
     );
     this.currentRange = range;
     return range;

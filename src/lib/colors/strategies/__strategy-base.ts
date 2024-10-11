@@ -9,7 +9,7 @@ export default class ColorStrategy implements IColorStrategy {
     public name: string,
     private REGEXP: RegExp,
     private REGEXP_ONE: RegExp,
-    private colorFromRegexp: RegexpResultExtractor
+    private colorFromRegexp: RegexpResultExtractor,
   ) {}
 
   async extractColors(fileLines: DocumentLine[]): Promise<LineExtraction[]> {

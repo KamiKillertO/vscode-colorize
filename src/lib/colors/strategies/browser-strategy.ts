@@ -768,7 +768,7 @@ class BrowsersColorExtractor implements IColorStrategy {
         position += (match.index ?? 0) + 1;
         const browserColor: string = match[1];
         colors.push(
-          new Color(match[1], position, COLORS[browserColor.toLowerCase()].rgb)
+          new Color(match[1], position, COLORS[browserColor.toLowerCase()].rgb),
         );
         text = text.slice((match.index ?? 0) + 1 + match[1].length);
         position += match[1].length;
@@ -784,7 +784,7 @@ class BrowsersColorExtractor implements IColorStrategy {
       return new Color(
         match[1],
         match.index,
-        COLORS[browserColor.toLowerCase()].rgb
+        COLORS[browserColor.toLowerCase()].rgb,
       );
     }
 

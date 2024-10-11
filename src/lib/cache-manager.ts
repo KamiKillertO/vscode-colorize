@@ -17,7 +17,7 @@ class CacheManager {
    * @returns {(Map<number, IDecoration[]> | null)}
    */
   public getCachedDecorations(
-    document: TextDocument
+    document: TextDocument,
   ): Map<number, IDecoration[]> | undefined {
     if (!document.isDirty && this._decorationsCache.has(document.fileName)) {
       return this._decorationsCache.get(document.fileName);
@@ -35,7 +35,7 @@ class CacheManager {
    */
   public saveDecorations(
     document: TextDocument,
-    deco: Map<number, IDecoration[]>
+    deco: Map<number, IDecoration[]>,
   ) {
     document.isDirty
       ? this._saveDirtyDecoration(document.fileName, deco)
@@ -44,14 +44,14 @@ class CacheManager {
 
   private _saveDirtyDecoration(
     fileName: string,
-    decorations: Map<number, IDecoration[]>
+    decorations: Map<number, IDecoration[]>,
   ) {
     return this._dirtyCache.set(fileName, decorations);
   }
 
   private _saveSavedDecorations(
     fileName: string,
-    decorations: Map<number, IDecoration[]>
+    decorations: Map<number, IDecoration[]>,
   ) {
     return this._decorationsCache.set(fileName, decorations);
   }

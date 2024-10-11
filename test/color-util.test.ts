@@ -16,7 +16,7 @@ describe('Test utility fonction', () => {
     assert.equal(
       0,
       colors.reduce((acc, cv) => acc.concat(cv.colors), [] as IColor[]).length,
-      'Should have found 0 colors'
+      'Should have found 0 colors',
     );
   });
   it('Should extract Colors from a text', async () => {
@@ -29,34 +29,34 @@ describe('Test utility fonction', () => {
     assert.equal(
       7,
       colors.reduce((acc, cv) => acc.concat(cv.colors), [] as IColor[]).length,
-      'Should have found 7 colors'
+      'Should have found 7 colors',
     );
   });
   it('Should return the color luminance', () => {
     assert.equal(
       colorLuminance(new Color('#fff', 0, [255, 255, 255])),
       1,
-      'Should be "1" for #fff'
+      'Should be "1" for #fff',
     );
     assert.equal(
       colorLuminance(new Color('#ffffff', 0, [255, 255, 255])),
       1,
-      'Should be "1" for #ffffff'
+      'Should be "1" for #ffffff',
     );
     assert.equal(
       colorLuminance(new Color('#000', 0, [0, 0, 0])),
       0,
-      'Should be "0" for #000'
+      'Should be "0" for #000',
     );
     assert.equal(
       colorLuminance(new Color('#000000', 0, [0, 0, 0])),
       0,
-      'Should be "0" for #000000'
+      'Should be "0" for #000000',
     );
     assert.equal(
       colorLuminance(new Color('#ccc', 0, [204, 204, 204])).toFixed(1),
       '0.6',
-      'Should be around "0.6" for #ccc'
+      'Should be around "0.6" for #ccc',
     );
   });
   it('Should convert hsla colors in rgba colors', function () {

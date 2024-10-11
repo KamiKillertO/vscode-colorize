@@ -19,7 +19,7 @@ class Variable implements IColor {
     name: string,
     color: Color,
     location: VariableLocation,
-    type: string
+    type: string,
   ) {
     this.name = name;
     this.color = color;

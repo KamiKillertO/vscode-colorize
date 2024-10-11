@@ -83,18 +83,18 @@ async function initDecorations(context: ColorizeContext) {
     (acc: DocumentLine[], range: Range) => {
       return [...acc, ...fileLines.slice(range.start.line, range.end.line + 2)];
     },
-    []
+    [],
   );
 
   // removeDuplicateDecorations(context);
   await VariablesManager.findVariablesDeclarations(
     context.editor.document.fileName,
-    fileLines
+    fileLines,
   );
 
   const variables: LineExtraction[] = await VariablesManager.findVariables(
     context.editor.document.fileName,
-    lines
+    lines,
   );
 
   const colors: LineExtraction[] = await ColorUtil.findColors(lines);
@@ -103,13 +103,13 @@ async function initDecorations(context: ColorizeContext) {
   return EditorManager.decorate(
     context.editor,
     context.deco,
-    context.currentSelection ?? []
+    context.currentSelection ?? [],
   );
 }
 
 function updateContextDecorations(
   decorations: Map<number, IDecoration[]>,
-  context: ColorizeContext
+  context: ColorizeContext,
 ): void {
   const it = decorations.entries();
   let tmp = it.next();
@@ -119,7 +119,7 @@ function updateContextDecorations(
       context.deco.set(
         line,
         // @ts-expect-error context.deco.get(line) cannot be undefined here has context.deco.has(line) before
-        context.deco.get(line).concat(decorations.get(line))
+        context.deco.get(line).concat(decorations.get(line)),
       );
     } else {
       context.deco.set(line, decorations.get(line) ?? []);
@@ -141,7 +141,7 @@ function removeDuplicateDecorations(context: ColorizeContext): void {
     decorations.forEach((deco) => {
       deco.generateRange(line);
       const exist = newDecorations.findIndex((_) =>
-        deco.currentRange.isEqual(_.currentRange)
+        deco.currentRange.isEqual(_.currentRange),
       );
       if (exist !== -1) {
         newDecorations[exist].dispose();
@@ -158,7 +158,7 @@ function removeDuplicateDecorations(context: ColorizeContext): void {
 function updateDecorationMap(
   map: Map<number, IDecoration[]>,
   line: number,
-  decoration: IDecoration
+  decoration: IDecoration,
 ) {
   if (map.has(line)) {
     // @ts-expect-error map.get(line) cannot be undefined as map.has(line) before
@@ -171,27 +171,27 @@ function updateDecorationMap(
 function generateDecorations(
   colors: LineExtraction[],
   variables: LineExtraction[],
-  decorations: Map<number, IDecoration[]>
+  decorations: Map<number, IDecoration[]>,
 ): Map<number, IDecoration[]> {
   colors.map(({ line, colors }) =>
     colors.forEach((color) => {
       const decoration = ColorUtil.generateDecoration(
         color,
         line,
-        config.decorationFn
+        config.decorationFn,
       );
       updateDecorationMap(decorations, line, decoration);
-    })
+    }),
   );
   variables.map(({ line, colors }) =>
     colors.forEach((variable) => {
       const decoration = VariablesManager.generateDecoration(
         <Variable>variable,
         line,
-        config.decorationFn
+        config.decorationFn,
       );
       updateDecorationMap(decorations, line, decoration);
-    })
+    }),
   );
   return decorations;
 }
@@ -215,7 +215,7 @@ function isLanguageSupported(languageId: string): boolean {
 function isIncludedFile(fileName: string): boolean {
   return (
     config.filesToIncludes.find((globPattern: string) =>
-      globToRegexp(globPattern).test(fileName)
+      globToRegexp(globPattern).test(fileName),
     ) !== undefined
   );
 }
@@ -236,7 +236,7 @@ function canColorize(document: TextDocument): boolean {
 
 function handleTextSelectionChange(
   event: TextEditorSelectionChangeEvent,
-  cb: () => void
+  cb: () => void,
 ) {
   if (
     !config.isHideCurrentLineDecorations ||
@@ -252,7 +252,7 @@ function handleTextSelectionChange(
         EditorManager.decorateOneLine(
           extension.editor as TextEditor, // editor cannot be null here
           decorations,
-          line
+          line,
         );
       }
     });
@@ -265,7 +265,7 @@ function handleTextSelectionChange(
     }
   });
   extension.currentSelection = event.selections.map(
-    (selection: Selection) => selection.active.line
+    (selection: Selection) => selection.active.line,
   );
   return cb();
 }
@@ -293,7 +293,7 @@ async function colorize(editor: TextEditor, cb: () => void): Promise<void> {
   extension.updateStatusBar(true);
   extension.editor = editor;
   extension.currentSelection = editor.selections.map(
-    (selection: Selection) => selection.active.line
+    (selection: Selection) => selection.active.line,
   );
   const deco = CacheManager.getCachedDecorations(editor.document);
   if (deco) {
@@ -303,7 +303,7 @@ async function colorize(editor: TextEditor, cb: () => void): Promise<void> {
     EditorManager.decorate(
       extension.editor,
       extension.deco,
-      extension.currentSelection
+      extension.currentSelection,
     );
   } else {
     extension.nbLine = editor.document.lineCount;
@@ -322,7 +322,7 @@ function handleChangeActiveTextEditor(editor: TextEditor | undefined) {
   }
   if (extension.editor !== undefined && extension.editor !== null) {
     extension.deco.forEach((decorations) =>
-      decorations.forEach((deco) => deco.hide())
+      decorations.forEach((deco) => deco.hide()),
     );
     CacheManager.saveDecorations(extension.editor.document, extension.deco);
   }
@@ -344,7 +344,7 @@ function cleanDecorationList(context: ColorizeContext, cb: () => void): void {
     const decorations = tmp.value[1];
     context.deco.set(
       line,
-      decorations.filter((decoration) => !decoration.disposed)
+      decorations.filter((decoration) => !decoration.disposed),
     );
     tmp = it.next();
   }
@@ -370,7 +370,7 @@ function handleConfigurationChanged() {
     if (newConfig.searchVariables) {
       await VariablesManager.getWorkspaceVariables(
         newConfig.filesToIncludes.concat(newConfig.inferedFilesToInclude),
-        newConfig.filesToExcludes
+        newConfig.filesToExcludes,
       ); // 👍
     }
     return cb();
@@ -383,24 +383,24 @@ function initEventListeners(context: ExtensionContext) {
   window.onDidChangeTextEditorSelection(
     (event) => q.push((cb) => handleTextSelectionChange(event, cb)),
     null,
-    context.subscriptions
+    context.subscriptions,
   );
 
   workspace.onDidCloseTextDocument(
     handleCloseOpen,
     null,
-    context.subscriptions
+    context.subscriptions,
   );
   workspace.onDidSaveTextDocument(handleCloseOpen, null, context.subscriptions);
   window.onDidChangeActiveTextEditor(
     handleChangeActiveTextEditor,
     null,
-    context.subscriptions
+    context.subscriptions,
   );
   workspace.onDidChangeConfiguration(
     handleConfigurationChanged,
     null,
-    context.subscriptions
+    context.subscriptions,
   ); // Does not update when local config file is edited manualy ><
 
   Listeners.setupEventListeners(context);
@@ -408,7 +408,7 @@ function initEventListeners(context: ExtensionContext) {
 
 function getVisibleFileEditors(): TextEditor[] {
   return window.visibleTextEditors.filter(
-    (editor) => editor.document.uri.scheme === 'file'
+    (editor) => editor.document.uri.scheme === 'file',
   );
 }
 
@@ -431,7 +431,7 @@ export function activate(context: ExtensionContext): ColorizeContext {
       if (config.searchVariables) {
         await VariablesManager.getWorkspaceVariables(
           config.filesToIncludes.concat(config.inferedFilesToInclude),
-          config.filesToExcludes
+          config.filesToExcludes,
         ); // 👍
       }
       initEventListeners(context);

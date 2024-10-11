@@ -14,7 +14,11 @@ async function main() {
 
     const vscodeVersion = '1.54.0';
     // Download VS Code, unzip it and run the integration test
-    await runTests({ extensionDevelopmentPath, extensionTestsPath, version: vscodeVersion });
+    await runTests({
+      extensionDevelopmentPath,
+      extensionTestsPath,
+      version: vscodeVersion,
+    });
   } catch (err) {
     console.error(err);
     console.error('Failed to run tests');

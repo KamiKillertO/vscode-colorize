@@ -6,11 +6,11 @@ import Color from '../color';
 const HEXA_PREFIX = '(?:#|0x)';
 export const REGEXP = new RegExp(
   `(${HEXA_PREFIX}(?:${HEXA_VALUE}{3,4}|${HEXA_VALUE}{6}|${HEXA_VALUE}{8}))${EOL}`,
-  'gi'
+  'gi',
 );
 export const REGEXP_ONE = new RegExp(
   `^(${HEXA_PREFIX}(?:${HEXA_VALUE}{3,4}|${HEXA_VALUE}{6}|${HEXA_VALUE}{8}))${EOL}`,
-  'i'
+  'i',
 );
 
 function extractRGB(argb: number[]): [number, number, number] {

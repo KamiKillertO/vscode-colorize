@@ -19,7 +19,7 @@ interface LineExtraction {
 }
 
 const flattenLineExtractionsFlatten = (
-  arr: LineExtraction[][] | LineExtraction[]
+  arr: LineExtraction[][] | LineExtraction[],
 ): LineExtraction[] => arr.flat(2).filter((_) => _.colors.length !== 0);
 
 const WHITE = '#FFFFFF',
@@ -80,7 +80,7 @@ class ColorUtil {
       Object({
         text: text,
         line: index,
-      })
+      }),
     );
   }
   /**
@@ -93,7 +93,7 @@ class ColorUtil {
    * @memberOf ColorUtil
    */
   public static findColors(
-    fileContent: DocumentLine[]
+    fileContent: DocumentLine[],
   ): Promise<LineExtraction[]> {
     return ColorExtractor.extract(fileContent);
   }
@@ -105,7 +105,7 @@ class ColorUtil {
   public static generateDecoration(
     color: IColor,
     line: number,
-    decorationFn: (color: Color) => TextEditorDecorationType
+    decorationFn: (color: Color) => TextEditorDecorationType,
   ): IDecoration {
     return new ColorDecoration(<Color>color, line, decorationFn);
   }
@@ -165,7 +165,7 @@ function convertRgbaToHsla(
   r: number,
   g: number,
   b: number,
-  a = 1
+  a = 1,
 ): [number, number, number, number] {
   (r /= 255), (g /= 255), (b /= 255);
 
@@ -210,7 +210,7 @@ function convertHslaToRgba(
   h: number,
   s: number,
   l: number,
-  a = 1
+  a = 1,
 ): [number, number, number, number] {
   let r: number, g: number, b: number;
   if (s === 0) {
@@ -251,7 +251,7 @@ function convertHslaToRgba(
 function executeHSLProperFormula(
   tmp_1: number,
   tmp_2: number,
-  value: number
+  value: number,
 ): number {
   const res = tmp_2;
   if (6 * value < 1) {

@@ -12,7 +12,7 @@ export interface IStategyRegexpResultExtractor {
   getVariableNameFromDeclaration(match: RegExpExecArray): string;
 
   getVariableNameFromUses(
-    match: RegExpExecArray
+    match: RegExpExecArray,
   ): string[] | [string, string | null, string];
 
   getVariableNameFromUse(match: RegExpMatchArray): string;
@@ -24,23 +24,23 @@ export default class VariableStrategy {
     private DECLARATION_REGEXP: RegExp,
     private USES_REGEXP: RegExp,
     private USE_REGEXP: RegExp,
-    private regexpExtractor: IStategyRegexpResultExtractor
+    private regexpExtractor: IStategyRegexpResultExtractor,
   ) {}
 
   protected store: VariablesStore = new VariablesStore();
 
   public async extractDeclarations(
     fileName: string,
-    fileLines: DocumentLine[]
+    fileLines: DocumentLine[],
   ): Promise<number> {
     return fileLines.map(({ text, line }) =>
-      this.__extractDeclarations(fileName, text, line)
+      this.__extractDeclarations(fileName, text, line),
     ).length;
   }
   public __extractDeclarations(
     fileName: string,
     text: string,
-    line: number
+    line: number,
   ): void {
     let match = null;
     while ((match = this.DECLARATION_REGEXP.exec(text)) !== null) {
@@ -48,11 +48,11 @@ export default class VariableStrategy {
         this.regexpExtractor.getVariableNameFromDeclaration(match);
       const color =
         ColorExtractor.extractOneColor(
-          text.slice(match.index + match[0].length).trim()
+          text.slice(match.index + match[0].length).trim(),
         ) ||
         this.extractVariable(
           fileName,
-          text.slice(match.index + match[0].length).trim()
+          text.slice(match.index + match[0].length).trim(),
         );
       if (this.store.has(varName, fileName, line)) {
         const decoration = this.store.findDeclaration(varName, fileName, line);
@@ -62,7 +62,7 @@ export default class VariableStrategy {
           varName,
           <Color>color,
           { fileName, line, position: match.index },
-          this.name
+          this.name,
         );
         this.store.addEntry(varName, variable); // update entry?? // outside ?
       }
@@ -71,7 +71,7 @@ export default class VariableStrategy {
 
   public extractVariables(
     fileName: string,
-    fileLines: DocumentLine[]
+    fileLines: DocumentLine[],
   ): LineExtraction[] {
     const variables = fileLines.map(({ line, text }) => {
       let match: RegExpExecArray | null = null;
@@ -95,10 +95,10 @@ export default class VariableStrategy {
             spacesCount + match.index,
             // @ts-expect-error Works for now, need to clean this
             null,
-            null
+            null,
           ),
           location,
-          this.name
+          this.name,
         );
         colors.push(variable);
       }
@@ -130,7 +130,7 @@ export default class VariableStrategy {
     if (this.store.has(variable.name) === true) {
       let declaration = this.store.findClosestDeclaration(
         variable.name,
-        variable.location.fileName
+        variable.location.fileName,
       );
       if (declaration.color === undefined) {
         declaration = this.store.findClosestDeclaration(variable.name, '.');
@@ -141,7 +141,7 @@ export default class VariableStrategy {
           variable.color.value,
           variable.location.position,
           declaration.color.rgb,
-          declaration.color.alpha
+          declaration.color.alpha,
         );
       }
     }

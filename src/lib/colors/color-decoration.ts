@@ -47,7 +47,7 @@ class ColorDecoration implements IDecoration {
   public constructor(
     color: Color,
     line: number,
-    decorationFn: (color: Color) => TextEditorDecorationType
+    decorationFn: (color: Color) => TextEditorDecorationType,
   ) {
     this.color = color;
     this.decorationFn = decorationFn;
@@ -91,7 +91,7 @@ class ColorDecoration implements IDecoration {
   public generateRange(line: number): Range {
     const range = new Range(
       new Position(line, this.color.positionInText),
-      new Position(line, this.color.positionInText + this.color.value.length)
+      new Position(line, this.color.positionInText + this.color.value.length),
     );
     this.currentRange = range;
     return range;

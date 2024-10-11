@@ -28,7 +28,7 @@ class VariablesManager {
 
   public async getWorkspaceVariables(
     includePattern: string[] = [],
-    excludePattern: string[] = []
+    excludePattern: string[] = [],
   ) {
     this.statusBar.show();
     this.statusBar.text =
@@ -38,7 +38,7 @@ class VariablesManager {
       const EXCLUDE_PATTERN = `{${excludePattern.join(',')}}`;
       const files: Uri[] = await workspace.findFiles(
         INCLUDE_PATTERN,
-        EXCLUDE_PATTERN
+        EXCLUDE_PATTERN,
       );
 
       await Promise.all(this.extractFilesVariable(files));
@@ -57,7 +57,7 @@ class VariablesManager {
       Object({
         text: text,
         line: index,
-      })
+      }),
     );
   }
 
@@ -71,7 +71,7 @@ class VariablesManager {
 
   public findVariablesDeclarations(
     fileName: string,
-    fileLines: DocumentLine[]
+    fileLines: DocumentLine[],
   ): Promise<number[]> {
     return VariablesExtractor.extractDeclarations(fileName, fileLines);
   }
@@ -87,7 +87,7 @@ class VariablesManager {
   public generateDecoration(
     variable: Variable,
     line: number,
-    decorationFn: (color: Color) => TextEditorDecorationType
+    decorationFn: (color: Color) => TextEditorDecorationType,
   ): VariableDecoration {
     return new VariableDecoration(variable, line, decorationFn);
   }

@@ -47,7 +47,7 @@ interface DecoPositionUpdate {
 function filterPositions(
   position: DecoPositionUpdate | DecoPositionMaybeUpdate,
   deco: Map<number, IDecoration[]>,
-  diffLine: number
+  diffLine: number,
 ): position is DecoPositionUpdate {
   if (position.updated === null) {
     deco.get(position.old)?.forEach(clearDecoration);
@@ -72,7 +72,7 @@ function filterPositions(
 
 function disposeDecorationsForEditedLines(
   editedLine: TextDocumentContentChangeEvent[],
-  context: ColorizeContext
+  context: ColorizeContext,
 ) {
   editedLine.map(({ range }: TextDocumentContentChangeEvent) => {
     const line = range.start.line;
@@ -84,7 +84,7 @@ function disposeDecorationsForEditedLines(
 
 function updatePositionsDeletion(
   range: Range,
-  positions: Array<DecoPositionMaybeUpdate>
+  positions: Array<DecoPositionMaybeUpdate>,
 ) {
   const rangeLength = range.end.line - range.start.line;
   positions.forEach((position) => {
@@ -111,7 +111,7 @@ function updatePositionsDeletion(
 
 function getRemovedLines(
   editedLine: TextDocumentContentChangeEvent[],
-  positions: DecoPositionMaybeUpdate[]
+  positions: DecoPositionMaybeUpdate[],
 ) {
   editedLine.reverse();
   editedLine.forEach((line: TextDocumentContentChangeEvent) => {
@@ -120,7 +120,7 @@ function getRemovedLines(
       // for (let i = line.range.start.line; i <= context.editor.document.lineCount; i++) {
       VariablesManager.deleteVariableInLine(
         extension.editor?.document.fileName as string,
-        i
+        i,
       );
     }
 
@@ -131,7 +131,7 @@ function getRemovedLines(
 
 function getAddedLines(
   editedLine: TextDocumentContentChangeEvent[],
-  positions: DecoPositionUpdate[]
+  positions: DecoPositionUpdate[],
 ) {
   editedLine = mutEditedLine(editedLine);
   editedLine.forEach((line) => {
@@ -148,13 +148,13 @@ function getAddedLines(
 function getEditedLines(
   editedLine: TextDocumentContentChangeEvent[],
   context: ColorizeContext,
-  diffLine: number
+  diffLine: number,
 ) {
   let positions: DecoPositionUpdate[] = Array.from(context.deco.keys()).map(
     (position) => ({
       old: position,
       updated: position,
-    })
+    }),
   );
 
   if (diffLine < 0) {
@@ -163,14 +163,14 @@ function getEditedLines(
     editedLine = getAddedLines(editedLine, positions);
   }
   positions = positions.filter((position) =>
-    filterPositions(position, context.deco, diffLine)
+    filterPositions(position, context.deco, diffLine),
   );
   context.deco = positions.reduce((decorations, position) => {
     if (decorations.has(position.updated)) {
       const decos = decorations
         .get(position.updated)
         ?.concat(
-          context.deco.get(position.old) as IDecoration[]
+          context.deco.get(position.old) as IDecoration[],
         ) as IDecoration[];
 
       decos.forEach((deco) => deco.generateRange(position.updated));
@@ -182,7 +182,7 @@ function getEditedLines(
 
     return decorations.set(
       position.updated,
-      context.deco.get(position.old) as IDecoration[]
+      context.deco.get(position.old) as IDecoration[],
     );
   }, new Map<number, IDecoration[]>());
   return editedLine;
@@ -190,7 +190,7 @@ function getEditedLines(
 
 function getDecorationsToColorize(
   colors: LineExtraction[],
-  variables: LineExtraction[]
+  variables: LineExtraction[],
 ): Map<number, IDecoration[]> {
   const decorations = generateDecorations(colors, variables, new Map());
 
@@ -218,8 +218,8 @@ function getDecorationsToColorize(
           i,
           filterDuplicated(
             decorations.get(i) as IDecoration[],
-            extension.deco.get(i) as IDecoration[]
-          )
+            extension.deco.get(i) as IDecoration[],
+          ),
         );
       }
 
@@ -259,11 +259,11 @@ function* handleVisibleRangeEvent() {
   const lines = getCurrentRangeText();
   yield VariablesManager.findVariablesDeclarations(
     extension.editor?.document.fileName as string,
-    fileLines
+    fileLines,
   );
   const variables: LineExtraction[] = yield VariablesManager.findVariables(
     extension.editor?.document.fileName as string,
-    lines
+    lines,
   );
   const colors: LineExtraction[] = yield ColorUtil.findColors(lines);
 
@@ -271,7 +271,7 @@ function* handleVisibleRangeEvent() {
   EditorManager.decorate(
     extension.editor as TextEditor,
     decorations,
-    extension.currentSelection ?? []
+    extension.currentSelection ?? [],
   );
   updateContextDecorations(decorations, extension);
   removeDuplicateDecorations(extension);
@@ -283,20 +283,20 @@ function* updateDecorations() {
   const fileName = extension.editor?.document.fileName as string;
 
   const fileLines: DocumentLine[] = ColorUtil.textToFileLines(
-    extension.editor?.document.getText() ?? ''
+    extension.editor?.document.getText() ?? '',
   );
 
   const lines = getCurrentRangeText();
 
   VariablesManager.removeVariablesDeclarations(
-    extension.editor?.document.fileName as string
+    extension.editor?.document.fileName as string,
   );
   cleanDecorationMap(extension.deco);
 
   yield VariablesManager.findVariablesDeclarations(fileName, fileLines);
   const variables: LineExtraction[] = yield VariablesManager.findVariables(
     fileName,
-    lines
+    lines,
   );
   const colors: LineExtraction[] = yield ColorUtil.findColors(lines);
   const decorations = getDecorationsToColorize(colors, variables);
@@ -304,7 +304,7 @@ function* updateDecorations() {
   EditorManager.decorate(
     extension.editor as TextEditor,
     decorations,
-    extension.currentSelection ?? []
+    extension.currentSelection ?? [],
   );
   updateContextDecorations(decorations, extension);
   removeDuplicateDecorations(extension);
@@ -319,7 +319,7 @@ function cleanDecorationMap(decorations: Map<number, IDecoration[]>) {
     const deco = tmp.value[1];
     decorations.set(
       line,
-      deco.filter((decoration) => !decoration.disposed)
+      deco.filter((decoration) => !decoration.disposed),
     );
     tmp = it.next();
   }
@@ -352,12 +352,12 @@ function setupEventListeners(context: ExtensionContext): void {
   workspace.onDidChangeTextDocument(
     textDocumentUpdated,
     null,
-    context.subscriptions
+    context.subscriptions,
   );
   window.onDidChangeTextEditorVisibleRanges(
     () => taskRuner.run(handleVisibleRangeEvent),
     null,
-    context.subscriptions
+    context.subscriptions,
   );
   // window.onDidChangeTextEditorVisibleRanges(handleVisibleRangeEvent, null, context.subscriptions);
 }

@@ -5,15 +5,15 @@ import VariableStrategy from './__strategy-base';
 // eslint-disable-next-line
 export const REGEXP = new RegExp(
   `(var\\((--(?:[a-z]+[\\-_a-z\\d]*))\\))(?!:)${EOL}`,
-  'gi'
+  'gi',
 );
 export const REGEXP_ONE = new RegExp(
   `^(var\\((--(?:[a-z]+[\\-_a-z\\d]*))\\))(?!:)${EOL}`,
-  'i'
+  'i',
 );
 export const DECLARATION_REGEXP = new RegExp(
   `(?:(--(?:[a-z]+[\\-_a-z\\d]*)\\s*):)${EOL}`,
-  'gi'
+  'gi',
 );
 
 const RegexpExtractor = {
@@ -35,7 +35,7 @@ const CssExtractor = new VariableStrategy(
   DECLARATION_REGEXP,
   REGEXP,
   REGEXP_ONE,
-  RegexpExtractor
+  RegexpExtractor,
 );
 VariablesExtractor.registerStrategy(CssExtractor);
 export default CssExtractor;

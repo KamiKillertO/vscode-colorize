@@ -11,12 +11,12 @@ import Variable from './variable';
 export interface IVariableStrategy extends IStrategy {
   extractDeclarations(
     fileName: string,
-    fileLines: DocumentLine[]
+    fileLines: DocumentLine[],
   ): Promise<number>;
 
   extractVariables(
     fileName: string,
-    fileLines: DocumentLine[]
+    fileLines: DocumentLine[],
   ): LineExtraction[];
   extractVariable(fileName: string, text: string): Color;
   getVariableValue(variable: Variable): Color | null;
@@ -27,49 +27,49 @@ export interface IVariableStrategy extends IStrategy {
 class VariablesExtractor extends Extractor {
   public async extractVariables(
     fileName: string,
-    fileLines: DocumentLine[]
+    fileLines: DocumentLine[],
   ): Promise<LineExtraction[]> {
     const colors = await Promise.all(
       this.enabledStrategies.map((strategy) =>
-        (<IVariableStrategy>strategy).extractVariables(fileName, fileLines)
-      )
+        (<IVariableStrategy>strategy).extractVariables(fileName, fileLines),
+      ),
     );
     return flattenLineExtractionsFlatten(colors); // should regroup per lines?
   }
 
   public deleteVariableInLine(fileName: string, line: number) {
     this.enabledStrategies.forEach((strategy) =>
-      (<IVariableStrategy>strategy).deleteVariable(fileName, line)
+      (<IVariableStrategy>strategy).deleteVariable(fileName, line),
     );
   }
 
   public async extractDeclarations(
     fileName: string,
-    fileLines: DocumentLine[]
+    fileLines: DocumentLine[],
   ): Promise<number[]> {
     return Promise.all(
       this.enabledStrategies.map((strategy) =>
-        (<IVariableStrategy>strategy).extractDeclarations(fileName, fileLines)
-      )
+        (<IVariableStrategy>strategy).extractDeclarations(fileName, fileLines),
+      ),
     );
   }
 
   public getVariablesCount(): number {
     return this.enabledStrategies.reduce(
       (cv, strategy) => cv + (<IVariableStrategy>strategy).variablesCount(),
-      0
+      0,
     );
   }
 
   public findVariable(variable: Variable): Color | null {
     return (<IVariableStrategy>this.get(variable.type)).getVariableValue(
-      variable
+      variable,
     );
   }
 
   public removeVariablesDeclarations(fileName: string) {
     this.enabledStrategies.forEach((strategy) =>
-      (<IVariableStrategy>strategy).deleteVariable(fileName)
+      (<IVariableStrategy>strategy).deleteVariable(fileName),
     );
   }
 }

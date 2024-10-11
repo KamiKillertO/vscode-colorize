@@ -5,11 +5,11 @@ import VariableStrategy from './__strategy-base';
 export const REGEXP = new RegExp(`(@(?:[a-z]+[\\-_a-z\\d]*)(?!:))${EOL}`, 'gi');
 export const REGEXP_ONE = new RegExp(
   `^(@(?:[a-z]+[\\-_a-z\\d]*)(?!:))${EOL}`,
-  'i'
+  'i',
 );
 export const DECLARATION_REGEXP = new RegExp(
   `(?:(@(?:[a-z]+[\\-_a-z\\d]*)\\s*):)${EOL}`,
-  'gi'
+  'gi',
 );
 
 const RegexpExtractor = {
@@ -32,6 +32,6 @@ VariablesExtractor.registerStrategy(
     DECLARATION_REGEXP,
     REGEXP,
     REGEXP_ONE,
-    RegexpExtractor
-  )
+    RegexpExtractor,
+  ),
 );

@@ -29,21 +29,21 @@ interface ColorizeConfig {
 function getColorizeConfig(): ColorizeConfig {
   const configuration: WorkspaceConfiguration = workspace.getConfiguration(
     'colorize',
-    window.activeTextEditor?.document
+    window.activeTextEditor?.document,
   );
 
   // remove duplicates (if duplicates)
   const colorizedVariables = Array.from(
-    new Set(configuration.get('colorized_variables', []))
+    new Set(configuration.get('colorized_variables', [])),
   ); // [...new Set(array)] // works too
   const colorizedColors = Array.from(
-    new Set(configuration.get('colorized_colors', []))
+    new Set(configuration.get('colorized_colors', [])),
   ); // [...new Set(array)] // works too
 
   const languages = configuration.get('languages', []);
 
   const inferedFilesToInclude = inferFilesToInclude(languages).map(
-    (extension) => `**/*${extension}`
+    (extension) => `**/*${extension}`,
   );
   const filesToIncludes = Array.from(new Set(configuration.get('include', [])));
   const filesToExcludes = Array.from(new Set(configuration.get('exclude', [])));
@@ -64,7 +64,7 @@ function getColorizeConfig(): ColorizeConfig {
 }
 
 function generateDecorationType(
-  decorationType = 'background'
+  decorationType = 'background',
 ): (color: Color) => TextEditorDecorationType {
   switch (decorationType) {
     case 'underline':
@@ -115,7 +115,7 @@ function inferFilesToInclude(languagesConfig: string[]): string[] {
       }
       return acc;
     },
-    [] as string[]
+    [] as string[],
   );
   return unique(filesExtensions.flat());
 }

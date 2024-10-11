@@ -9,11 +9,11 @@ const R_BLUE = R_RED;
 
 export const REGEXP = new RegExp(
   `((?:rgb\\(\\s*${R_RED}\\s*,\\s*${R_GREEN}\\s*,\\s*${R_BLUE}\\s*\\))|(?:rgba\\(\\s*${R_RED}\\s*,\\s*${R_GREEN}\\s*,\\s*${R_BLUE}\\s*,\\s*${ALPHA}\\s*\\)))${EOL}`,
-  'gi'
+  'gi',
 );
 export const REGEXP_ONE = new RegExp(
   `^((?:rgb\\(\\s*${R_RED}\\s*,\\s*${R_GREEN}\\s*,\\s*${R_BLUE}\\s*\\))|(?:rgba\\(\\s*${R_RED}\\s*,\\s*${R_GREEN}\\s*,\\s*${R_BLUE}\\s*,\\s*${ALPHA}\\s*\\)))${EOL}`,
-  'i'
+  'i',
 );
 
 function extractRGBA(value: string): number[] {

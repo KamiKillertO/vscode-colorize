@@ -50,7 +50,7 @@ class Color implements IColor {
     value: string,
     positionInText = 0,
     rgb: [number, number, number],
-    alpha?: number
+    alpha?: number,
   ) {
     this.value = value;
     this.positionInText = positionInText;

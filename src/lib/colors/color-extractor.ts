@@ -14,14 +14,14 @@ class ColorExtractor extends Extractor {
   public async extract(fileLines: DocumentLine[]): Promise<LineExtraction[]> {
     const colors = await Promise.all(
       this.enabledStrategies.map((strategy) =>
-        (<IColorStrategy>strategy).extractColors(fileLines)
-      )
+        (<IColorStrategy>strategy).extractColors(fileLines),
+      ),
     );
     return flattenLineExtractionsFlatten(colors); // should regroup per lines?
   }
   public extractOneColor(text: string): IColor | undefined {
     const colors = this.enabledStrategies.map((strategy) =>
-      (<IColorStrategy>strategy).extractColor(text)
+      (<IColorStrategy>strategy).extractColor(text),
     );
 
     return colors.find((color) => color !== null);
