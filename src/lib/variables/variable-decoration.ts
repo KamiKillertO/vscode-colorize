@@ -42,7 +42,7 @@ class VariableDecoration implements IDecoration {
     this._decoration = deco;
   }
 
-  get rgb(): [number, number, number] {
+  get rgb() {
     return this.variable.color.rgb;
   }
 

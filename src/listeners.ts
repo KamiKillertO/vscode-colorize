@@ -199,7 +199,7 @@ function getDecorationsToColorize(
         if (decoration.rgb === null && _.rgb !== null) {
           return false;
         }
-        const colors = equals(decoration.rgb, _.rgb);
+        const colors = equals(decoration.rgb as number[], _.rgb as number[]);
         return position && colors;
       });
       return exist === -1;

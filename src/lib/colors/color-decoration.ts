@@ -40,7 +40,7 @@ class ColorDecoration implements IDecoration {
     this._decoration = deco;
   }
 
-  get rgb(): [number, number, number] {
+  get rgb() {
     return this.color.rgb;
   }
 

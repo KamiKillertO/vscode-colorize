@@ -28,7 +28,7 @@ const WHITE = '#FFFFFF',
 interface IDecoration {
   decoration: TextEditorDecorationType;
 
-  rgb: number[];
+  rgb: readonly number[];
 
   currentRange: Range;
   /**
