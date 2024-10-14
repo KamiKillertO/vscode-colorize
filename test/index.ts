@@ -1,48 +1,29 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/prefer-promise-reject-errors */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-// eslint-disable @typescript-eslint/no-unsafe-argument
-import * as path from 'path';
-import * as Mocha from 'mocha';
-import * as glob from 'glob';
+import glob from 'glob';
+import Mocha from 'mocha';
+import path from 'path';
 
-export function run(): Promise<void> {
-  // Create the mocha test
-  // @ts-expect-error TOFIX
-  const mocha = new Mocha({
-    ui: 'tdd',
-    color: true,
-  });
+export function run(
+  testsRoot: string,
+  cb: (error: Error | null, failures?: number) => void,
+): void {
+  const mocha = new Mocha({ color: true, ui: 'tdd' });
 
-  const testsRoot = path.resolve(__dirname, '..');
+  glob('**/**.test.js', { cwd: testsRoot }, (err, files) => {
+    if (err) {
+      cb(err);
+      return;
+    }
 
-  return new Promise((c, e) => {
-    // @ts-expect-error TOFIX
-    glob('**/**.test.js', { cwd: testsRoot }, (err, files) => {
-      if (err) {
-        return e(err);
-      }
+    // Add files to the test suite
+    files.forEach((f) => mocha.addFile(path.resolve(testsRoot, f)));
 
-      // Add files to the test suite
-      // @ts-expect-error TOFIX
-      files.forEach((f) => mocha.addFile(path.resolve(testsRoot, f)));
-
-      try {
-        // Run the mocha test
-        // @ts-expect-error TOFIX
-        mocha.run((failures) => {
-          if (failures > 0) {
-            e(new Error(`${failures} tests failed.`));
-          } else {
-            c();
-          }
-        });
-      } catch (err) {
-        e(err);
-      }
-    });
+    try {
+      // Run the mocha test
+      mocha.run((failures) => {
+        cb(null, failures);
+      });
+    } catch (error) {
+      cb(error as Error);
+    }
   });
 }
