@@ -5,27 +5,26 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main, develop]
   pull_request: {}
 
 jobs:
   test:
-
     runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
-        node-version: [10.x, 12.x, 14.x]
-        os: [macos-latest, ubuntu-latest]
+        node-version: [18.x, 20.x, 22.x]
+        os: [macos-latest, ubuntu-latest, windows-latest]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm ci
-    - run: xvfb-run -a npm test
-      if: runner.os == 'Linux'
-    - run: npm test
-      if: runner.os != 'Linux'
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: volta-cli/action@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - run: xvfb-run -a npm test
+        if: runner.os == 'Linux'
+      - run: npm test
+        if: runner.os != 'Linux'
