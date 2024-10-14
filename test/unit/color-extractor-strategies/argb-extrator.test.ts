@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 import { describe, it } from 'mocha';
 
-import ARGBStrategy from '../../src/lib/colors/strategies/argb-strategy';
-import Color from '../../src/lib/colors/color';
+import ARGBStrategy from '../../../src/lib/colors/strategies/argb-strategy';
+import Color from '../../../src/lib/colors/color';
 
 // Defines a Mocha test suite to group tests of similar kind together
 describe('ARGB color extractor', () => {

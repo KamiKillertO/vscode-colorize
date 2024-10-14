@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 import { describe, it } from 'mocha';
 
-import { REGEXP } from '../../src/lib/colors/strategies/hsl-strategy';
-import { regex_exec } from '../test-util';
+import { REGEXP } from '../../../src/lib/colors/strategies/hsl-strategy';
+import { regex_exec } from '../../test-util';
 
 describe('Test hsl(a) color Regex', () => {
   it('Should match a simple hsl color', function () {

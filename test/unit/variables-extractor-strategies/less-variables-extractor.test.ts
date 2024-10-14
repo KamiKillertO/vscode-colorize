@@ -4,8 +4,8 @@ import { describe, it } from 'mocha';
 import {
   REGEXP,
   DECLARATION_REGEXP,
-} from '../../src/lib/variables/strategies/less-strategy';
-import { regex_exec } from '../test-util';
+} from '../../../src/lib/variables/strategies/less-strategy';
+import { regex_exec } from '../../test-util';
 // Defines a Mocha test suite to group tests of similar kind together
 describe('Test variables declaration Regex', () => {
   // less

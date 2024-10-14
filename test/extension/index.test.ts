@@ -5,13 +5,20 @@ import { describe, it } from 'mocha';
 // You can import and use all API from the 'vscode' module
 // as well as import your extension to test it
 import * as vscode from 'vscode';
-import * as colorize from '../src/extension';
+import * as colorize from '../../src/extension';
 import * as path from 'path';
 
 const ext = vscode.extensions.getExtension(
   'kamikillerto.vscode-colorize',
 ) as vscode.Extension<colorize.ColorizeContext>;
-const fixtureSourcePath = path.join(__dirname, '..', '..', 'test', 'fixtures');
+const fixtureSourcePath = path.join(
+  __dirname,
+  '..',
+  '..',
+  '..',
+  'test',
+  'fixtures',
+);
 
 describe('Extension', () => {
   it('is activated successfully upon opening a scss file', async () => {

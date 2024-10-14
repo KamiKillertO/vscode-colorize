@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 import { describe, it } from 'mocha';
 
-import { REGEXP } from '../../src/lib/colors/strategies/hexa-strategy';
-import { regex_exec } from '../test-util';
+import { REGEXP } from '../../../src/lib/colors/strategies/hexa-strategy';
+import { regex_exec } from '../../test-util';
 // Defines a Mocha test suite to group tests of similar kind together
 describe('Test CSS hexa shorthand color Regex', () => {
   it('Should match color with only integer', function () {
