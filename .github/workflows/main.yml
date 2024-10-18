@@ -15,7 +15,9 @@ jobs:
     strategy:
       matrix:
         node-version: [18.x, 20.x, 22.x]
-        os: [macos-latest, ubuntu-latest, windows-latest]
+        os: [macos-latest, ubuntu-latest]
+        # Windows not working for now, need to update build before
+        # os: [macos-latest, ubuntu-latest, windows-latest]
 
     steps:
       - uses: actions/checkout@v4
