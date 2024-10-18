@@ -24,7 +24,6 @@ import Queue from './lib/queue';
 import VariablesManager from './lib/variables/variables-manager';
 import CacheManager from './lib/cache-manager';
 import EditorManager from './lib/editor-manager';
-import globToRegexp from 'glob-to-regexp';
 import {
   getColorizeConfig,
   ColorizeConfig,
@@ -32,6 +31,7 @@ import {
 } from './lib/colorize-config';
 
 import Listeners from './listeners';
+import { minimatch } from 'minimatch';
 
 let config: ColorizeConfig = {
   languages: [],
@@ -213,10 +213,24 @@ function isLanguageSupported(languageId: string): boolean {
  * @returns {boolean}
  */
 function isIncludedFile(fileName: string): boolean {
-  return (
-    config.filesToIncludes.find((globPattern: string) =>
-      globToRegexp(globPattern).test(fileName),
-    ) !== undefined
+  return config.filesToIncludes.some((globPattern: string) =>
+    // No reason why this reports an error
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    minimatch(fileName, globPattern, { nonegate: true }),
+  );
+}
+
+/**
+ * Check if the file is the `colorize.exclude` setting
+ *
+ * @param {string} fileName A valid filename (path to the file)
+ * @returns {boolean}
+ */
+function isExcludedFile(fileName: string): boolean {
+  return config.filesToExcludes.some((globPattern: string) =>
+    // No reason why this reports an error
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    minimatch(fileName, globPattern, { nonegate: true }),
   );
 }
 
@@ -229,8 +243,9 @@ function isIncludedFile(fileName: string): boolean {
 function canColorize(document: TextDocument): boolean {
   // update to use filesToExcludes. Remove `isLanguageSupported` ? checking path with file extension or include glob pattern should be enough
   return (
-    isLanguageSupported(document.languageId) ||
-    isIncludedFile(document.fileName)
+    !isExcludedFile(document.fileName) &&
+    (isLanguageSupported(document.languageId) ||
+      isIncludedFile(document.fileName))
   );
 }
 
