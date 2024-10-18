@@ -26,18 +26,22 @@ import { TextDocumentContentChangeEvent, Range, Position } from 'vscode';
 //  range: {start:{line:4,/*...*/}, end:{line:4,/*...*/}}
 // }]
 //
-function mutEditedLine(editedLine: TextDocumentContentChangeEvent[]): TextDocumentContentChangeEvent[] {
+function mutEditedLine(
+  editedLine: TextDocumentContentChangeEvent[],
+): TextDocumentContentChangeEvent[] {
   const newEditedLine: TextDocumentContentChangeEvent[] = [];
   let startLine = 0;
   let before = 0;
   editedLine.reverse();
-  editedLine.forEach(line => {
+  editedLine.forEach((line) => {
     startLine = line.range.start.line + before;
     line.text.split(/\n/).map((text, i, array) => {
       if (i === 0 && text === '' && array.length === 1) {
         startLine++;
       } else {
-        newEditedLine.push(generateTextDocumentContentChange(startLine++, text));
+        newEditedLine.push(
+          generateTextDocumentContentChange(startLine++, text),
+        );
       }
       before++;
     });
@@ -47,12 +51,15 @@ function mutEditedLine(editedLine: TextDocumentContentChangeEvent[]): TextDocume
 }
 
 // Generate a TextDocumentContentChangeEvent like object for one line
-function generateTextDocumentContentChange(line: number, text: string): TextDocumentContentChangeEvent {
+function generateTextDocumentContentChange(
+  line: number,
+  text: string,
+): TextDocumentContentChangeEvent {
   return {
     rangeLength: 0,
     rangeOffset: 0,
     text: text,
-    range: new Range(new Position(line, 0), new Position(line, text.length))
+    range: new Range(new Position(line, 0), new Position(line, text.length)),
   };
 }
 

@@ -8,18 +8,18 @@ function unique<T>(arr: Array<T>, f?: callbackFn<T>): Array<T> {
   return arr.filter((_, i) => vArr.indexOf(vArr[i]) === i);
 }
 
-function equals<T>(arr1: Array<T>, arr2: Array<T>) : boolean {
+function equals<T>(arr1: Array<T>, arr2: Array<T>): boolean {
   if (arr1 === null || arr2 === null) {
     return false;
   }
   if (arr1.length !== arr2.length) {
     return false;
   }
-  for (const i in arr1) {
+  arr1.forEach((_value, i) => {
     if (arr1[i] !== arr2[i]) {
       return false;
     }
-  }
+  });
   return true;
 }
 

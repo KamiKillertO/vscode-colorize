@@ -1,6 +1,5 @@
-type QueueItem = (cb: () => void) => unknown
+type QueueItem = (cb: () => void) => unknown;
 class Queue {
-
   private _running = false;
 
   private _queue: Array<QueueItem> = [];
@@ -29,7 +28,7 @@ class Queue {
       this._running = true;
       try {
         action(this._next.bind(this));
-      } catch (error) {
+      } catch {
         this._next.call(this);
       }
     }
