@@ -21,14 +21,28 @@ export const REGEXP_ONE = new RegExp(
 );
 
 function extractRGBA(value: string): number[] {
-  const rgba_string = value.replace(/rgb(a){0,1}\(/, '').replace(/\)/, '');
-  return rgba_string.split(/,/gi).map((c) => parseFloat(c));
+  const rgba_string = value
+    .replace(/rgb(a){0,1}\(/, '')
+    .replace(/\)/, '')
+    .replace(/%/g, '')
+    .replace('/', ' ')
+    .replaceAll(',', ' ');
+  return rgba_string.split(/\s+/).map((c) => parseFloat(c));
 }
 
 function getColor(match: RegExpExecArray) {
   const value = match[1];
   const rgba = extractRGBA(value);
-  const alpha = rgba[3] || 1;
+  let alpha = rgba[3] ?? 1;
+
+  if (alpha > 100) {
+    alpha = 1;
+  }
+
+  if (alpha > 1) {
+    alpha = alpha / 100;
+  }
+
   const rgb = rgba.slice(0, 3) as [number, number, number];
   // Check if it's a valid rgb(a) color
   if (rgb.every((c) => c <= 255)) {
@@ -40,3 +54,4 @@ function getColor(match: RegExpExecArray) {
 
 const strategy = new ColorStrategy('RGB', REGEXP, REGEXP_ONE, getColor);
 ColorExtractor.registerStrategy(strategy);
+export default strategy;

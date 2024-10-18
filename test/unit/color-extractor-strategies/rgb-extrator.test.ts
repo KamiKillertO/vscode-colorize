@@ -3,6 +3,8 @@ import { describe, it } from 'mocha';
 
 import { REGEXP } from '../../../src/lib/colors/strategies/rgb-strategy';
 import { regex_exec } from '../../test-util';
+import RGBStrategy from '../../../src/lib/colors/strategies/rgb-strategy';
+import Color from '../../../src/lib/colors/color';
 
 describe('Test rgb(a) color Regex', () => {
   it('Should match the new syntax', function () {
@@ -152,5 +154,199 @@ describe('Test rgb(a) color Regex', () => {
       regex_exec('rgba(.123, 123, 123, 1)', REGEXP)[1],
       'rgba(.123, 123, 123, 1)',
     );
+  });
+});
+
+describe('Extract color', () => {
+  (
+    [
+      {
+        input: 'rgb(255 255 255)',
+        expected: {
+          rgb: [255, 255, 255],
+          alpha: 1,
+        },
+      },
+      {
+        input: 'rgb(255 255 255 / 50%)',
+        expected: {
+          rgb: [255, 255, 255],
+          alpha: 0.5,
+        },
+      },
+      {
+        input: 'rgb(255 255 255 / 255%)',
+        expected: {
+          rgb: [255, 255, 255],
+          alpha: 1,
+        },
+      },
+      {
+        input: 'rgba(0 255 255)',
+        expected: {
+          rgb: [0, 255, 255],
+          alpha: 1,
+        },
+      },
+      {
+        input: 'rgba(0 255 255 / 50)',
+        expected: {
+          rgb: [0, 255, 255],
+          alpha: 0.5,
+        },
+      },
+      {
+        input: 'rgba(.1 25.5 2.55 / 50)',
+        expected: {
+          rgb: [0.1, 25.5, 2.55],
+          alpha: 0.5,
+        },
+      },
+      {
+        input: 'rgb(123, 123, 123)',
+        expected: {
+          rgb: [123, 123, 123],
+          alpha: 1,
+        },
+      },
+      {
+        input: 'rgba(123, 123, 123, 0)',
+        expected: {
+          rgb: [123, 123, 123],
+          alpha: 0,
+        },
+      },
+      {
+        input: 'rgba(123, 123, 123, 0.3)',
+        expected: {
+          rgb: [123, 123, 123],
+          alpha: 0.3,
+        },
+      },
+      {
+        input: 'rgba(123, 123, 123, .3)',
+        expected: {
+          rgb: [123, 123, 123],
+          alpha: 0.3,
+        },
+      },
+      {
+        input: 'rgba(123, 123, 123, 1)',
+        expected: {
+          rgb: [123, 123, 123],
+          alpha: 1,
+        },
+      },
+      {
+        input: 'rgba(123, 123, 123, 1.0)',
+        expected: {
+          rgb: [123, 123, 123],
+          alpha: 1,
+        },
+      },
+      {
+        input: 'rgb(12.3, 123, 123)',
+        expected: {
+          rgb: [12.3, 123, 123],
+          alpha: 1,
+        },
+      },
+      {
+        input: 'rgb(123, 12.3, 123)',
+        expected: {
+          rgb: [123, 12.3, 123],
+          alpha: 1,
+        },
+      },
+      {
+        input: 'rgb(123, 123, 12.3)',
+        expected: {
+          rgb: [123, 123, 12.3],
+          alpha: 1,
+        },
+      },
+      {
+        input: 'rgb(123, 123, 12.333333)',
+        expected: {
+          rgb: [123, 123, 12.333333],
+          alpha: 1,
+        },
+      },
+      {
+        input: 'rgb(12.3, 12.3, 12.3)',
+        expected: {
+          rgb: [12.3, 12.3, 12.3],
+          alpha: 1,
+        },
+      },
+      {
+        input: 'rgb(.3, 12.3, 12.3)',
+        expected: {
+          rgb: [0.3, 12.3, 12.3],
+          alpha: 1,
+        },
+      },
+      {
+        input: 'rgba(12.3, 123, 123, 0)',
+        expected: {
+          rgb: [12.3, 123, 123],
+          alpha: 0,
+        },
+      },
+      {
+        input: 'rgba(123, 12.3, 123, 0)',
+        expected: {
+          rgb: [123, 12.3, 123],
+          alpha: 0,
+        },
+      },
+      {
+        input: 'rgba(123, 123, 12.3, 0)',
+        expected: {
+          rgb: [123, 123, 12.3],
+          alpha: 0,
+        },
+      },
+      {
+        input: 'rgba(123, 123, 123, 1.0)',
+        expected: {
+          rgb: [123, 123, 123],
+          alpha: 1,
+        },
+      },
+      {
+        input: 'rgba(123, 123, 123, 1.00)',
+        expected: {
+          rgb: [123, 123, 123],
+          alpha: 1,
+        },
+      },
+      {
+        input: 'rgba(123, 123, 123, 1)',
+        expected: {
+          rgb: [123, 123, 123],
+          alpha: 1,
+        },
+      },
+      {
+        input: 'rgba(.123, 123, 123, 1)',
+        expected: {
+          rgb: [0.123, 123, 123],
+          alpha: 1,
+        },
+      },
+    ] satisfies Array<{
+      input: string;
+      expected: {
+        rgb: [number, number, number];
+        alpha: number;
+      };
+    }>
+  ).forEach((test) => {
+    it(`Should correctly extract '${test.input}'`, function () {
+      const color = RGBStrategy.extractColor(test.input) as Color;
+      assert.deepEqual(color.rgb, test.expected.rgb);
+      assert.deepEqual(color.alpha, test.expected.alpha);
+    });
   });
 });
