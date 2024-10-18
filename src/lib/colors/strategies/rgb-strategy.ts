@@ -7,12 +7,16 @@ const R_RED = `(?:\\d{1,3}${DOT_VALUE}?|${DOT_VALUE})`;
 const R_GREEN = R_RED;
 const R_BLUE = R_RED;
 
+const RGB_NEW_SYNTAX = `rgba?\\(\\s*${R_RED}\\s*${R_GREEN}\\s*${R_BLUE}(?:\\s*\\/\\s*(?:\\d{1,3}${DOT_VALUE}?|${ALPHA})?%?)?\\)`;
+const RGB_LEGACY_SYNTAX = `rgb\\(\\s*${R_RED}\\s*,\\s*${R_GREEN}\\s*,\\s*${R_BLUE}\\s*\\)`;
+const RGBA_LEGACY_SYNTAX = `rgba\\(\\s*${R_RED}\\s*,\\s*${R_GREEN}\\s*,\\s*${R_BLUE}\\s*,\\s*${ALPHA}\\s*\\)`;
+
 export const REGEXP = new RegExp(
-  `((?:rgb\\(\\s*${R_RED}\\s*,\\s*${R_GREEN}\\s*,\\s*${R_BLUE}\\s*\\))|(?:rgba\\(\\s*${R_RED}\\s*,\\s*${R_GREEN}\\s*,\\s*${R_BLUE}\\s*,\\s*${ALPHA}\\s*\\)))${EOL}`,
+  `(${RGB_LEGACY_SYNTAX}|${RGBA_LEGACY_SYNTAX}|${RGB_NEW_SYNTAX})${EOL}`,
   'gi',
 );
 export const REGEXP_ONE = new RegExp(
-  `^((?:rgb\\(\\s*${R_RED}\\s*,\\s*${R_GREEN}\\s*,\\s*${R_BLUE}\\s*\\))|(?:rgba\\(\\s*${R_RED}\\s*,\\s*${R_GREEN}\\s*,\\s*${R_BLUE}\\s*,\\s*${ALPHA}\\s*\\)))${EOL}`,
+  `^(${RGB_LEGACY_SYNTAX}|${RGBA_LEGACY_SYNTAX}|${RGB_NEW_SYNTAX})${EOL}`,
   'i',
 );
 

@@ -5,6 +5,23 @@ import { REGEXP } from '../../../src/lib/colors/strategies/rgb-strategy';
 import { regex_exec } from '../../test-util';
 
 describe('Test rgb(a) color Regex', () => {
+  it('Should match the new syntax', function () {
+    assert.equal(regex_exec('rgb(255 255 255)', REGEXP)[1], 'rgb(255 255 255)');
+    assert.equal(
+      regex_exec('rgb(255 255 255 / 50%)', REGEXP)[1],
+      'rgb(255 255 255 / 50%)',
+    );
+    assert.equal(regex_exec('rgba(0 255 255)', REGEXP)[1], 'rgba(0 255 255)');
+    assert.equal(
+      regex_exec('rgba(0 255 255 / 50)', REGEXP)[1],
+      'rgba(0 255 255 / 50)',
+    );
+
+    assert.equal(
+      regex_exec('rgba(.1 25.5 2.55 / 50)', REGEXP)[1],
+      'rgba(.1 25.5 2.55 / 50)',
+    );
+  });
   it('Should match a simple rgb color', function () {
     assert.equal(
       regex_exec('rgb(123, 123, 123)', REGEXP)[1],
