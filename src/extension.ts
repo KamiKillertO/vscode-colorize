@@ -221,6 +221,20 @@ function isIncludedFile(fileName: string): boolean {
 }
 
 /**
+ * Check if the file is the `colorize.exclude` setting
+ *
+ * @param {string} fileName A valid filename (path to the file)
+ * @returns {boolean}
+ */
+function isExcludedFile(fileName: string): boolean {
+  return config.filesToExcludes.some((globPattern: string) =>
+    // No reason why this reports an error
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    minimatch(fileName, globPattern, { nonegate: true }),
+  );
+}
+
+/**
  * Check if a file can be colorized by COLORIZE
  *
  * @param {TextDocument} document The document to test
@@ -229,8 +243,9 @@ function isIncludedFile(fileName: string): boolean {
 function canColorize(document: TextDocument): boolean {
   // update to use filesToExcludes. Remove `isLanguageSupported` ? checking path with file extension or include glob pattern should be enough
   return (
-    isLanguageSupported(document.languageId) ||
-    isIncludedFile(document.fileName)
+    !isExcludedFile(document.fileName) &&
+    (isLanguageSupported(document.languageId) ||
+      isIncludedFile(document.fileName))
   );
 }
 
