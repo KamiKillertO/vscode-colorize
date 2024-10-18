@@ -24,7 +24,6 @@ import Queue from './lib/queue';
 import VariablesManager from './lib/variables/variables-manager';
 import CacheManager from './lib/cache-manager';
 import EditorManager from './lib/editor-manager';
-import globToRegexp from 'glob-to-regexp';
 import {
   getColorizeConfig,
   ColorizeConfig,
@@ -32,6 +31,7 @@ import {
 } from './lib/colorize-config';
 
 import Listeners from './listeners';
+import { minimatch } from 'minimatch';
 
 let config: ColorizeConfig = {
   languages: [],
@@ -213,10 +213,10 @@ function isLanguageSupported(languageId: string): boolean {
  * @returns {boolean}
  */
 function isIncludedFile(fileName: string): boolean {
-  return (
-    config.filesToIncludes.find((globPattern: string) =>
-      globToRegexp(globPattern).test(fileName),
-    ) !== undefined
+  return config.filesToIncludes.some((globPattern: string) =>
+    // No reason why this reports an error
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    minimatch(fileName, globPattern, { nonegate: true }),
   );
 }
 
