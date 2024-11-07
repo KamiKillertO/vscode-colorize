@@ -36,6 +36,7 @@ function extractHSLValue(value: string) {
     .replace(/\)/, '')
     .replace(/%/g, '')
     .replace(/deg/, '')
+    .replace('/', ' ')
     .replaceAll(',', ' ')
     .split(/\s+/)
     .map((c) => parseFloat(c));

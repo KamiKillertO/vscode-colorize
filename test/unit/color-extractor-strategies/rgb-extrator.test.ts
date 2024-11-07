@@ -9,6 +9,7 @@ import Color from '../../../src/lib/colors/color';
 describe('Test rgb(a) color Regex', () => {
   it('Should match the new syntax', function () {
     assert.equal(regex_exec('rgb(255 255 255)', REGEXP)[1], 'rgb(255 255 255)');
+    assert.equal(regex_exec('rgb(2% 13% 255)', REGEXP)[1], 'rgb(2% 13% 255)');
     assert.equal(
       regex_exec('rgb(255 255 255 / 50%)', REGEXP)[1],
       'rgb(255 255 255 / 50%)',
@@ -192,14 +193,21 @@ describe('Extract color', () => {
         input: 'rgba(0 255 255 / 50)',
         expected: {
           rgb: [0, 255, 255],
-          alpha: 0.5,
+          alpha: 1,
         },
       },
       {
         input: 'rgba(.1 25.5 2.55 / 50)',
         expected: {
           rgb: [0.1, 25.5, 2.55],
-          alpha: 0.5,
+          alpha: 1,
+        },
+      },
+      {
+        input: 'rgb(2% 13% 255)',
+        expected: {
+          rgb: [5.1, 33.15, 255],
+          alpha: 1,
         },
       },
       {
