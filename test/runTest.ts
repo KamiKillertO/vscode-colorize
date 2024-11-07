@@ -17,6 +17,7 @@ async function main() {
       extensionDevelopmentPath,
       extensionTestsPath,
       version: vscodeVersion,
+      launchArgs: ['--disable-extensions'],
     });
   } catch (err) {
     console.error(err);
@@ -25,4 +26,4 @@ async function main() {
   }
 }
 
-main();
+void main();

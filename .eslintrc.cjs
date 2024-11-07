@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
@@ -5,6 +7,7 @@ module.exports = {
   parserOptions: {
     project: true,
     tsconfigRootDir: __dirname,
+    project: ['./tsconfig.eslint.json'],
   },
   extends: [
     'plugin:@typescript-eslint/recommended-type-checked',
