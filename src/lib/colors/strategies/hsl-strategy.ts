@@ -9,7 +9,7 @@ const R_SATURATION = `(?:\\d{1,3}${DOT_VALUE}?|${DOT_VALUE})`;
 const R_LUMINANCE = R_SATURATION;
 const R_ALPHA = `([ ,]\\s*${ALPHA}\\s*|\\s*\\/\\s*${R_SATURATION}%?\\s*)?`;
 
-const HSL_NEW_SYNTAX = `hsla?\\(\\s*${R_HUE}(deg)?\\s*\\s*${R_SATURATION}%?\\s*\\s*${R_LUMINANCE}%?\\s*${R_ALPHA}\\)`;
+const HSL_NEW_SYNTAX = `hsla?\\(\\s*${R_HUE}(deg|turn)?\\s*\\s*${R_SATURATION}%?\\s*\\s*${R_LUMINANCE}%?\\s*${R_ALPHA}\\)`;
 const HSL_LEGACY_SYNTAX = `hsl\\(\\s*${R_HUE}\\s*,\\s*${R_SATURATION}%\\s*,\\s*${R_LUMINANCE}%\\s*\\)`;
 const HSLA_LEGACY_SYNTAX = `hsla\\(\\s*${R_HUE}\\s*,\\s*${R_SATURATION}%\\s*,\\s*${R_LUMINANCE}%\\s*,\\s*${ALPHA}\\s*\\)`;
 
@@ -31,15 +31,37 @@ export const REGEXP_ONE = new RegExp(
  * @memberof HSLColorExtractor
  */
 function extractHSLValue(value: string) {
-  const [h, s, l, a]: number[] = value
+  const values = value
     .replace(/hsl(a){0,1}\(/, '')
     .replace(/\)/, '')
-    .replace(/%/g, '')
-    .replace(/deg/, '')
     .replace('/', ' ')
     .replaceAll(',', ' ')
-    .split(/\s+/)
-    .map((c) => parseFloat(c));
+    .split(/\s+/);
+
+  let h = parseFloat(values[0]);
+
+  if (/turn/.test(values[0])) {
+    h = (h % 1) * 360;
+  }
+
+  const [s, l] = values.slice(1, 3).map(parseFloat);
+
+  const isRelativeAlpha = /%/.test(values[3]);
+
+  let a = parseFloat(values[3] ?? 1);
+
+  if (!isRelativeAlpha && a > 1) {
+    a = 1;
+  }
+
+  if (isRelativeAlpha && a > 100) {
+    a = 1;
+  }
+
+  if (a > 1) {
+    a = a / 100;
+  }
+
   return [h, s, l, a];
 }
 
