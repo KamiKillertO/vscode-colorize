@@ -59,12 +59,10 @@ class ColorizeContext {
   updateStatusBar(activated: boolean): void {
     // List of icons can be found here https://code.visualstudio.com/api/references/icons-in-labels
     const icon = activated ? '$(check)' : '$(circle-slash)';
-    const color = activated ? undefined : new ThemeColor('errorForeground');
     const hoverMessage = activated
       ? 'Colorize is activated for this file'
       : 'Colorize is not activated for this file';
     this.statusBar.text = `${icon} Colorize`;
-    this.statusBar.color = color;
     this.statusBar.tooltip = hoverMessage;
     this.statusBar.show();
   }

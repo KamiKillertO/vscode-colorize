@@ -13,8 +13,8 @@ import {
   StatusBarAlignment,
   StatusBarItem,
   Uri,
-  ThemeColor,
   TextEditorDecorationType,
+  ThemeColor,
 } from 'vscode';
 import { DocumentLine } from '../util/color-util';
 import Color from '../colors/color';
@@ -45,7 +45,10 @@ class VariablesManager {
       const variablesCount: number = VariablesExtractor.getVariablesCount();
       this.statusBar.text = `Colorize: ${variablesCount} variables`;
     } catch {
-      this.statusBar.color = new ThemeColor('errorForeground');
+      this.statusBar.backgroundColor = new ThemeColor(
+        'statusBarItem.errorBackground',
+      );
+      this.statusBar.color = new ThemeColor('statusBarItem.errorForeground');
       this.statusBar.text =
         'Colorize: $(circle-slash) Variables extraction fail';
     }
