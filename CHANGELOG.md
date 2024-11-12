@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.12.0
+
+### Features
+
+- Update rgb and hsl extractors to support new color syntax
+
+### Fix
+
+- Use [minimatch](https://www.npmjs.com/package/minimatch) to correctly include/exclude path on windows. This should also fix most of the high CPU issue as the default exclude config will now work correctly on windows.
+- Use correct theme colors for status bar item.
+- Use the `colorize.exclude` config to not colorize files.
+
 ## 0.11.1
 
 ### Fix
@@ -70,7 +82,7 @@ The setting `colorize.colorize_only_visible_beta` was introduced a long time ago
 Correct a typo preventing the browser color `burlywood` from being colorized.
 
 ### BUILD
-  
+
 Update extension to latest target latest version of vscode.
 
 ## 0.8.16
