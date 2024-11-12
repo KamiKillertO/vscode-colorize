@@ -1,783 +1,799 @@
 import Color from './../color';
 import ColorExtractor, { IColorStrategy } from '../color-extractor';
-import { LineExtraction, DocumentLine } from '../../util/color-util';
+import { DocumentLine } from '../../util/color-util';
 import { EOL } from '../../util/regexp';
 
-export const COLORS = Object({
-  'aliceblue': {
+export const COLORS = {
+  aliceblue: {
     value: '#F0F8FF',
     rgb: [240, 248, 255],
-    luminace: 1
+    luminace: 1,
   },
-  'antiquewhite': {
+  antiquewhite: {
     value: '#FAEBD7',
     rgb: [250, 235, 215],
-    luminace: 1
+    luminace: 1,
   },
-  'aqua': {
+  aqua: {
     value: '#00FFFF',
     rgb: [0, 255, 255],
-    luminace: 1
+    luminace: 1,
   },
-  'aquamarine': {
+  aquamarine: {
     value: '#7FFFD4',
     rgb: [127, 255, 212],
-    luminace: 1
+    luminace: 1,
   },
-  'azure': {
+  azure: {
     value: '#F0FFFF',
     rgb: [240, 255, 255],
-    luminace: 1
+    luminace: 1,
   },
-  'beige': {
+  beige: {
     value: '#F5F5DC',
     rgb: [245, 245, 220],
-    luminace: 1
+    luminace: 1,
   },
-  'bisque': {
+  bisque: {
     value: '#FFE4C4',
     rgb: [255, 228, 196],
-    luminace: 1
+    luminace: 1,
   },
-  'black': {
+  black: {
     value: '#000000',
     rgb: [0, 0, 0],
-    luminace: 1
+    luminace: 1,
   },
-  'blanchedalmond': {
+  blanchedalmond: {
     value: '#FFEBCD',
     rgb: [255, 235, 205],
-    luminace: 1
+    luminace: 1,
   },
-  'blue': {
+  blue: {
     value: '#0000FF',
     rgb: [0, 0, 255],
-    luminace: 1
+    luminace: 1,
   },
-  'blueviolet': {
+  blueviolet: {
     value: '#8A2BE2',
     rgb: [138, 43, 226],
-    luminace: 1
+    luminace: 1,
   },
-  'brown': {
+  brown: {
     value: '#A52A2A',
     rgb: [165, 42, 42],
-    luminace: 1
+    luminace: 1,
   },
-  'burlywood': {
+  burlywood: {
     value: '#DEB887',
     rgb: [222, 184, 135],
-    luminace: 1
+    luminace: 1,
   },
-  'cadetblue': {
+  cadetblue: {
     value: '#5F9EA0',
     rgb: [95, 158, 160],
-    luminace: 1
+    luminace: 1,
   },
-  'chartreuse': {
+  chartreuse: {
     value: '#7FFF00',
     rgb: [127, 255, 0],
-    luminace: 1
+    luminace: 1,
   },
-  'chocolate': {
+  chocolate: {
     value: '#D2691E',
     rgb: [210, 105, 30],
-    luminace: 1
+    luminace: 1,
   },
-  'coral': {
+  coral: {
     value: '#FF7F50',
     rgb: [255, 127, 80],
-    luminace: 1
+    luminace: 1,
   },
-  'cornflowerblue': {
+  cornflowerblue: {
     value: '#6495ED',
     rgb: [100, 149, 237],
-    luminace: 1
+    luminace: 1,
   },
-  'cornsilk': {
+  cornsilk: {
     value: '#FFF8DC',
     rgb: [255, 248, 220],
-    luminace: 1
+    luminace: 1,
   },
-  'crimson': {
+  crimson: {
     value: '#DC143C',
     rgb: [220, 20, 60],
-    luminace: 1
+    luminace: 1,
   },
-  'cyan': {
+  cyan: {
     value: '#00FFFF',
     rgb: [0, 255, 255],
-    luminace: 1
+    luminace: 1,
   },
-  'darkblue': {
+  darkblue: {
     value: '#00008B',
     rgb: [0, 0, 139],
-    luminace: 1
+    luminace: 1,
   },
-  'darkcyan': {
+  darkcyan: {
     value: '#008B8B',
     rgb: [0, 139, 139],
-    luminace: 1
+    luminace: 1,
   },
-  'darkgoldenrod': {
+  darkgoldenrod: {
     value: '#B8860B',
     rgb: [184, 134, 11],
-    luminace: 1
+    luminace: 1,
   },
-  'darkgray': {
+  darkgray: {
     value: '#A9A9A9',
     rgb: [169, 169, 169],
-    luminace: 1
+    luminace: 1,
   },
-  'darkgrey': {
+  darkgrey: {
     value: '#A9A9A9',
     rgb: [169, 169, 169],
-    luminace: 1
+    luminace: 1,
   },
-  'darkgreen': {
+  darkgreen: {
     value: '#006400',
     rgb: [0, 100, 0],
-    luminace: 1
+    luminace: 1,
   },
-  'darkkhaki': {
+  darkkhaki: {
     value: '#BDB76B',
     rgb: [189, 183, 107],
-    luminace: 1
+    luminace: 1,
   },
-  'darkmagenta': {
+  darkmagenta: {
     value: '#8B008B',
     rgb: [139, 0, 139],
-    luminace: 1
+    luminace: 1,
   },
-  'darkolivegreen': {
+  darkolivegreen: {
     value: '#556B2F',
     rgb: [85, 107, 47],
-    luminace: 1
+    luminace: 1,
   },
-  'darkorange': {
+  darkorange: {
     value: '#FF8C00',
     rgb: [255, 140, 0],
-    luminace: 1
+    luminace: 1,
   },
-  'darkorchid': {
+  darkorchid: {
     value: '#9932CC',
     rgb: [153, 50, 204],
-    luminace: 1
+    luminace: 1,
   },
-  'darkred': {
+  darkred: {
     value: '#8B0000',
     rgb: [139, 0, 0],
-    luminace: 1
+    luminace: 1,
   },
-  'darksalmon': {
+  darksalmon: {
     value: '#E9967A',
     rgb: [233, 150, 122],
-    luminace: 1
+    luminace: 1,
   },
-  'darkseagreen': {
+  darkseagreen: {
     value: '#8FBC8F',
     rgb: [143, 188, 143],
-    luminace: 1
+    luminace: 1,
   },
-  'darkslateblue': {
+  darkslateblue: {
     value: '#483D8B',
     rgb: [72, 61, 139],
-    luminace: 1
+    luminace: 1,
   },
-  'darkslategray': {
+  darkslategray: {
     value: '#2F4F4F',
     rgb: [47, 79, 79],
-    luminace: 1
+    luminace: 1,
   },
-  'darkslategrey': {
+  darkslategrey: {
     value: '#2F4F4F',
     rgb: [47, 79, 79],
-    luminace: 1
+    luminace: 1,
   },
-  'darkturquoise': {
+  darkturquoise: {
     value: '#00CED1',
     rgb: [0, 206, 209],
-    luminace: 1
+    luminace: 1,
   },
-  'darkviolet': {
+  darkviolet: {
     value: '#9400D3',
     rgb: [148, 0, 211],
-    luminace: 1
+    luminace: 1,
   },
-  'deeppink': {
+  deeppink: {
     value: '#FF1493',
     rgb: [255, 20, 147],
-    luminace: 1
+    luminace: 1,
   },
-  'deepskyblue': {
+  deepskyblue: {
     value: '#00BFFF',
     rgb: [0, 191, 255],
-    luminace: 1
+    luminace: 1,
   },
-  'dimgray': {
+  dimgray: {
     value: '#696969',
     rgb: [105, 105, 105],
-    luminace: 1
+    luminace: 1,
   },
-  'dimgrey': {
+  dimgrey: {
     value: '#696969',
     rgb: [105, 105, 105],
-    luminace: 1
+    luminace: 1,
   },
-  'dodgerblue': {
+  dodgerblue: {
     value: '#1E90FF',
     rgb: [30, 144, 255],
-    luminace: 1
+    luminace: 1,
   },
-  'firebrick': {
+  firebrick: {
     value: '#B22222',
     rgb: [178, 34, 34],
-    luminace: 1
+    luminace: 1,
   },
-  'floralwhite': {
+  floralwhite: {
     value: '#FFFAF0',
     rgb: [255, 250, 240],
-    luminace: 1
+    luminace: 1,
   },
-  'forestgreen': {
+  forestgreen: {
     value: '#228B22',
     rgb: [34, 139, 34],
-    luminace: 1
+    luminace: 1,
   },
-  'fuchsia': {
+  fuchsia: {
     value: '#FF00FF',
     rgb: [255, 0, 255],
-    luminace: 1
+    luminace: 1,
   },
-  'gainsboro': {
+  gainsboro: {
     value: '#DCDCDC',
     rgb: [220, 220, 220],
-    luminace: 1
+    luminace: 1,
   },
-  'ghostwhite': {
+  ghostwhite: {
     value: '#F8F8FF',
     rgb: [248, 248, 255],
-    luminace: 1
+    luminace: 1,
   },
-  'gold': {
+  gold: {
     value: '#FFD700',
     rgb: [255, 215, 0],
-    luminace: 1
+    luminace: 1,
   },
-  'goldenrod': {
+  goldenrod: {
     value: '#DAA520',
     rgb: [218, 165, 32],
-    luminace: 1
+    luminace: 1,
   },
-  'gray': {
+  gray: {
     value: '#808080',
     rgb: [128, 128, 128],
-    luminace: 1
+    luminace: 1,
   },
-  'grey': {
+  grey: {
     value: '#808080',
     rgb: [128, 128, 128],
-    luminace: 1
+    luminace: 1,
   },
-  'green': {
+  green: {
     value: '#008000',
     rgb: [0, 128, 0],
-    luminace: 1
+    luminace: 1,
   },
-  'greenyellow': {
+  greenyellow: {
     value: '#ADFF2F',
     rgb: [173, 255, 47],
-    luminace: 1
+    luminace: 1,
   },
-  'honeydew': {
+  honeydew: {
     value: '#F0FFF0',
     rgb: [240, 255, 240],
-    luminace: 1
+    luminace: 1,
   },
-  'hotpink': {
+  hotpink: {
     value: '#FF69B4',
     rgb: [255, 105, 180],
-    luminace: 1
+    luminace: 1,
   },
-  'indianred': {
+  indianred: {
     value: '#CD5C5C',
     rgb: [205, 92, 92],
-    luminace: 1
+    luminace: 1,
   },
-  'indigo': {
+  indigo: {
     value: '#4B0082',
     rgb: [75, 0, 130],
-    luminace: 1
+    luminace: 1,
   },
-  'ivory': {
+  ivory: {
     value: '#FFFFF0',
     rgb: [255, 255, 240],
-    luminace: 1
+    luminace: 1,
   },
-  'khaki': {
+  khaki: {
     value: '#F0E68C',
     rgb: [240, 230, 140],
-    luminace: 1
+    luminace: 1,
   },
-  'lavender': {
+  lavender: {
     value: '#E6E6FA',
     rgb: [230, 230, 250],
-    luminace: 1
+    luminace: 1,
   },
-  'lavenderblush': {
+  lavenderblush: {
     value: '#FFF0F5',
     rgb: [255, 240, 245],
-    luminace: 1
+    luminace: 1,
   },
-  'lawngreen': {
+  lawngreen: {
     value: '#7CFC00',
     rgb: [124, 252, 0],
-    luminace: 1
+    luminace: 1,
   },
-  'lemonchiffon': {
+  lemonchiffon: {
     value: '#FFFACD',
     rgb: [255, 250, 205],
-    luminace: 1
+    luminace: 1,
   },
-  'lightblue': {
+  lightblue: {
     value: '#ADD8E6',
     rgb: [173, 216, 230],
-    luminace: 1
+    luminace: 1,
   },
-  'lightcoral': {
+  lightcoral: {
     value: '#F08080',
     rgb: [240, 128, 128],
-    luminace: 1
+    luminace: 1,
   },
-  'lightcyan': {
+  lightcyan: {
     value: '#E0FFFF',
     rgb: [224, 255, 255],
-    luminace: 1
+    luminace: 1,
   },
-  'lightgoldenrodyellow': {
+  lightgoldenrodyellow: {
     value: '#FAFAD2',
     rgb: [250, 250, 210],
-    luminace: 1
+    luminace: 1,
   },
-  'lightgray': {
+  lightgray: {
     value: '#D3D3D3',
     rgb: [211, 211, 211],
-    luminace: 1
+    luminace: 1,
   },
-  'lightgrey': {
+  lightgrey: {
     value: '#D3D3D3',
     rgb: [211, 211, 211],
-    luminace: 1
+    luminace: 1,
   },
-  'lightgreen': {
+  lightgreen: {
     value: '#90EE90',
     rgb: [144, 238, 144],
-    luminace: 1
+    luminace: 1,
   },
-  'lightpink': {
+  lightpink: {
     value: '#FFB6C1',
     rgb: [255, 182, 193],
-    luminace: 1
+    luminace: 1,
   },
-  'lightsalmon': {
+  lightsalmon: {
     value: '#FFA07A',
     rgb: [255, 160, 122],
-    luminace: 1
+    luminace: 1,
   },
-  'lightseagreen': {
+  lightseagreen: {
     value: '#20B2AA',
     rgb: [32, 178, 170],
-    luminace: 1
+    luminace: 1,
   },
-  'lightskyblue': {
+  lightskyblue: {
     value: '#87CEFA',
     rgb: [135, 206, 250],
-    luminace: 1
+    luminace: 1,
   },
-  'lightslategray': {
+  lightslategray: {
     value: '#778899',
     rgb: [119, 136, 153],
-    luminace: 1
+    luminace: 1,
   },
-  'lightslategrey': {
+  lightslategrey: {
     value: '#778899',
     rgb: [119, 136, 153],
-    luminace: 1
+    luminace: 1,
   },
-  'lightsteelblue': {
+  lightsteelblue: {
     value: '#B0C4DE',
     rgb: [176, 196, 222],
-    luminace: 1
+    luminace: 1,
   },
-  'lightyellow': {
+  lightyellow: {
     value: '#FFFFE0',
     rgb: [255, 255, 224],
-    luminace: 1
+    luminace: 1,
   },
-  'lime': {
+  lime: {
     value: '#00FF00',
     rgb: [0, 255, 0],
-    luminace: 1
+    luminace: 1,
   },
-  'limegreen': {
+  limegreen: {
     value: '#32CD32',
     rgb: [50, 205, 50],
-    luminace: 1
+    luminace: 1,
   },
-  'linen': {
+  linen: {
     value: '#FAF0E6',
     rgb: [250, 240, 230],
-    luminace: 1
+    luminace: 1,
   },
-  'magenta': {
+  magenta: {
     value: '#FF00FF',
     rgb: [255, 0, 255],
-    luminace: 1
+    luminace: 1,
   },
-  'maroon': {
+  maroon: {
     value: '#800000',
     rgb: [128, 0, 0],
-    luminace: 1
+    luminace: 1,
   },
-  'mediumaquamarine': {
+  mediumaquamarine: {
     value: '#66CDAA',
     rgb: [102, 205, 170],
-    luminace: 1
+    luminace: 1,
   },
-  'mediumblue': {
+  mediumblue: {
     value: '#0000CD',
     rgb: [0, 0, 205],
-    luminace: 1
+    luminace: 1,
   },
-  'mediumorchid': {
+  mediumorchid: {
     value: '#BA55D3',
     rgb: [186, 85, 211],
-    luminace: 1
+    luminace: 1,
   },
-  'mediumpurple': {
+  mediumpurple: {
     value: '#9370DB',
     rgb: [147, 112, 219],
-    luminace: 1
+    luminace: 1,
   },
-  'mediumseagreen': {
+  mediumseagreen: {
     value: '#3CB371',
     rgb: [60, 179, 113],
-    luminace: 1
+    luminace: 1,
   },
-  'mediumslateblue': {
+  mediumslateblue: {
     value: '#7B68EE',
     rgb: [123, 104, 238],
-    luminace: 1
+    luminace: 1,
   },
-  'mediumspringgreen': {
+  mediumspringgreen: {
     value: '#00FA9A',
     rgb: [0, 250, 154],
-    luminace: 1
+    luminace: 1,
   },
-  'mediumturquoise': {
+  mediumturquoise: {
     value: '#48D1CC',
     rgb: [72, 209, 204],
-    luminace: 1
+    luminace: 1,
   },
-  'mediumvioletred': {
+  mediumvioletred: {
     value: '#C71585',
     rgb: [199, 21, 133],
-    luminace: 1
+    luminace: 1,
   },
-  'midnightblue': {
+  midnightblue: {
     value: '#191970',
     rgb: [25, 25, 112],
-    luminace: 1
+    luminace: 1,
   },
-  'mintcream': {
+  mintcream: {
     value: '#F5FFFA',
     rgb: [245, 255, 250],
-    luminace: 1
+    luminace: 1,
   },
-  'mistyrose': {
+  mistyrose: {
     value: '#FFE4E1',
     rgb: [255, 228, 225],
-    luminace: 1
+    luminace: 1,
   },
-  'moccasin': {
+  moccasin: {
     value: '#FFE4B5',
     rgb: [255, 228, 181],
-    luminace: 1
+    luminace: 1,
   },
-  'navajowhite': {
+  navajowhite: {
     value: '#FFDEAD',
     rgb: [255, 222, 173],
-    luminace: 1
+    luminace: 1,
   },
-  'navy': {
+  navy: {
     value: '#000080',
     rgb: [0, 0, 128],
-    luminace: 1
+    luminace: 1,
   },
-  'oldlace': {
+  oldlace: {
     value: '#FDF5E6',
     rgb: [253, 245, 230],
-    luminace: 1
+    luminace: 1,
   },
-  'olive': {
+  olive: {
     value: '#808000',
     rgb: [128, 128, 0],
-    luminace: 1
+    luminace: 1,
   },
-  'olivedrab': {
+  olivedrab: {
     value: '#6B8E23',
     rgb: [107, 142, 35],
-    luminace: 1
+    luminace: 1,
   },
-  'orange': {
+  orange: {
     value: '#FFA500',
     rgb: [255, 165, 0],
-    luminace: 1
+    luminace: 1,
   },
-  'orangered': {
+  orangered: {
     value: '#FF4500',
     rgb: [255, 69, 0],
-    luminace: 1
+    luminace: 1,
   },
-  'orchid': {
+  orchid: {
     value: '#DA70D6',
     rgb: [218, 112, 214],
-    luminace: 1
+    luminace: 1,
   },
-  'palegoldenrod': {
+  palegoldenrod: {
     value: '#EEE8AA',
     rgb: [238, 232, 170],
-    luminace: 1
+    luminace: 1,
   },
-  'palegreen': {
+  palegreen: {
     value: '#98FB98',
     rgb: [152, 251, 152],
-    luminace: 1
+    luminace: 1,
   },
-  'paleturquoise': {
+  paleturquoise: {
     value: '#AFEEEE',
     rgb: [175, 238, 238],
-    luminace: 1
+    luminace: 1,
   },
-  'palevioletred': {
+  palevioletred: {
     value: '#DB7093',
     rgb: [219, 112, 147],
-    luminace: 1
+    luminace: 1,
   },
-  'papayawhip': {
+  papayawhip: {
     value: '#FFEFD5',
     rgb: [255, 239, 213],
-    luminace: 1
+    luminace: 1,
   },
-  'peachpuff': {
+  peachpuff: {
     value: '#FFDAB9',
     rgb: [255, 218, 185],
-    luminace: 1
+    luminace: 1,
   },
-  'peru': {
+  peru: {
     value: '#CD853F',
     rgb: [205, 133, 63],
-    luminace: 1
+    luminace: 1,
   },
-  'pink': {
+  pink: {
     value: '#FFC0CB',
     rgb: [255, 192, 203],
-    luminace: 1
+    luminace: 1,
   },
-  'plum': {
+  plum: {
     value: '#DDA0DD',
     rgb: [221, 160, 221],
-    luminace: 1
+    luminace: 1,
   },
-  'powderblue': {
+  powderblue: {
     value: '#B0E0E6',
     rgb: [176, 224, 230],
-    luminace: 1
+    luminace: 1,
   },
-  'purple': {
+  purple: {
     value: '#800080',
     rgb: [128, 0, 128],
-    luminace: 1
+    luminace: 1,
   },
-  'rebeccapurple': {
+  rebeccapurple: {
     value: '#663399',
     rgb: [102, 51, 153],
-    luminace: 1
+    luminace: 1,
   },
-  'red': {
+  red: {
     value: '#FF0000',
     rgb: [255, 0, 0],
-    luminace: 1
+    luminace: 1,
   },
-  'rosybrown': {
+  rosybrown: {
     value: '#BC8F8F',
     rgb: [188, 143, 143],
-    luminace: 1
+    luminace: 1,
   },
-  'royalblue': {
+  royalblue: {
     value: '#4169E1',
     rgb: [65, 105, 225],
-    luminace: 1
+    luminace: 1,
   },
-  'saddlebrown': {
+  saddlebrown: {
     value: '#8B4513',
     rgb: [139, 69, 19],
-    luminace: 1
+    luminace: 1,
   },
-  'salmon': {
+  salmon: {
     value: '#FA8072',
     rgb: [250, 128, 114],
-    luminace: 1
+    luminace: 1,
   },
-  'sandybrown': {
+  sandybrown: {
     value: '#F4A460',
     rgb: [244, 164, 96],
-    luminace: 1
+    luminace: 1,
   },
-  'seagreen': {
+  seagreen: {
     value: '#2E8B57',
     rgb: [46, 139, 87],
-    luminace: 1
+    luminace: 1,
   },
-  'seashell': {
+  seashell: {
     value: '#FFF5EE',
     rgb: [255, 245, 238],
-    luminace: 1
+    luminace: 1,
   },
-  'sienna': {
+  sienna: {
     value: '#A0522D',
     rgb: [160, 82, 45],
-    luminace: 1
+    luminace: 1,
   },
-  'silver': {
+  silver: {
     value: '#C0C0C0',
     rgb: [192, 192, 192],
-    luminace: 1
+    luminace: 1,
   },
-  'skyblue': {
+  skyblue: {
     value: '#87CEEB',
     rgb: [135, 206, 235],
-    luminace: 1
+    luminace: 1,
   },
-  'slateblue': {
+  slateblue: {
     value: '#6A5ACD',
     rgb: [106, 90, 205],
-    luminace: 1
+    luminace: 1,
   },
-  'slategray': {
+  slategray: {
     value: '#708090',
     rgb: [112, 128, 144],
-    luminace: 1
+    luminace: 1,
   },
-  'slategrey': {
+  slategrey: {
     value: '#708090',
     rgb: [112, 128, 144],
-    luminace: 1
+    luminace: 1,
   },
-  'snow': {
+  snow: {
     value: '#FFFAFA',
     rgb: [255, 250, 250],
-    luminace: 1
+    luminace: 1,
   },
-  'springgreen': {
+  springgreen: {
     value: '#00FF7F',
     rgb: [0, 255, 127],
-    luminace: 1
+    luminace: 1,
   },
-  'steelblue': {
+  steelblue: {
     value: '#4682B4',
     rgb: [70, 130, 180],
-    luminace: 1
+    luminace: 1,
   },
-  'tan': {
+  tan: {
     value: '#D2B48C',
     rgb: [210, 180, 140],
-    luminace: 1
+    luminace: 1,
   },
-  'teal': {
+  teal: {
     value: '#008080',
     rgb: [0, 128, 128],
-    luminace: 1
+    luminace: 1,
   },
-  'thistle': {
+  thistle: {
     value: '#D8BFD8',
     rgb: [216, 191, 216],
-    luminace: 1
+    luminace: 1,
   },
-  'tomato': {
+  tomato: {
     value: '#FF6347',
     rgb: [255, 99, 71],
-    luminace: 1
+    luminace: 1,
   },
-  'turquoise': {
+  turquoise: {
     value: '#40E0D0',
     rgb: [64, 224, 208],
-    luminace: 1
+    luminace: 1,
   },
-  'violet': {
+  violet: {
     value: '#EE82EE',
     rgb: [238, 130, 238],
-    luminace: 1
+    luminace: 1,
   },
-  'wheat': {
+  wheat: {
     value: '#F5DEB3',
     rgb: [245, 222, 179],
-    luminace: 1
+    luminace: 1,
   },
-  'white': {
+  white: {
     value: '#FFFFFF',
     rgb: [255, 255, 255],
-    luminace: 1
+    luminace: 1,
   },
-  'whitesmoke': {
+  whitesmoke: {
     value: '#F5F5F5',
     rgb: [245, 245, 245],
-    luminace: 1
+    luminace: 1,
   },
-  'yellow': {
+  yellow: {
     value: '#FFFF00',
     rgb: [255, 255, 0],
-    luminace: 1
+    luminace: 1,
   },
-  'yellowgreen': {
+  yellowgreen: {
     value: '#9ACD32',
     rgb: [154, 205, 50],
-    luminace: 1
-  }
-});
+    luminace: 1,
+  },
+} as const;
 
-const REGEXP_BASE = Object.keys(COLORS).map((color) => `(?:${color.toLowerCase()})`).join('|');
-export const REGEXP = (() => RegExp(`(?:,| |'|"|\\(|:)(${REGEXP_BASE})${EOL}`, 'i'))();
+const REGEXP_BASE = Object.keys(COLORS)
+  .map((color) => `(?:${color.toLowerCase()})`)
+  .join('|');
+export const REGEXP = (() =>
+  RegExp(`(?:,| |'|"|\\(|:)(${REGEXP_BASE})${EOL}`, 'i'))();
 // export const REGEXP_ONE = (() => RegExp(`^(?:,| |\\(|:)(${Object.keys(COLORS).map((color) => `(?:${color.toLowerCase()})`).join('|')})(?:$|,| |;|\\)|\\r|\\n)`, 'i'))();
 // Checking for beginning beginning allow to catch stylus var value
-// eslint-disable-next-line
-export const REGEXP_ONE = (() => RegExp(`^(?:^|,|\s|\\(|:)(${REGEXP_BASE})${EOL}`, 'i'))();
+export const REGEXP_ONE = (() =>
+  RegExp(`^(?:^|,|\\s|\\(|:)(${REGEXP_BASE})${EOL}`, 'i'))();
 
 class BrowsersColorExtractor implements IColorStrategy {
   public name = 'BROWSERS_COLORS';
 
-  public async extractColors(fileLines: DocumentLine[]): Promise < LineExtraction[] > {
-    return fileLines.map(({line, text}) => {
-      let match = null;
-      const colors: Color[] = [];
-      let position = 0;
-      while ((match = text.match(REGEXP)) !== null) {
-        position += match.index + 1;
-        const browserColor: string = match[1];
-        colors.push(new Color(match[1], position, COLORS[browserColor.toLowerCase()].rgb));
-        text = text.slice(match.index + 1 + match[1].length);
-        position += match[1].length;
-      }
-      return {line, colors};
-    });
+  public extractColors(fileLines: DocumentLine[]) {
+    return Promise.resolve(
+      fileLines.map(({ line, text }) => {
+        let match = null;
+        const colors: Color[] = [];
+        let position = 0;
+        while ((match = text.match(REGEXP)) !== null) {
+          position += (match.index ?? 0) + 1;
+          const browserColor = match[1];
+          colors.push(
+            new Color(
+              match[1],
+              position,
+              COLORS[browserColor.toLowerCase() as keyof typeof COLORS].rgb,
+            ),
+          );
+          text = text.slice((match.index ?? 0) + 1 + match[1].length);
+          position += match[1].length;
+        }
+        return { line, colors };
+      }),
+    );
   }
 
-  public extractColor(text: string): Color {
+  public extractColor(text: string) {
     const match = text.match(REGEXP_ONE);
     if (match) {
       const browserColor: string = match[1];
-      return new Color(match[1], match.index, COLORS[browserColor.toLowerCase()].rgb);
+      return new Color(
+        match[1],
+        match.index,
+        COLORS[browserColor.toLowerCase() as keyof typeof COLORS].rgb,
+      );
     }
+
     return null;
   }
 }

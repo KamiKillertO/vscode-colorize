@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 import { describe, it } from 'mocha';
 
-import { REGEXP } from '../../src/lib/colors/strategies/hexa-strategy';
-import { regex_exec } from '../test-util';
+import { REGEXP } from '../../../src/lib/colors/strategies/hexa-strategy';
+import { regex_exec } from '../../test-util';
 // Defines a Mocha test suite to group tests of similar kind together
 describe('Test CSS hexa shorthand color Regex', () => {
   it('Should match color with only integer', function () {
@@ -17,10 +17,10 @@ describe('Test CSS hexa shorthand color Regex', () => {
   it('Regex should not care about the case', function () {
     assert.equal(regex_exec('#Abc', REGEXP)[1], '#Abc');
   });
-  it('Should match inside a string', function() {
+  it('Should match inside a string', function () {
     assert.equal(regex_exec('"#Abc"', REGEXP)[1], '#Abc');
   });
-  it('Should accept accept an alpha value', function() {
+  it('Should accept accept an alpha value', function () {
     assert.equal(regex_exec('#0000', REGEXP)[1], '#0000');
   });
   it('Should match with different characters at the end', function () {
@@ -50,9 +50,9 @@ describe('Test CSS hexa color Regex', () => {
   it('Regex should not care about the case', function () {
     assert.equal(regex_exec('#Abc012', REGEXP)[1], '#Abc012');
   });
-  it('Sould match inside a string', function() {
+  it('Sould match inside a string', function () {
     assert.equal(regex_exec('"#ffffff"', REGEXP)[1], '#ffffff');
-    // tslint:disable-next-line
+    // prettier-ignore
     assert.equal(regex_exec('\'#ffffff\'', REGEXP)[1], '#ffffff');
     assert.equal(regex_exec('`#ffffff`', REGEXP)[1], '#ffffff');
   });
@@ -65,7 +65,7 @@ describe('Test CSS hexa color Regex', () => {
     assert.equal(regex_exec('#ffffff}', REGEXP)[1], '#ffffff');
     assert.equal(regex_exec('#ffffff<', REGEXP)[1], '#ffffff');
   });
-  it('Should accept accept an alpha value', function() {
+  it('Should accept accept an alpha value', function () {
     assert.equal(regex_exec('#00000000', REGEXP)[1], '#00000000');
   });
   it('Should not match', function () {
@@ -88,7 +88,7 @@ describe('Test CSS hexa (with 0x prefix) color Regex', () => {
   it('Regex should not care about the case', function () {
     assert.equal(regex_exec('0xAbc012', REGEXP)[1], '0xAbc012');
   });
-  it('Sould match inside a string', function() {
+  it('Sould match inside a string', function () {
     assert.equal(regex_exec('"0xffffff"', REGEXP)[1], '0xffffff');
   });
   it('Should match with different characters at the end', function () {
@@ -100,7 +100,7 @@ describe('Test CSS hexa (with 0x prefix) color Regex', () => {
     assert.equal(regex_exec('0xffffff}', REGEXP)[1], '0xffffff');
     assert.equal(regex_exec('0xffffff<', REGEXP)[1], '0xffffff');
   });
-  it('Should accept accept an alpha value', function() {
+  it('Should accept accept an alpha value', function () {
     assert.equal(regex_exec('0x00000000', REGEXP)[1], '0x00000000');
   });
   it('Should not match', function () {

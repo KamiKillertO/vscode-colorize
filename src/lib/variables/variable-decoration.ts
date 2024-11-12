@@ -1,8 +1,4 @@
-import {
-  Range,
-  TextEditorDecorationType,
-  Position,
-} from 'vscode';
+import { Range, TextEditorDecorationType, Position } from 'vscode';
 import { IDecoration } from '../util/color-util';
 import Variable from './variable';
 import VariablesManager from './variables-manager';
@@ -16,7 +12,7 @@ class VariableDecoration implements IDecoration {
    * @public
    * @memberOf ColorDecoration
    */
-  public variable: Variable;
+  public declare variable: Variable;
   /**
    * Keep track of the TextEditorDecorationType status
    *
@@ -28,10 +24,10 @@ class VariableDecoration implements IDecoration {
 
   private hidden = false;
 
-  private decorationFn: (Color) => TextEditorDecorationType
+  private decorationFn: (color: Color) => TextEditorDecorationType;
 
-  public currentRange: Range;
-  private _decoration: TextEditorDecorationType;
+  public declare currentRange: Range;
+  private declare _decoration: TextEditorDecorationType;
   /**
    * The TextEditorDecorationType associated to the color
    *
@@ -46,17 +42,24 @@ class VariableDecoration implements IDecoration {
     this._decoration = deco;
   }
 
-  get rgb(): [number, number, number] {
+  get rgb() {
     return this.variable.color.rgb;
   }
 
-  public constructor(variable: Variable, line: number, decorationFn: (Color) => TextEditorDecorationType) {
+  public constructor(
+    variable: Variable,
+    line: number,
+    decorationFn: (color: Color) => TextEditorDecorationType,
+  ) {
     this.variable = variable;
     this.decorationFn = decorationFn;
     if (this.variable.color) {
       this.generateRange(line);
     } else {
-      this.currentRange = new Range(new Position(line, 0), new Position(line, 0));
+      this.currentRange = new Range(
+        new Position(line, 0),
+        new Position(line, 0),
+      );
     }
   }
   /**
@@ -69,8 +72,8 @@ class VariableDecoration implements IDecoration {
   public dispose(): void {
     try {
       this._decoration.dispose();
-      this.variable.color.rgb = null;
-    } catch (error) {
+      // this.variable.color.rgb = null; // Needed ?
+    } catch {
       // do something
     }
     this.disposed = true;
@@ -91,7 +94,13 @@ class VariableDecoration implements IDecoration {
    * @memberOf ColorDecoration
    */
   public generateRange(line: number): Range {
-    const range = new Range(new Position(line, this.variable.color.positionInText), new Position(line, this.variable.color.positionInText + this.variable.color.value.length));
+    const range = new Range(
+      new Position(line, this.variable.color.positionInText),
+      new Position(
+        line,
+        this.variable.color.positionInText + this.variable.color.value.length,
+      ),
+    );
     this.currentRange = range;
     return range;
   }
@@ -99,11 +108,13 @@ class VariableDecoration implements IDecoration {
   public shouldGenerateDecoration(): boolean {
     const color: Color | null = VariablesManager.findVariable(this.variable);
 
-    if (this.disposed === true || color === null ) {
+    if (this.disposed === true || color === null) {
       return false;
     }
 
-    return (this._decoration === null || this._decoration === undefined || this.hidden);
+    return (
+      this._decoration === null || this._decoration === undefined || this.hidden
+    );
   }
 
   private _generateDecorator() {

@@ -1,5 +1,5 @@
-// eslint-disable-next-line
-const EOL = `(?:$|\`|"|'|,| |;|\\)|\\r|\\n|\}|<)`;
+// eslint-disable-next-line quotes,no-useless-escape
+const EOL = `(?:$|\`|"|'|,| |;|\\)|\\r|\\n|\}|\\]|<)`;
 
 const DOT_VALUE = '(?:\\.\\d+)'; // ['.x', '']
 const ALPHA = `(?:1(:?\\.0+)?|0${DOT_VALUE}?|${DOT_VALUE})`; // ['0', '1', '0.x', '1.0', '.x']

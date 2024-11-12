@@ -2,7 +2,7 @@
   "name": "vscode-colorize",
   "displayName": "colorize",
   "description": "A vscode extension to help visualize css colors in files.",
-  "version": "0.11.1",
+  "version": "0.12.1",
   "publisher": "kamikillerto",
   "license": "Apache-2.0",
   "icon": "assets/logo.png",
@@ -182,25 +182,32 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "tsc -p ./",
-    "compile": "tsc -watch -p ./",
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
     "lint": "eslint .",
-    "test": "npm run vscode:prepublish; node ./out/test/runTest.js"
+    "test": "npm run vscode:prepublish && node ./out/test/runTest.js"
   },
   "devDependencies": {
-    "@types/chai": "^4.2.17",
-    "@types/mocha": "^8.2.2",
+    "@types/chai": "5.0.0",
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.9",
     "@types/node": "^12.0.0",
     "@types/vscode": "^1.54.0",
-    "@typescript-eslint/eslint-plugin": "^4.22.0",
-    "@typescript-eslint/parser": "^4.22.0",
-    "chai": "^4.3.4",
-    "eslint": "^7.25.0",
-    "mocha": "^8.3.2",
-    "typescript": "^3.9.3",
-    "vscode-test": "^1.5.2"
+    "@typescript-eslint/eslint-plugin": "^8.8.1",
+    "@typescript-eslint/parser": "^8.8.1",
+    "@vscode/test-electron": "^2.4.1",
+    "chai": "^4.5.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-config-prettier": "^9.1.0",
+    "globby": "^14.0.2",
+    "mocha": "^10.7.3",
+    "ts-node": "^10.9.2",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.2"
   },
   "dependencies": {
-    "glob-to-regexp": "^0.4.1"
+    "minimatch": "^10.0.1"
   }
 }
