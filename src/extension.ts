@@ -63,6 +63,10 @@ class ColorizeContext {
       ? 'Colorize is activated for this file'
       : 'Colorize is not activated for this file';
     this.statusBar.text = `${icon} Colorize`;
+    this.statusBar.backgroundColor = new ThemeColor(
+      'statusBarItem.errorBackground',
+    );
+    this.statusBar.color = new ThemeColor('statusBarItem.errorForeground');
     this.statusBar.tooltip = hoverMessage;
     this.statusBar.show();
   }
