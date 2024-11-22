@@ -9,6 +9,8 @@ interface VariableLocation {
 class Variable implements IColor {
   public name: string;
 
+  public value: string;
+
   public color: Color;
 
   public location: VariableLocation;
@@ -17,11 +19,13 @@ class Variable implements IColor {
 
   public constructor(
     name: string,
+    value: string,
     color: Color,
     location: VariableLocation,
     type: string,
   ) {
     this.name = name;
+    this.value = value;
     this.color = color;
     this.location = location;
     this.type = type;

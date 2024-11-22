@@ -98,7 +98,7 @@ class VariableDecoration implements IDecoration {
       new Position(line, this.variable.color.positionInText),
       new Position(
         line,
-        this.variable.color.positionInText + this.variable.color.value.length,
+        this.variable.color.positionInText + this.variable.value.length,
       ),
     );
     this.currentRange = range;
