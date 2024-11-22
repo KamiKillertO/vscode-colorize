@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.13.0
+
+### Features
+
+- Generate colorization for oklab and oklch colors
+
 ## 0.12.0
 
 ### Features
