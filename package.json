@@ -163,7 +163,9 @@
               "HEXA",
               "RGB",
               "HSL",
-              "ARGB"
+              "ARGB",
+              "OKLAB",
+              "OKLCH"
             ],
             "description": "You should enter a valid extractor",
             "uniqueItems": true
