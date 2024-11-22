@@ -68,6 +68,10 @@ class Color implements IColor {
    * @memberOf Color
    */
   public toRgbString(): string {
+    if (this.alpha === -1) {
+      return this.value;
+    }
+
     return `rgb(${this.rgb.join(', ')})`;
   }
   /**
@@ -81,6 +85,10 @@ class Color implements IColor {
    * @memberOf Color
    */
   public toRgbaString(): string {
+    if (this.alpha === -1) {
+      return this.value;
+    }
+
     return `rgba(${this.rgb.join(', ')}, ${this.alpha})`;
   }
 }

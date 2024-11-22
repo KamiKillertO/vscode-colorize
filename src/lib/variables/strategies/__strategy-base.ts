@@ -62,6 +62,7 @@ export default class VariableStrategy {
       } else {
         const variable = new Variable(
           varName,
+          varName,
           <Color>color,
           { fileName, line, position: match.index },
           this.name,
@@ -92,6 +93,7 @@ export default class VariableStrategy {
         };
         const variable = new Variable(
           varName,
+          extendedVarName || varName,
           new Color(
             extendedVarName || varName,
             spacesCount + match.index,
@@ -140,7 +142,9 @@ export default class VariableStrategy {
 
       if (declaration.color) {
         color = new Color(
-          variable.color.value,
+          declaration.color.alpha === -1
+            ? declaration.color.value
+            : variable.color.value,
           variable.location.position,
           declaration.color.rgb,
           declaration.color.alpha,
