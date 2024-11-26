@@ -155,7 +155,9 @@
             "BROWSERS_COLORS",
             "HEXA",
             "RGB",
-            "HSL"
+            "HSL",
+            "OKLAB",
+            "OKLCH"
           ],
           "items": {
             "enum": [
