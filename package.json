@@ -184,10 +184,15 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "lint": "eslint .",
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src/ test/",
     "test": "npm run vscode:prepublish && node ./out/test/runTest.js"
   },
   "devDependencies": {
@@ -200,13 +205,15 @@
     "@typescript-eslint/parser": "^8.8.1",
     "@vscode/test-electron": "^2.4.1",
     "chai": "^4.5.0",
+    "esbuild": "^0.24.0",
     "eslint": "^8.57.0",
-    "eslint-plugin-prettier": "^5.2.1",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
     "globby": "^14.0.2",
     "mocha": "^10.7.3",
-    "ts-node": "^10.9.2",
+    "npm-run-all": "^4.1.5",
     "prettier": "^3.3.3",
+    "ts-node": "^10.9.2",
     "typescript": "^5.6.2"
   },
   "dependencies": {
