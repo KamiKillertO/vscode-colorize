@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.14.0
+
+### Features
+
+- Activate oklab and oklch colorization by default
+- Use default color theme for colorize status item
+
+## Chore
+
+- Use esbuild to bundle extension
+
 ## 0.13.0
 
 ### Features
