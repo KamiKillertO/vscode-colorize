@@ -24,8 +24,8 @@ class ColorDecoration implements IDecoration {
 
   private decorationFn: (color: Color) => TextEditorDecorationType;
 
-  public declare currentRange: Range;
-  private declare _decoration: TextEditorDecorationType;
+  declare public currentRange: Range;
+  declare private _decoration: TextEditorDecorationType;
   /**
    * The TextEditorDecorationType associated to the color
    *
