@@ -195,7 +195,7 @@
     "compile-tests": "tsc -p . --outDir out",
     "check-types": "tsc --noEmit",
     "lint": "eslint src/ test/",
-    "test": "npm run vscode:prepublish && node ./out/test/runTest.js"
+    "test": "npm run compile-tests && node ./out/test/runTest.js"
   },
   "devDependencies": {
     "@types/chai": "5.0.0",
