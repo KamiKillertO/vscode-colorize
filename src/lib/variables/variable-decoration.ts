@@ -28,16 +28,16 @@ class VariableDecoration implements IDecoration {
   private decorationFn: (color: Color) => TextEditorDecorationType;
 
   declare public currentRange: Range;
-  declare private _decoration: TextEditorDecorationType;
+  private _decoration?: TextEditorDecorationType;
   /**
    * The TextEditorDecorationType associated to the color
    *
    * @type {TextEditorDecorationType}
    * @memberOf ColorDecoration
    */
-  get decoration(): TextEditorDecorationType {
+  get decoration() {
     this._generateDecorator();
-    return this._decoration;
+    return this._decoration as TextEditorDecorationType;
   }
   set decoration(deco: TextEditorDecorationType) {
     this._decoration = deco;
@@ -70,19 +70,13 @@ class VariableDecoration implements IDecoration {
    * @public
    * @memberOf ColorDecoration
    */
-  public dispose(): void {
-    try {
-      this._decoration.dispose();
-      // this.variable.color.rgb = null; // Needed ?
-    } catch {
-      // do something
-    }
+  public dispose() {
+    this._decoration?.dispose();
     this.disposed = true;
   }
-  public hide(): void {
-    if (this._decoration) {
-      this._decoration.dispose();
-    }
+
+  public hide() {
+    this._decoration?.dispose();
     this.hidden = true;
   }
 
@@ -94,7 +88,7 @@ class VariableDecoration implements IDecoration {
    *
    * @memberOf ColorDecoration
    */
-  public generateRange(line: number): Range {
+  public generateRange(line: number) {
     const range = new Range(
       new Position(line, this.variable.color.positionInText),
       new Position(
@@ -106,7 +100,7 @@ class VariableDecoration implements IDecoration {
     return range;
   }
 
-  public shouldGenerateDecoration(): boolean {
+  public shouldGenerateDecoration() {
     const color: Color | null = VariablesManager.findVariable(this.variable);
 
     if (this.disposed === true || color === null) {

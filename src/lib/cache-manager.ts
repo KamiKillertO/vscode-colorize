@@ -16,9 +16,7 @@ class CacheManager {
    * @param {TextEditor} editor
    * @returns {(Map<number, IDecoration[]> | null)}
    */
-  public getCachedDecorations(
-    document: TextDocument,
-  ): Map<number, IDecoration[]> | undefined {
+  public getCachedDecorations(document: TextDocument) {
     if (!document.isDirty && this._decorationsCache.has(document.fileName)) {
       return this._decorationsCache.get(document.fileName);
     }

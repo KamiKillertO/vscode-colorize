@@ -13,15 +13,15 @@ export const DECLARATION_REGEXP = new RegExp(
 );
 
 const RegexpExtractor = {
-  getVariableNameFromDeclaration(match: RegExpExecArray): string {
+  getVariableNameFromDeclaration(match: RegExpExecArray) {
     return (match[1] || match[2]).trim();
   },
 
-  getVariableNameFromUses(match: RegExpExecArray): string[] {
+  getVariableNameFromUses(match: RegExpExecArray) {
     return [match[1].trim()];
   },
 
-  getVariableNameFromUse(match: RegExpMatchArray): string {
+  getVariableNameFromUse(match: RegExpMatchArray) {
     return match[1].trim();
   },
 };

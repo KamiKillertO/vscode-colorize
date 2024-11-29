@@ -9,7 +9,7 @@ class TasksRunner<T extends Generator<unknown>> {
    * @returns
    * @memberOf TasksRunner
    */
-  run(f: () => IterableIterator<T>): TasksRunner<T> {
+  run(f: () => IterableIterator<T>) {
     if (this._currentTask) {
       this._currentTask.return?.();
     }
@@ -22,13 +22,13 @@ class TasksRunner<T extends Generator<unknown>> {
    *
    * @memberOf TasksRunner
    */
-  stop(): void {
+  stop() {
     if (this._currentTask) {
       this._currentTask.return?.();
     }
   }
 
-  _run(): void {
+  _run() {
     // cannot be null here
     const it = this._currentTask as IterableIterator<T>;
 

@@ -23,7 +23,7 @@ interface ColorizeConfig {
   decorationFn: (color: Color) => TextEditorDecorationType;
 }
 
-function getColorizeConfig(): ColorizeConfig {
+function getColorizeConfig() {
   const configuration: WorkspaceConfiguration = workspace.getConfiguration(
     'colorize',
     window.activeTextEditor?.document,
@@ -96,7 +96,7 @@ function generateDecorationType(
   }
 }
 
-function inferFilesToInclude(languagesConfig: string[]): string[] {
+function inferFilesToInclude(languagesConfig: string[]) {
   const filesExtensions = extensions.all.reduce(
     (acc, extension: Extension<unknown>) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access

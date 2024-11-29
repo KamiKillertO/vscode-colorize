@@ -24,7 +24,7 @@ interface LineExtraction {
 
 const flattenLineExtractionsFlatten = (
   arr: LineExtraction[][] | LineExtraction[],
-): LineExtraction[] => arr.flat(2).filter((_) => _.colors.length !== 0);
+) => arr.flat(2).filter((_) => _.colors.length !== 0);
 
 const WHITE = '#FFFFFF',
   BLACK = '#000000';
@@ -79,7 +79,7 @@ interface IDecoration {
 }
 
 class ColorUtil {
-  public static textToFileLines(text: string): DocumentLine[] {
+  public static textToFileLines(text: string) {
     return text.split(/\n/).map((text, index) => ({
       text: text,
       line: index,
@@ -94,13 +94,11 @@ class ColorUtil {
    *
    * @memberOf ColorUtil
    */
-  public static findColors(
-    fileContent: DocumentLine[],
-  ): Promise<LineExtraction[]> {
+  public static findColors(fileContent: DocumentLine[]) {
     return ColorExtractor.extract(fileContent);
   }
 
-  public static setupColorsExtractors(extractors: string[]): void {
+  public static setupColorsExtractors(extractors: string[]) {
     ColorExtractor.enableStrategies(extractors);
   }
 
@@ -108,7 +106,7 @@ class ColorUtil {
     color: IColor,
     line: number,
     decorationFn: (color: Color) => TextEditorDecorationType,
-  ): IDecoration {
+  ) {
     return new ColorDecoration(<Color>color, line, decorationFn);
   }
 }
@@ -123,7 +121,7 @@ class ColorUtil {
  * @param {Color} color
  * @returns {number}
  */
-function colorLuminance(color: Color): number {
+function colorLuminance(color: Color) {
   const rgb = color.rgb.map((c) => {
     c = c / 255;
     if (c < 0.03928) {
@@ -137,19 +135,23 @@ function colorLuminance(color: Color): number {
   return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
 }
 
-function generateOptimalTextColor(color: Color): string {
+function generateOptimalTextColor(color: Color) {
   const luminance: number = colorLuminance(color);
   const contrastRatioBlack: number = (luminance + 0.05) / 0.05;
+
   if (contrastRatioBlack > 7) {
     return BLACK;
   }
+
   const contrastRatioWhite: number = 1.05 / (luminance + 0.05);
   if (contrastRatioWhite > 7) {
     return WHITE;
   }
+
   if (contrastRatioBlack > contrastRatioWhite) {
     return BLACK;
   }
+
   return WHITE;
 }
 /**
@@ -163,12 +165,7 @@ function generateOptimalTextColor(color: Color): string {
  *
  * @return  {[number, number, number, number]} [h,s,l,a] - The HSLa representation
  */
-function convertRgbaToHsla(
-  r: number,
-  g: number,
-  b: number,
-  a = 1,
-): [number, number, number, number] {
+function convertRgbaToHsla(r: number, g: number, b: number, a = 1) {
   r /= 255;
   g /= 255;
   b /= 255;
@@ -197,7 +194,13 @@ function convertRgbaToHsla(
       break;
   }
   h /= 6;
-  return [Math.round(360 * h), Math.round(100 * s), Math.round(l * 100), a];
+
+  return [
+    Math.round(360 * h),
+    Math.round(100 * s),
+    Math.round(l * 100),
+    a,
+  ] as const;
 }
 /**
  * Converts an HSLa color value to RGBa. Conversion formula
@@ -210,12 +213,7 @@ function convertRgbaToHsla(
  *
  * @return  {[number, number, number, number]} [r,g,b,a] - The RGBa representation
  */
-function convertHslaToRgba(
-  h: number,
-  s: number,
-  l: number,
-  a = 1,
-): [number, number, number, number] {
+function convertHslaToRgba(h: number, s: number, l: number, a = 1) {
   let r: number, g: number, b: number;
   if (s === 0) {
     r = g = b = Math.round((l / 100) * 255);
@@ -239,7 +237,12 @@ function convertHslaToRgba(
   g = executeHSLProperFormula(tmp_1, temp_2, tmp_g);
   b = executeHSLProperFormula(tmp_1, temp_2, tmp_b);
 
-  return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255), a];
+  return [
+    Math.round(r * 255),
+    Math.round(g * 255),
+    Math.round(b * 255),
+    a,
+  ] as const;
 }
 /**
  * Select and execute the proper formula to get the r,g,b values
@@ -252,18 +255,16 @@ function convertHslaToRgba(
  *
  * @memberof HSLColorExtractor
  */
-function executeHSLProperFormula(
-  tmp_1: number,
-  tmp_2: number,
-  value: number,
-): number {
+function executeHSLProperFormula(tmp_1: number, tmp_2: number, value: number) {
   const res = tmp_2;
   if (6 * value < 1) {
     return tmp_2 + (tmp_1 - tmp_2) * 6 * value;
   }
+
   if (2 * value < 1) {
     return tmp_1;
   }
+
   if (3 * value < 2) {
     return tmp_2 + (tmp_1 - tmp_2) * (2 / 3 - value) * 6;
   }

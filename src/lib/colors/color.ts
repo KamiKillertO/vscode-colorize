@@ -67,7 +67,7 @@ class Color implements IColor {
    * @public
    * @memberOf Color
    */
-  public toRgbString(): string {
+  public toRgbString() {
     if (this.alpha === -1) {
       return this.value;
     }
@@ -84,7 +84,7 @@ class Color implements IColor {
    * @public
    * @memberOf Color
    */
-  public toRgbaString(): string {
+  public toRgbaString() {
     if (this.alpha === -1) {
       return this.value;
     }

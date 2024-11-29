@@ -13,33 +13,44 @@ export const REGEXP_ONE = new RegExp(
   'i',
 );
 
-function extractRGB(argb: number[]): [number, number, number] {
+function extractRGB(argb: number[]) {
   let rgb = argb.slice(-6);
+
   if (argb.length === 3 || argb.length === 4) {
     const _argb = argb.slice(-3);
     rgb = [_argb[0], _argb[0], _argb[1], _argb[1], _argb[2], _argb[2]];
   }
-  return [16 * rgb[0] + rgb[1], 16 * rgb[2] + rgb[3], 16 * rgb[4] + rgb[5]];
+
+  return [
+    16 * rgb[0] + rgb[1],
+    16 * rgb[2] + rgb[3],
+    16 * rgb[4] + rgb[5],
+  ] as const;
 }
 
-function extractAlpha(argb: number[]): number {
+function extractAlpha(argb: number[]) {
   if (argb.length === 4) {
     const alpha = argb[0];
     return (16 * alpha + alpha) / 255;
   }
+
   if (argb.length === 8) {
     const alpha = argb.slice(0, 2);
     return (16 * alpha[0] + alpha[1]) / 255;
   }
+
   return 1;
 }
-function removePrefix(argb: string): RegExpExecArray {
+
+function removePrefix(argb: string) {
   return /(?:#|0x)(.+)/gi.exec(argb) as RegExpExecArray;
 }
-function hexaToInt(argb: string): number[] {
+
+function hexaToInt(argb: string) {
   return argb.split('').map((_) => parseInt(_, 16));
 }
-function getColor(match: RegExpExecArray): Color {
+
+function getColor(match: RegExpExecArray) {
   const value = match[1];
   const argb = removePrefix(value)[1];
   const values = hexaToInt(argb);

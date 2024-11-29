@@ -54,7 +54,7 @@ class ColorizeContext {
     this.statusBar = window.createStatusBarItem(StatusBarAlignment.Right);
   }
 
-  updateStatusBar(activated: boolean): void {
+  updateStatusBar(activated: boolean) {
     // List of icons can be found here https://code.visualstudio.com/api/references/icons-in-labels
     const icon = activated ? '$(check)' : '$(circle-slash)';
     const hoverMessage = activated
@@ -108,7 +108,7 @@ async function initDecorations(context: ColorizeContext) {
 function updateContextDecorations(
   decorations: Map<number, IDecoration[]>,
   context: ColorizeContext,
-): void {
+) {
   const it = decorations.entries();
   let tmp = it.next();
   while (!tmp.done) {
@@ -126,7 +126,7 @@ function updateContextDecorations(
   }
 }
 
-function removeDuplicateDecorations(context: ColorizeContext): void {
+function removeDuplicateDecorations(context: ColorizeContext) {
   const it = context.deco.entries();
   const m: Map<number, IDecoration[]> = new Map();
   let tmp = it.next();
@@ -170,7 +170,7 @@ function generateDecorations(
   colors: LineExtraction[],
   variables: LineExtraction[],
   decorations: Map<number, IDecoration[]>,
-): Map<number, IDecoration[]> {
+) {
   colors.map(({ line, colors }) =>
     colors.forEach((color) => {
       const decoration = ColorUtil.generateDecoration(
@@ -200,7 +200,7 @@ function generateDecorations(
  * @param {string} languageId A valid languageId
  * @returns {boolean}
  */
-function isLanguageSupported(languageId: string): boolean {
+function isLanguageSupported(languageId: string) {
   return config.languages.indexOf(languageId) !== -1;
 }
 
@@ -210,7 +210,7 @@ function isLanguageSupported(languageId: string): boolean {
  * @param {string} fileName A valid filename (path to the file)
  * @returns {boolean}
  */
-function isIncludedFile(fileName: string): boolean {
+function isIncludedFile(fileName: string) {
   return config.filesToIncludes.some((globPattern: string) =>
     minimatch(fileName, globPattern, { nonegate: true }),
   );
@@ -222,7 +222,7 @@ function isIncludedFile(fileName: string): boolean {
  * @param {string} fileName A valid filename (path to the file)
  * @returns {boolean}
  */
-function isExcludedFile(fileName: string): boolean {
+function isExcludedFile(fileName: string) {
   return config.filesToExcludes.some((globPattern: string) =>
     minimatch(fileName, globPattern, { nonegate: true }),
   );
@@ -234,7 +234,7 @@ function isExcludedFile(fileName: string): boolean {
  * @param {TextDocument} document The document to test
  * @returns {boolean}
  */
-function canColorize(document: TextDocument): boolean {
+function canColorize(document: TextDocument) {
   // update to use filesToExcludes. Remove `isLanguageSupported` ? checking path with file extension or include glob pattern should be enough
   return (
     !isExcludedFile(document.fileName) &&
@@ -292,7 +292,7 @@ function handleCloseOpen(document: TextDocument) {
   });
 }
 
-async function colorize(editor: TextEditor, cb: () => void): Promise<void> {
+async function colorize(editor: TextEditor, cb: () => void) {
   extension.editor = undefined;
   extension.deco = new Map();
   if (!editor || !canColorize(editor.document)) {
@@ -345,7 +345,7 @@ function handleChangeActiveTextEditor(editor: TextEditor | undefined) {
   q.push((cb) => colorize(editor, cb));
 }
 
-function cleanDecorationList(context: ColorizeContext, cb: () => void): void {
+function cleanDecorationList(context: ColorizeContext, cb: () => void) {
   const it = context.deco.entries();
   let tmp = it.next();
   while (!tmp.done) {
@@ -415,7 +415,7 @@ function initEventListeners(context: ExtensionContext) {
   Listeners.setupEventListeners(context);
 }
 
-function getVisibleFileEditors(): TextEditor[] {
+function getVisibleFileEditors() {
   return window.visibleTextEditors.filter(
     (editor) => editor.document.uri.scheme === 'file',
   );
@@ -430,7 +430,7 @@ function colorizeVisibleTextEditors() {
 
 let extension: ColorizeContext;
 
-export function activate(context: ExtensionContext): ColorizeContext {
+export function activate(context: ExtensionContext) {
   extension = new ColorizeContext();
   config = getColorizeConfig();
   ColorUtil.setupColorsExtractors(config.colorizedColors);
@@ -454,7 +454,7 @@ export function activate(context: ExtensionContext): ColorizeContext {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate(): void {
+export function deactivate() {
   extension.nbLine = null;
   extension.editor = undefined;
   extension.deco.clear();

@@ -8,8 +8,9 @@ export interface IColorStrategy extends IStrategy {
   extractColors(fileLines: DocumentLine[]): Promise<LineExtraction[]>;
   extractColor(text: string): IColor | null;
 }
+
 class ColorExtractor extends Extractor {
-  public async extract(fileLines: DocumentLine[]): Promise<LineExtraction[]> {
+  public async extract(fileLines: DocumentLine[]) {
     const colors = await Promise.all(
       this.enabledStrategies.map((strategy) =>
         (<IColorStrategy>strategy).extractColors(fileLines),
@@ -17,7 +18,8 @@ class ColorExtractor extends Extractor {
     );
     return flattenLineExtractionsFlatten(colors); // should regroup per lines?
   }
-  public extractOneColor(text: string): IColor | undefined {
+
+  public extractOneColor(text: string) {
     const colors = this.enabledStrategies.map((strategy) =>
       (<IColorStrategy>strategy).extractColor(text),
     );
@@ -25,5 +27,6 @@ class ColorExtractor extends Extractor {
     return colors.find((color) => color !== null);
   }
 }
+
 const instance = new ColorExtractor();
 export default instance;

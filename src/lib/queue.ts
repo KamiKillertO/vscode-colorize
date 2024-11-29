@@ -12,7 +12,7 @@ class Queue {
    * @returns
    * @memberOf Queue
    */
-  public push(f: QueueItem): Queue {
+  public push(f: QueueItem) {
     this._queue.push(f);
     if (!this._running) {
       // if nothing is running, then start the engines!

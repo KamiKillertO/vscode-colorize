@@ -16,7 +16,7 @@ class EditorManager {
     editor: TextEditor,
     decorations: Map<number, IDecoration[]>,
     skipLines: number[],
-  ): void {
+  ) {
     const it = decorations.entries();
     let tmp = it.next();
     while (!tmp.done) {
@@ -44,7 +44,7 @@ class EditorManager {
     editor: TextEditor,
     decorations: IDecoration[],
     line: number,
-  ): void {
+  ) {
     decorations.forEach((decoration: IDecoration) => {
       if (decoration.shouldGenerateDecoration() === true) {
         editor.setDecorations(decoration.decoration, [

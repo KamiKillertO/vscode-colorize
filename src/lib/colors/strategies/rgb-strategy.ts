@@ -20,7 +20,7 @@ export const REGEXP_ONE = new RegExp(
   'i',
 );
 
-function extractRGBA(value: string): number[] {
+function extractRGBA(value: string) {
   const rgba_string = value
     .replace(/rgb(a){0,1}\(/, '')
     .replace(/\)/, '')

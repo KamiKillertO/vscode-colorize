@@ -26,16 +26,16 @@ class ColorDecoration implements IDecoration {
   private decorationFn: (color: Color) => TextEditorDecorationType;
 
   declare public currentRange: Range;
-  declare private _decoration: TextEditorDecorationType;
+  private _decoration?: TextEditorDecorationType;
   /**
    * The TextEditorDecorationType associated to the color
    *
    * @type {TextEditorDecorationType}
    * @memberOf ColorDecoration
    */
-  get decoration(): TextEditorDecorationType {
+  get decoration() {
     this._generateDecorator();
-    return this._decoration;
+    return this._decoration as TextEditorDecorationType;
   }
   set decoration(deco: TextEditorDecorationType) {
     this._decoration = deco;
@@ -61,14 +61,9 @@ class ColorDecoration implements IDecoration {
    * @public
    * @memberOf ColorDecoration
    */
-  public dispose(): void {
-    try {
-      this._decoration.dispose();
-      this.disposed = true;
-    } catch (error) {
-      // do something
-      console.log(error);
-    }
+  public dispose() {
+    this._decoration?.dispose();
+    this.disposed = true;
   }
   /**
    * Hide the TextEditorDecorationType.
@@ -76,10 +71,8 @@ class ColorDecoration implements IDecoration {
    * @public
    * @memberOf ColorDecoration
    */
-  public hide(): void {
-    if (this._decoration) {
-      this._decoration.dispose();
-    }
+  public hide() {
+    this._decoration?.dispose();
     this.hidden = true;
   }
   /**
@@ -90,7 +83,7 @@ class ColorDecoration implements IDecoration {
    *
    * @memberOf ColorDecoration
    */
-  public generateRange(line: number): Range {
+  public generateRange(line: number) {
     const range = new Range(
       new Position(line, this.color.positionInText),
       new Position(line, this.color.positionInText + this.color.value.length),
@@ -99,7 +92,7 @@ class ColorDecoration implements IDecoration {
     return range;
   }
 
-  public shouldGenerateDecoration(): boolean {
+  public shouldGenerateDecoration() {
     if (this.disposed === true /* || this.hidden === true */) {
       return false;
     }

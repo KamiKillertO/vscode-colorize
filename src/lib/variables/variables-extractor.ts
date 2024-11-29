@@ -23,10 +23,7 @@ export interface IVariableStrategy extends IStrategy {
 }
 
 class VariablesExtractor extends Extractor {
-  public async extractVariables(
-    fileName: string,
-    fileLines: DocumentLine[],
-  ): Promise<LineExtraction[]> {
+  public async extractVariables(fileName: string, fileLines: DocumentLine[]) {
     const colors = await Promise.all(
       this.enabledStrategies.map((strategy) =>
         (<IVariableStrategy>strategy).extractVariables(fileName, fileLines),
@@ -44,7 +41,7 @@ class VariablesExtractor extends Extractor {
   public async extractDeclarations(
     fileName: string,
     fileLines: DocumentLine[],
-  ): Promise<number[]> {
+  ) {
     return Promise.all(
       this.enabledStrategies.map((strategy) =>
         (<IVariableStrategy>strategy).extractDeclarations(fileName, fileLines),
@@ -52,14 +49,14 @@ class VariablesExtractor extends Extractor {
     );
   }
 
-  public getVariablesCount(): number {
+  public getVariablesCount() {
     return this.enabledStrategies.reduce(
       (cv, strategy) => cv + (<IVariableStrategy>strategy).variablesCount(),
       0,
     );
   }
 
-  public findVariable(variable: Variable): Color | null {
+  public findVariable(variable: Variable) {
     return (<IVariableStrategy>this.get(variable.type)).getVariableValue(
       variable,
     );

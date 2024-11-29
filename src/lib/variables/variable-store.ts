@@ -5,12 +5,12 @@ import { dirname } from 'path';
 class VariablesStore {
   private entries: Map<string, Variable[]> = new Map();
 
-  public has(variable: string, fileName?: string, line?: number): boolean {
+  public has(variable: string, fileName?: string, line?: number) {
     const declarations = this.get(variable, fileName, line);
     return declarations && declarations.length > 0;
   }
 
-  public get(variable: string, fileName?: string, line?: number): Variable[] {
+  public get(variable: string, fileName?: string, line?: number) {
     let decorations = this.entries.get(variable) || [];
     if (fileName !== undefined) {
       decorations = decorations.filter((_) => _.location.fileName === fileName);
@@ -21,7 +21,7 @@ class VariablesStore {
     return decorations;
   }
 
-  private __delete(variable: string, fileName?: string, line?: number): void {
+  private __delete(variable: string, fileName?: string, line?: number) {
     let decorations = this.get(variable);
 
     if (line !== null) {
@@ -37,7 +37,7 @@ class VariablesStore {
     return;
   }
 
-  public deleteVariablesFile(fileName?: string, line?: number): void {
+  public deleteVariablesFile(fileName?: string, line?: number) {
     const IT: IterableIterator<[string, Variable[]]> = this.entries.entries();
     let tmp: IteratorResult<[string, Variable[]]> = IT.next();
     while (tmp.done === false) {
@@ -47,11 +47,11 @@ class VariablesStore {
     }
   }
 
-  public delete(variable: string, fileName?: string, line?: number): void {
+  public delete(variable: string, fileName?: string, line?: number) {
     this.__delete(variable, fileName, line);
   }
 
-  public addEntry(key: string, value: Variable | Variable[]): void {
+  public addEntry(key: string, value: Variable | Variable[]) {
     const _value: Variable[] = Array.isArray(value) ? value : [value];
     if (this.entries.has(key)) {
       const decorations = this.entries.get(key);
@@ -61,25 +61,17 @@ class VariablesStore {
     }
   }
 
-  public get count(): number {
+  public get count() {
     return this.entries.size;
   }
 
   // need to create a proxy (?) to always return the same variable.
-  public findDeclaration(
-    variable: string,
-    file: string,
-    line: number,
-  ): Variable {
+  public findDeclaration(variable: string, file: string, line: number) {
     return this.findClosestDeclaration(variable, file, line);
   }
 
   // need to create a proxy (?) to always return the same variable.
-  public findClosestDeclaration(
-    variable: string,
-    file: string,
-    line?: number,
-  ): Variable {
+  public findClosestDeclaration(variable: string, file: string, line?: number) {
     let decorations = this.get(variable, file);
     if (decorations.length === 0) {
       decorations = this.get(variable);

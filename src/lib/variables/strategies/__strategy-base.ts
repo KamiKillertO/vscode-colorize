@@ -3,7 +3,7 @@ import Variable from '../variable';
 import Color from '../../colors/color';
 import VariablesStore from '../variable-store';
 import ColorExtractor from '../../colors/color-extractor';
-import type { DocumentLine, LineExtraction } from '../../util/color-util';
+import type { DocumentLine } from '../../util/color-util';
 import { flattenLineExtractionsFlatten } from '../../util/color-util';
 
 export interface IStategyRegexpResultExtractor {
@@ -37,11 +37,7 @@ export default class VariableStrategy {
       ).length,
     );
   }
-  public __extractDeclarations(
-    fileName: string,
-    text: string,
-    line: number,
-  ): void {
+  public __extractDeclarations(fileName: string, text: string, line: number) {
     let match = null;
     while ((match = this.DECLARATION_REGEXP.exec(text)) !== null) {
       const varName =
@@ -70,10 +66,7 @@ export default class VariableStrategy {
     }
   }
 
-  public extractVariables(
-    fileName: string,
-    fileLines: DocumentLine[],
-  ): LineExtraction[] {
+  public extractVariables(fileName: string, fileLines: DocumentLine[]) {
     const variables = fileLines.map(({ line, text }) => {
       let match: RegExpExecArray | null = null;
       const colors: Variable[] = [];
@@ -110,7 +103,7 @@ export default class VariableStrategy {
     return flattenLineExtractionsFlatten(variables);
   }
 
-  extractVariable(fileName: string, text: string): Color | undefined {
+  extractVariable(fileName: string, text: string) {
     const match = text.match(this.USE_REGEXP);
     let variable;
     if (match) {
@@ -127,7 +120,7 @@ export default class VariableStrategy {
    * @param {Variable} variable
    * @returns {Color|null}
    */
-  public getVariableValue(variable: Variable): Color | null {
+  public getVariableValue(variable: Variable) {
     let color = null;
     if (this.store.has(variable.name) === true) {
       let declaration = this.store.findClosestDeclaration(
@@ -152,11 +145,11 @@ export default class VariableStrategy {
     return color;
   }
 
-  variablesCount(): number {
+  variablesCount() {
     return this.store.count;
   }
 
-  deleteVariable(fileName: string, line: number): void {
+  deleteVariable(fileName: string, line: number) {
     this.store.deleteVariablesFile(fileName, line);
   }
 }

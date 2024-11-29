@@ -189,7 +189,7 @@ function getEditedLines(
 function getDecorationsToColorize(
   colors: LineExtraction[],
   variables: LineExtraction[],
-): Map<number, IDecoration[]> {
+) {
   const decorations = generateDecorations(colors, variables, new Map());
 
   function filterDuplicated(A: IDecoration[], B: IDecoration[]) {
@@ -231,7 +231,7 @@ function getDecorationsToColorize(
   return decorations;
 }
 
-function getCurrentRangeText(): DocumentLine[] {
+function getCurrentRangeText() {
   const text = extension.editor?.document.getText() ?? '';
   const fileLines: DocumentLine[] = ColorUtil.textToFileLines(text);
   const lines: DocumentLine[] = [];
@@ -348,7 +348,7 @@ function textDocumentUpdated(event: TextDocumentChangeEvent) {
   }
 }
 
-function setupEventListeners(context: ExtensionContext): void {
+function setupEventListeners(context: ExtensionContext) {
   // window.onDidChangeTextEditorSelection((event) => q.push((cb) => handleTextSelectionChange(event, cb)), null, context.subscriptions);
   workspace.onDidChangeTextDocument(
     textDocumentUpdated,

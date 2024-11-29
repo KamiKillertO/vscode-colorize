@@ -5,7 +5,7 @@ import path from 'path';
 export function run(
   testsRoot: string,
   cb: (error: Error | null, failures?: number) => void,
-): void {
+) {
   const mocha = new Mocha({ color: true, ui: 'tdd' });
 
   const files = globSync('**/**.test.js', { cwd: testsRoot });

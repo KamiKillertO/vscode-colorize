@@ -42,11 +42,11 @@ class Variable implements IColor {
    * @public
    * @memberOf Color
    */
-  public toRgbString(): string {
+  public toRgbString() {
     return this.color.toRgbString();
   }
 
-  public update(color: Color): void {
+  public update(color: Color) {
     this.color = color;
   }
 }

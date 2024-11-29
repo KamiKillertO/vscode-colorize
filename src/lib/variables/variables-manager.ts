@@ -48,7 +48,7 @@ class VariablesManager {
     return;
   }
 
-  private textToDocumentLine(text: string): DocumentLine[] {
+  private textToDocumentLine(text: string) {
     return text.split(/\n/).map((text, index) => ({
       text: text,
       line: index,
@@ -66,7 +66,7 @@ class VariablesManager {
   public findVariablesDeclarations(
     fileName: string,
     fileLines: DocumentLine[],
-  ): Promise<number[]> {
+  ) {
     return VariablesExtractor.extractDeclarations(fileName, fileLines);
   }
 
@@ -82,7 +82,7 @@ class VariablesManager {
     variable: Variable,
     line: number,
     decorationFn: (color: Color) => TextEditorDecorationType,
-  ): VariableDecoration {
+  ) {
     return new VariableDecoration(variable, line, decorationFn);
   }
 

@@ -31,7 +31,7 @@ export default class ColorStrategy implements IColorStrategy {
       }),
     );
   }
-  extractColor(text: string): Color | null {
+  extractColor(text: string) {
     const match = this.REGEXP_ONE.exec(text);
     if (match) {
       return this.colorFromRegexp(match);

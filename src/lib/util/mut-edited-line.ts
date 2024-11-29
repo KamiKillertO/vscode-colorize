@@ -27,9 +27,7 @@ import { Range, Position } from 'vscode';
 //  range: {start:{line:4,/*...*/}, end:{line:4,/*...*/}}
 // }]
 //
-function mutEditedLine(
-  editedLine: TextDocumentContentChangeEvent[],
-): TextDocumentContentChangeEvent[] {
+function mutEditedLine(editedLine: TextDocumentContentChangeEvent[]) {
   const newEditedLine: TextDocumentContentChangeEvent[] = [];
   let startLine = 0;
   let before = 0;
@@ -52,10 +50,7 @@ function mutEditedLine(
 }
 
 // Generate a TextDocumentContentChangeEvent like object for one line
-function generateTextDocumentContentChange(
-  line: number,
-  text: string,
-): TextDocumentContentChangeEvent {
+function generateTextDocumentContentChange(line: number, text: string) {
   return {
     rangeLength: 0,
     rangeOffset: 0,
