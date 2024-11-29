@@ -4,7 +4,7 @@ import { describe, it } from 'mocha';
 import { REGEXP } from '../../../src/lib/colors/strategies/hsl-strategy';
 import { regex_exec } from '../../test-util';
 import HSLStrategy from '../../../src/lib/colors/strategies/hsl-strategy';
-import Color from '../../../src/lib/colors/color';
+import type Color from '../../../src/lib/colors/color';
 
 describe('Test hsl(a) color Regex', () => {
   it('Should match new hsl syntax', function () {

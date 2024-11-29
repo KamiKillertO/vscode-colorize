@@ -1,6 +1,7 @@
 import Color from './../color';
-import ColorExtractor, { IColorStrategy } from '../color-extractor';
-import { DocumentLine } from '../../util/color-util';
+import type { IColorStrategy } from '../color-extractor';
+import ColorExtractor from '../color-extractor';
+import type { DocumentLine } from '../../util/color-util';
 import { EOL } from '../../util/regexp';
 
 export const COLORS = {

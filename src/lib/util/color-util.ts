@@ -1,4 +1,5 @@
-import Color, { IColor } from '../colors/color';
+import type { IColor } from '../colors/color';
+import type Color from '../colors/color';
 import '../colors/strategies/hexa-strategy';
 import '../colors/strategies/argb-strategy';
 import '../colors/strategies/rgb-strategy';
@@ -9,7 +10,7 @@ import '../colors/strategies/oklch-strategy';
 
 import ColorExtractor from '../colors/color-extractor';
 import ColorDecoration from '../colors/color-decoration';
-import { Range, TextEditorDecorationType } from 'vscode';
+import type { Range, TextEditorDecorationType } from 'vscode';
 
 interface DocumentLine {
   line: number;

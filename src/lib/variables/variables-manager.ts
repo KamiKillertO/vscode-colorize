@@ -1,4 +1,4 @@
-import Variable from './variable';
+import type Variable from './variable';
 import VariableDecoration from './variable-decoration';
 import VariablesExtractor from './variables-extractor';
 
@@ -7,17 +7,10 @@ import './strategies/less-strategy';
 import './strategies/sass-strategy';
 import './strategies/stylus-strategy';
 import * as fs from 'fs';
-import {
-  workspace,
-  window,
-  StatusBarAlignment,
-  StatusBarItem,
-  Uri,
-  TextEditorDecorationType,
-  ThemeColor,
-} from 'vscode';
-import { DocumentLine } from '../util/color-util';
-import Color from '../colors/color';
+import type { StatusBarItem, Uri, TextEditorDecorationType } from 'vscode';
+import { workspace, window, StatusBarAlignment, ThemeColor } from 'vscode';
+import type { DocumentLine } from '../util/color-util';
+import type Color from '../colors/color';
 
 class VariablesManager {
   private statusBar: StatusBarItem;

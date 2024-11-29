@@ -1,7 +1,8 @@
-import { Range, Position, TextEditorDecorationType } from 'vscode';
+import type { TextEditorDecorationType } from 'vscode';
+import { Range, Position } from 'vscode';
 
-import { IDecoration } from '../util/color-util';
-import Color from './color';
+import type { IDecoration } from '../util/color-util';
+import type Color from './color';
 
 class ColorDecoration implements IDecoration {
   /**

@@ -1,5 +1,5 @@
-import { TextEditor } from 'vscode';
-import { IDecoration } from './util/color-util';
+import type { TextEditor } from 'vscode';
+import type { IDecoration } from './util/color-util';
 
 class EditorManager {
   /**

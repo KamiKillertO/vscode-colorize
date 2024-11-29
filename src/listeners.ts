@@ -1,27 +1,27 @@
 'use strict';
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import {
-  window,
-  workspace,
+import type {
   ExtensionContext,
   Range,
   TextDocumentChangeEvent,
   TextDocumentContentChangeEvent,
   TextEditor,
 } from 'vscode';
+import { window, workspace } from 'vscode';
+import type { ColorizeContext } from './extension';
 import {
   extension,
   updateContextDecorations,
   generateDecorations,
   removeDuplicateDecorations,
-  ColorizeContext,
 } from './extension';
-import ColorUtil, {
+import type {
   IDecoration,
   DocumentLine,
   LineExtraction,
 } from './lib/util/color-util';
+import ColorUtil from './lib/util/color-util';
 import VariablesManager from './lib/variables/variables-manager';
 import EditorManager from './lib/editor-manager';
 import { mutEditedLine } from './lib/util/mut-edited-line';

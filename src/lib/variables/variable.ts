@@ -1,4 +1,5 @@
-import Color, { IColor } from '../colors/color';
+import type { IColor } from '../colors/color';
+import type Color from '../colors/color';
 
 interface VariableLocation {
   fileName: string;

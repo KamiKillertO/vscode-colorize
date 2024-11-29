@@ -1,12 +1,10 @@
-import Variable, { VariableLocation } from '../variable';
+import type { VariableLocation } from '../variable';
+import Variable from '../variable';
 import Color from '../../colors/color';
 import VariablesStore from '../variable-store';
 import ColorExtractor from '../../colors/color-extractor';
-import {
-  DocumentLine,
-  LineExtraction,
-  flattenLineExtractionsFlatten,
-} from '../../util/color-util';
+import type { DocumentLine, LineExtraction } from '../../util/color-util';
+import { flattenLineExtractionsFlatten } from '../../util/color-util';
 
 export interface IStategyRegexpResultExtractor {
   getVariableNameFromDeclaration(match: RegExpExecArray): string;

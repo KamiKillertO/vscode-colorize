@@ -1,4 +1,4 @@
-import Variable from './variable';
+import type Variable from './variable';
 // import Color from '../colors/color';
 import { dirname } from 'path';
 

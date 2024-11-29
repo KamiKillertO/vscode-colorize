@@ -1,10 +1,8 @@
-import { IColor } from './color';
-import {
-  LineExtraction,
-  DocumentLine,
-  flattenLineExtractionsFlatten,
-} from '../util/color-util';
-import { Extractor, IStrategy } from '../extractor-mixin';
+import type { IColor } from './color';
+import type { LineExtraction, DocumentLine } from '../util/color-util';
+import { flattenLineExtractionsFlatten } from '../util/color-util';
+import type { IStrategy } from '../extractor-mixin';
+import { Extractor } from '../extractor-mixin';
 
 export interface IColorStrategy extends IStrategy {
   extractColors(fileLines: DocumentLine[]): Promise<LineExtraction[]>;

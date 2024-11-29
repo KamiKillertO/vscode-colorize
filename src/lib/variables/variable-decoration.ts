@@ -1,8 +1,9 @@
-import { Range, TextEditorDecorationType, Position } from 'vscode';
-import { IDecoration } from '../util/color-util';
-import Variable from './variable';
+import type { TextEditorDecorationType } from 'vscode';
+import { Range, Position } from 'vscode';
+import type { IDecoration } from '../util/color-util';
+import type Variable from './variable';
 import VariablesManager from './variables-manager';
-import Color from '../colors/color';
+import type Color from '../colors/color';
 
 class VariableDecoration implements IDecoration {
   /**

@@ -5,7 +5,8 @@ import ColorUtil, {
   convertHslaToRgba,
   convertRgbaToHsla,
 } from '../../src/lib/util/color-util';
-import Color, { IColor } from '../../src/lib/colors/color';
+import type { IColor } from '../../src/lib/colors/color';
+import Color from '../../src/lib/colors/color';
 import { describe, it } from 'mocha';
 
 describe('Test utility fonction', () => {

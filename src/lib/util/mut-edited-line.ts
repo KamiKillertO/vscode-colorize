@@ -1,4 +1,5 @@
-import { TextDocumentContentChangeEvent, Range, Position } from 'vscode';
+import type { TextDocumentContentChangeEvent } from 'vscode';
+import { Range, Position } from 'vscode';
 
 // Split the TextDocumentContentChangeEvent into multiple line if the added text contain multiple lines
 // example :

@@ -1,32 +1,30 @@
 'use strict';
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import {
-  window,
-  workspace,
+import type {
   ExtensionContext,
   TextEditor,
   TextDocument,
   TextEditorSelectionChangeEvent,
   Selection,
   Range,
-  StatusBarAlignment,
   StatusBarItem,
-  ThemeColor,
 } from 'vscode';
-import Variable from './lib/variables/variable';
-import ColorUtil, {
+import { window, workspace, StatusBarAlignment, ThemeColor } from 'vscode';
+import type Variable from './lib/variables/variable';
+import type {
   IDecoration,
   DocumentLine,
   LineExtraction,
 } from './lib/util/color-util';
+import ColorUtil from './lib/util/color-util';
 import Queue from './lib/queue';
 import VariablesManager from './lib/variables/variables-manager';
 import CacheManager from './lib/cache-manager';
 import EditorManager from './lib/editor-manager';
+import type { ColorizeConfig } from './lib/colorize-config';
 import {
   getColorizeConfig,
-  ColorizeConfig,
   generateDecorationType,
 } from './lib/colorize-config';
 
@@ -214,8 +212,6 @@ function isLanguageSupported(languageId: string): boolean {
  */
 function isIncludedFile(fileName: string): boolean {
   return config.filesToIncludes.some((globPattern: string) =>
-    // No reason why this reports an error
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     minimatch(fileName, globPattern, { nonegate: true }),
   );
 }
@@ -228,8 +224,6 @@ function isIncludedFile(fileName: string): boolean {
  */
 function isExcludedFile(fileName: string): boolean {
   return config.filesToExcludes.some((globPattern: string) =>
-    // No reason why this reports an error
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     minimatch(fileName, globPattern, { nonegate: true }),
   );
 }

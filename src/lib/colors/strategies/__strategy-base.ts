@@ -1,6 +1,6 @@
-import Color from './../color';
-import { IColorStrategy } from '../color-extractor';
-import { DocumentLine } from '../../util/color-util';
+import type Color from './../color';
+import type { IColorStrategy } from '../color-extractor';
+import type { DocumentLine } from '../../util/color-util';
 
 type RegexpResultExtractor = (match: RegExpExecArray) => Color | null;
 

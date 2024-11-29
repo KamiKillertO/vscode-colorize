@@ -1,11 +1,9 @@
-import Color from '../colors/color';
-import {
-  DocumentLine,
-  LineExtraction,
-  flattenLineExtractionsFlatten,
-} from '../util/color-util';
-import { IStrategy, Extractor } from '../extractor-mixin';
-import Variable from './variable';
+import type Color from '../colors/color';
+import type { DocumentLine, LineExtraction } from '../util/color-util';
+import { flattenLineExtractionsFlatten } from '../util/color-util';
+import type { IStrategy } from '../extractor-mixin';
+import { Extractor } from '../extractor-mixin';
+import type Variable from './variable';
 
 // export class IVariableStrategy { // class instead? // avoid duplication (variablesCount/deleteVariable same code for all extractors)
 export interface IVariableStrategy extends IStrategy {

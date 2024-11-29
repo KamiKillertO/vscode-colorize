@@ -4,7 +4,7 @@ import { describe, it } from 'mocha';
 import { REGEXP } from '../../../src/lib/colors/strategies/rgb-strategy';
 import { regex_exec } from '../../test-util';
 import RGBStrategy from '../../../src/lib/colors/strategies/rgb-strategy';
-import Color from '../../../src/lib/colors/color';
+import type Color from '../../../src/lib/colors/color';
 
 describe('Test rgb(a) color Regex', () => {
   it('Should match the new syntax', function () {

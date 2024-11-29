@@ -1,5 +1,5 @@
-import { IDecoration } from './util/color-util';
-import { TextDocument } from 'vscode';
+import type { IDecoration } from './util/color-util';
+import type { TextDocument } from 'vscode';
 
 class CacheManager {
   private _dirtyCache: Map<string, Map<number, IDecoration[]>>;
