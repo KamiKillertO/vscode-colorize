@@ -18,7 +18,7 @@ interface ColorizeConfig {
   colorizedColors: string[];
   filesToExcludes: string[];
   filesToIncludes: string[];
-  inferedFilesToInclude: string[];
+  inferredFilesToInclude: string[];
   searchVariables: boolean;
   decorationFn: (color: Color) => TextEditorDecorationType;
 }
@@ -39,7 +39,7 @@ function getColorizeConfig(): ColorizeConfig {
 
   const languages = configuration.get('languages', []);
 
-  const inferedFilesToInclude = inferFilesToInclude(languages).map(
+  const inferredFilesToInclude = inferFilesToInclude(languages).map(
     (extension) => `**/*${extension}`,
   );
   const filesToIncludes = Array.from(new Set(configuration.get('include', [])));
@@ -54,7 +54,7 @@ function getColorizeConfig(): ColorizeConfig {
     colorizedVariables,
     filesToIncludes,
     filesToExcludes,
-    inferedFilesToInclude,
+    inferredFilesToInclude,
     searchVariables,
     decorationFn: generateDecorationType(configuration.get('decoration_type')),
   };
