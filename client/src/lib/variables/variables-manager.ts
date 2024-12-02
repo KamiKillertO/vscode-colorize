@@ -6,9 +6,8 @@ import './strategies/css-strategy';
 import './strategies/less-strategy';
 import './strategies/sass-strategy';
 import './strategies/stylus-strategy';
-import * as fs from 'fs';
-import type { StatusBarItem, Uri, TextEditorDecorationType } from 'vscode';
-import { workspace, window, StatusBarAlignment, ThemeColor } from 'vscode';
+import type { StatusBarItem, TextEditorDecorationType } from 'vscode';
+import { window, StatusBarAlignment, ThemeColor } from 'vscode';
 import type { DocumentLine } from '../util/color-util';
 import type Color from '../colors/color';
 
@@ -19,48 +18,42 @@ class VariablesManager {
     this.statusBar = window.createStatusBarItem(StatusBarAlignment.Right);
   }
 
-  public async getWorkspaceVariables(
-    includePattern: string[] = [],
-    excludePattern: string[] = [],
-  ) {
+  private startVariableExtraction() {
     this.statusBar.show();
     this.statusBar.text =
       'Colorize: $(loading~spin) Searching for color variables...';
+  }
+
+  private updateVariableExtractionCount() {
+    this.statusBar.show();
+    const variablesCount: number = VariablesExtractor.getVariablesCount();
+    this.statusBar.text = `Colorize: ${variablesCount} variables`;
+  }
+
+  private onVariableExtractionFail() {
+    this.statusBar.show();
+    this.statusBar.backgroundColor = new ThemeColor(
+      'statusBarItem.errorBackground',
+    );
+    this.statusBar.color = new ThemeColor('statusBarItem.errorForeground');
+    this.statusBar.text = 'Colorize: $(circle-slash) Variables extraction fail';
+  }
+
+  public async getWorkspaceVariables(
+    filesContent: [{ fileName: string; content: DocumentLine[] }],
+  ) {
+    this.startVariableExtraction();
     try {
-      const INCLUDE_PATTERN = `{${includePattern.join(',')}}`;
-      const EXCLUDE_PATTERN = `{${excludePattern.join(',')}}`;
-      const files: Uri[] = await workspace.findFiles(
-        INCLUDE_PATTERN,
-        EXCLUDE_PATTERN,
+      await Promise.all(
+        filesContent.map(async ({ fileName, content }) => {
+          return VariablesExtractor.extractDeclarations(fileName, content);
+        }),
       );
 
-      await Promise.all(this.extractFilesVariable(files));
-      const variablesCount: number = VariablesExtractor.getVariablesCount();
-      this.statusBar.text = `Colorize: ${variablesCount} variables`;
+      this.updateVariableExtractionCount();
     } catch {
-      this.statusBar.backgroundColor = new ThemeColor(
-        'statusBarItem.errorBackground',
-      );
-      this.statusBar.color = new ThemeColor('statusBarItem.errorForeground');
-      this.statusBar.text =
-        'Colorize: $(circle-slash) Variables extraction fail';
+      this.onVariableExtractionFail();
     }
-    return;
-  }
-
-  private textToDocumentLine(text: string) {
-    return text.split(/\n/).map((text, index) => ({
-      text: text,
-      line: index,
-    }));
-  }
-
-  private extractFilesVariable(files: Uri[]) {
-    return files.map(async (file: Uri) => {
-      const text = fs.readFileSync(file.fsPath, 'utf8');
-      const content: DocumentLine[] = this.textToDocumentLine(text);
-      return VariablesExtractor.extractDeclarations(file.fsPath, content);
-    });
   }
 
   public findVariablesDeclarations(

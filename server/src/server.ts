@@ -11,6 +11,8 @@ import {
 } from 'vscode-languageserver/node.js';
 
 import { TextDocument } from 'vscode-languageserver-textdocument';
+import { globbySync } from 'globby';
+import { extractFileContent } from './utils/index.js';
 
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -44,9 +46,9 @@ connection.onInitialize((params: InitializeParams) => {
     capabilities: {
       textDocumentSync: TextDocumentSyncKind.Incremental,
       // Tell the client that this server supports code completion.
-      completionProvider: {
-        resolveProvider: true,
-      },
+      // completionProvider: {
+      //   resolveProvider: true,
+      // },
     },
   };
   if (hasWorkspaceFolderCapability) {
@@ -81,7 +83,14 @@ connection.onInitialized(() => {
 // but could happen
 
 // The example settings
-type ColorizeSettings = Record<string, unknown>;
+interface ColorizeSettings {
+  colorized_variables: string[];
+  colorized_colors: string[];
+  languages: string[];
+  include: string[];
+  exclude: string[];
+  enable_search_variables: boolean;
+}
 
 // Cache the settings of all open documents
 const documentSettings: Map<string, Thenable<ColorizeSettings>> = new Map();
@@ -139,6 +148,29 @@ connection.onDidChangeWatchedFiles((_change) => {
   // Monitored files have change in VS Code
   connection.console.log('We received a file change event');
 });
+
+connection.onRequest(
+  'colorize_extract_variables',
+  (request: { rootFolder: string; includes: string[]; excludes: string[] }) => {
+    const files = globbySync(request.includes, {
+      cwd: request.rootFolder,
+      ignore: request.excludes,
+    });
+
+    const filesContent = files.map((fileName) => {
+      const content = extractFileContent(fileName);
+      return { fileName, content };
+    });
+
+    return filesContent;
+
+    // VariableManager.setupVariablesExtractors(settings.colorized_variables);
+
+    // await Promise.all(VariableManager.extractFilesVariable(files));
+
+    // return VariableManager.getAllVariables();
+  },
+);
 
 // // This handler provides the initial list of the completion items.
 // connection.onCompletion(

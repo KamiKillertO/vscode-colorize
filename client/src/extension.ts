@@ -31,6 +31,15 @@ import Listeners from './listeners';
 import { minimatch } from 'minimatch';
 import type Variable from './lib/variables/variable';
 
+import type {
+  LanguageClientOptions,
+  ServerOptions,
+} from 'vscode-languageclient/node';
+import { LanguageClient, TransportKind } from 'vscode-languageclient/node';
+import path from 'path';
+
+let client: LanguageClient;
+
 let config: ColorizeConfig = {
   languages: [],
   isHideCurrentLineDecorations: true,
@@ -38,7 +47,7 @@ let config: ColorizeConfig = {
   colorizedColors: [],
   filesToExcludes: [],
   filesToIncludes: [],
-  inferedFilesToInclude: [],
+  inferredFilesToInclude: [],
   searchVariables: false,
   decorationFn: generateDecorationType(),
 };
@@ -49,9 +58,11 @@ class ColorizeContext {
   deco: Map<number, IDecoration[]> = new Map();
   currentSelection: number[] | null = null;
   statusBar: StatusBarItem;
+  serverPath: string;
 
-  constructor() {
+  constructor(serverPath: string) {
     this.statusBar = window.createStatusBarItem(StatusBarAlignment.Right);
+    this.serverPath = serverPath;
   }
 
   updateStatusBar(activated: boolean) {
@@ -376,16 +387,28 @@ function handleConfigurationChanged() {
     // remove event listeners?
     VariablesManager.setupVariablesExtractors(newConfig.colorizedVariables);
 
-    if (newConfig.searchVariables) {
-      await VariablesManager.getWorkspaceVariables(
-        newConfig.filesToIncludes.concat(newConfig.inferedFilesToInclude),
-        newConfig.filesToExcludes,
-      ); // 👍
+    if (newConfig.searchVariables && window.activeTextEditor) {
+      await triggerVariablesExtraction(window.activeTextEditor.document);
     }
     return cb();
   });
   config = newConfig;
   colorizeVisibleTextEditors();
+}
+
+async function triggerVariablesExtraction(textDocument: TextDocument) {
+  if (!client) {
+    await startServerClient(extension.serverPath);
+  }
+  const workspaceFolder = workspace.getWorkspaceFolder(textDocument.uri);
+  const filesContent: [{ fileName: string; content: DocumentLine[] }] =
+    await client.sendRequest('colorize_extract_variables', {
+      rootFolder: workspaceFolder?.uri.path,
+      includes: config.filesToIncludes.concat(config.inferredFilesToInclude), // let server infer ? What about activated languages ??
+      excludes: config.filesToExcludes,
+    });
+
+  await VariablesManager.getWorkspaceVariables(filesContent); // 👍// 👍
 }
 
 function initEventListeners(context: ExtensionContext) {
@@ -395,6 +418,11 @@ function initEventListeners(context: ExtensionContext) {
     context.subscriptions,
   );
 
+  workspace.onDidOpenTextDocument(
+    triggerVariablesExtraction,
+    null,
+    context.subscriptions,
+  );
   workspace.onDidCloseTextDocument(
     handleCloseOpen,
     null,
@@ -431,17 +459,18 @@ function colorizeVisibleTextEditors() {
 let extension: ColorizeContext;
 
 export function activate(context: ExtensionContext) {
-  extension = new ColorizeContext();
+  extension = new ColorizeContext(
+    context.asAbsolutePath(path.join('server', 'out', 'server.js')),
+  );
   config = getColorizeConfig();
+
   ColorUtil.setupColorsExtractors(config.colorizedColors);
   VariablesManager.setupVariablesExtractors(config.colorizedVariables);
+
   q.push(async (cb) => {
     try {
-      if (config.searchVariables) {
-        await VariablesManager.getWorkspaceVariables(
-          config.filesToIncludes.concat(config.inferedFilesToInclude),
-          config.filesToExcludes,
-        ); // 👍
+      if (config.searchVariables && window.activeTextEditor) {
+        await triggerVariablesExtraction(window.activeTextEditor.document);
       }
       initEventListeners(context);
     } catch (error) {
@@ -451,6 +480,43 @@ export function activate(context: ExtensionContext) {
   });
   colorizeVisibleTextEditors();
   return extension;
+}
+
+function startServerClient(serverModule: string) {
+  // The debug options for the server
+  // --inspect=6009: runs the server in Node's Inspector mode so VS Code can attach to the server for debugging
+  const debugOptions = { execArgv: ['--nolazy', '--inspect=6009'] };
+
+  // If the extension is launched in debug mode then the debug server options are used
+  // Otherwise the run options are used
+  const serverOptions: ServerOptions = {
+    run: { module: serverModule, transport: TransportKind.ipc },
+    debug: {
+      module: serverModule,
+      transport: TransportKind.ipc,
+      options: debugOptions,
+    },
+  };
+
+  // Options to control the language client
+  const clientOptions: LanguageClientOptions = {
+    documentSelector: [{ scheme: 'file', pattern: '**' }],
+    // synchronize: {
+    //   // Notify the server about file changes to '.clientrc files contained in the workspace
+    //   fileEvents: workspace.createFileSystemWatcher('**/.clientrc'),
+    // },
+  };
+
+  // Create the language client and start the client.
+  client = new LanguageClient(
+    'colorizeServer',
+    'Colorize Server',
+    serverOptions,
+    clientOptions,
+  );
+
+  // Start the client. This will also launch the server
+  return client.start();
 }
 
 // this method is called when your extension is deactivated
