@@ -21,3 +21,4 @@ testem.log
 .env*
 .vscode-test
 
+**/*.tsbuildinfo
