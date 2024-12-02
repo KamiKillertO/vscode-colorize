@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "Node16" /* Specify what module code is generated. */,
+    "moduleResolution": "Node16" /* Specify how TypeScript looks up a file from a given module specifier. */,
+    "target": "ES2023",
+    "outDir": "out",
+    "rootDir": "src",
+    "sourceMap": true,
+    "strict": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}
