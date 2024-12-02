@@ -1,0 +1,31 @@
+{
+  "name": "vscode-colorize-client",
+  "description": "Client side of vscode-colorize",
+  "version": "0.14.0",
+  "publisher": "kamikillerto",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kamikillerto/vscode-colorize.git"
+  },
+  "engines": {
+    "vscode": "^1.82.0"
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src/"
+  },
+  "devDependencies": {
+    "glob": "11.0.0"
+  },
+  "dependencies": {
+    "minimatch": "^10.0.1"
+  }
+}
