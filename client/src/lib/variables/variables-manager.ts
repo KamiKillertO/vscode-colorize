@@ -60,7 +60,9 @@ class VariablesManager {
     fileName: string,
     fileLines: DocumentLine[],
   ) {
-    return VariablesExtractor.extractDeclarations(fileName, fileLines);
+    return VariablesExtractor.extractDeclarations(fileName, fileLines).then(
+      () => this.updateVariableExtractionCount(),
+    );
   }
 
   public findVariables(fileName: string, fileLines: DocumentLine[]) {
