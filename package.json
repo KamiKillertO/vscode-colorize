@@ -7,7 +7,7 @@
   "license": "Apache-2.0",
   "icon": "assets/logo.png",
   "engines": {
-    "vscode": "^1.54.0"
+    "vscode": "^1.82.0"
   },
   "categories": [
     "Other"
@@ -34,7 +34,11 @@
   "activationEvents": [
     "*"
   ],
-  "main": "./out/src/extension",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "main": "./client/out/extension.js",
   "contributes": {
     "configuration": {
       "title": "Colorize",
@@ -186,23 +190,23 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run package",
-    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "vscode:prepublish": "npm run package --workspaces --if-present",
+    "compile": "npm run compile --workspaces --if-present",
     "watch": "npm-run-all -p watch:*",
     "watch:esbuild": "node esbuild.js --watch",
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
-    "package": "npm run check-types && npm run lint && node esbuild.js --production",
-    "compile-tests": "tsc -p . --outDir out",
-    "check-types": "tsc --noEmit",
-    "lint": "eslint src/ test/",
-    "test": "npm run compile-tests && node ./out/test/runTest.js"
+    "check-types": "npm run check-types --workspaces --if-present",
+    "package": "npm run package --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test-e2e": "npm run compile-tests --workspaces --if-present && sh ./scripts/e2e.sh",
+    "test": "npm run test --workspaces --if-present && npm run test-e2e"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
     "@types/chai": "5.0.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "^20.17.9",
-    "@types/vscode": "^1.54.0",
+    "@types/vscode": "^1.82.0",
     "@typescript-eslint/eslint-plugin": "^8.16.0",
     "@typescript-eslint/parser": "^8.16.0",
     "@vscode/test-electron": "^2.4.1",
@@ -211,16 +215,11 @@
     "eslint": "^9.15.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
-    "globby": "^14.0.2",
     "mocha": "^11.0.0",
     "npm-run-all": "^4.1.5",
-    "glob": "11.0.0",
     "prettier": "^3.4.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.16.0"
-  },
-  "dependencies": {
-    "minimatch": "^10.0.1"
   }
 }

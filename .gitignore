@@ -3,10 +3,10 @@
 # compiled output
 /dist
 /tmp
-/out
+out
 
 # dependencies
-/node_modules
+node_modules
 /bower_components
 
 # misc
