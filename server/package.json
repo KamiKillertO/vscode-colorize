@@ -12,6 +12,12 @@
     "type": "git",
     "url": "https://github.com/linthtml/vscode-linthtml"
   },
+  "scripts": {
+    "compile": "tsc -b",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run compile",
+    "lint": "eslint src/"
+  },
   "dependencies": {
     "vscode-uri": "^3.0.8",
     "vscode-languageserver": "^9.0.1",
