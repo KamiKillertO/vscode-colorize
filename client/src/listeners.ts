@@ -112,17 +112,17 @@ function getRemovedLines(
   positions: DecoPositionMaybeUpdate[],
 ) {
   editedLine.reverse();
-  editedLine.forEach((line: TextDocumentContentChangeEvent) => {
-    for (let i = line.range.start.line; i <= line.range.end.line; i++) {
-      // ?
-      // for (let i = line.range.start.line; i <= context.editor.document.lineCount; i++) {
-      VariablesManager.deleteVariableInLine(
-        extension.editor?.document.fileName as string,
-        i,
-      );
-    }
+  editedLine.forEach(({ range }) => {
+    const lines = Array(range.end.line - range.start.line + 1)
+      .fill(0)
+      .map((_, i) => i + range.start.line);
 
-    positions = updatePositionsDeletion(line.range, positions);
+    VariablesManager.deleteVariableInLine(
+      extension.editor?.document.fileName as string,
+      lines,
+    );
+
+    positions = updatePositionsDeletion(range, positions);
   });
   return editedLine;
 }
