@@ -155,6 +155,7 @@ connection.onRequest(
     const files = globbySync(request.includes, {
       cwd: request.rootFolder,
       ignore: request.excludes,
+      absolute: true,
     });
 
     const filesContent = files.map((fileName) => {
