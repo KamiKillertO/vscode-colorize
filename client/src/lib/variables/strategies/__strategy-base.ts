@@ -127,11 +127,11 @@ export default class VariableStrategy {
         variable.name,
         variable.location.fileName,
       );
-      if (declaration.color === undefined) {
+      if (declaration?.color === undefined) {
         declaration = this.store.findClosestDeclaration(variable.name, '.');
       }
 
-      if (declaration.color) {
+      if (declaration?.color) {
         color = new Color(
           declaration.color.alpha === -1
             ? declaration.color.value

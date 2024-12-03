@@ -62,7 +62,9 @@ class VariablesStore {
   }
 
   public get count() {
-    return this.entries.size;
+    return Array.from(this.entries.values()).filter(
+      (values) => values.length !== 0,
+    ).length;
   }
 
   // need to create a proxy (?) to always return the same variable.
