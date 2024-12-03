@@ -85,12 +85,16 @@ class VariablesManager {
     VariablesExtractor.enableStrategies(extractors);
   }
 
-  public deleteVariableInLine(fileName: string, line: number) {
-    VariablesExtractor.deleteVariableInLine(fileName, line);
+  public deleteVariableInLine(fileName: string, lines: number[]) {
+    lines.forEach((line) =>
+      VariablesExtractor.deleteVariableInLine(fileName, line),
+    );
+    this.updateVariableExtractionCount();
   }
 
   public removeVariablesDeclarations(fileName: string) {
     VariablesExtractor.removeVariablesDeclarations(fileName);
+    this.updateVariableExtractionCount();
   }
 }
 
