@@ -1,6 +1,0 @@
-{
-  "extends": "../.eslintrc.base.js",
-  "rules": {
-    "no-console": "error"
-  }
-}
