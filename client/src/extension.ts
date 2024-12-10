@@ -403,7 +403,7 @@ async function triggerVariablesExtraction(textDocument: TextDocument) {
   const workspaceFolder = workspace.getWorkspaceFolder(textDocument.uri);
   const filesContent: [{ fileName: string; content: DocumentLine[] }] =
     await client.sendRequest('colorize_extract_variables', {
-      rootFolder: workspaceFolder?.uri.path,
+      rootFolder: workspaceFolder?.uri.fsPath,
       includes: config.filesToIncludes.concat(config.inferredFilesToInclude), // let server infer ? What about activated languages ??
       excludes: config.filesToExcludes,
     });
