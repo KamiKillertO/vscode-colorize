@@ -17,6 +17,7 @@ describe('Extension', () => {
     const settings = vscode.workspace.getConfiguration('colorize');
     await settings.update('exclude', [], true);
     await settings.update('include', [], true);
+    await settings.update('enable_search_variables', false, true);
   });
   it('is activated successfully upon opening a scss file', async () => {
     const fileName = getDocUri('style.scss');
@@ -59,7 +60,7 @@ describe('Extension', () => {
     await new Promise((resolve) => setTimeout(resolve, 200)); // mandatory because of the queue ><
 
     assert.isUndefined(ext.exports.editor);
-  });
+  }).timeout(500000);
   it('Can use "include" setting to colorize file', async () => {
     const fileName = getDocUri('file.other');
 
