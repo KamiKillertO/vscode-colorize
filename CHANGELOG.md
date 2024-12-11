@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.15.0
+
+### Refactor
+
+Moving to an [LSP](https://code.visualstudio.com/api/language-extensions/language-server-extension-guide) extension, this will allow the extension to perform heavy operations on a node server without slowing down the VSCode app.
+For now only the initial variables search and extraction has been moved to the server side.
+
 ## 0.14.0
 
 ### Features
