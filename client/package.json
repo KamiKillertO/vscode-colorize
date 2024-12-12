@@ -26,6 +26,7 @@
     "glob": "11.0.0"
   },
   "dependencies": {
+    "colorjs.io": "^0.5.2",
     "minimatch": "^10.0.1"
   }
 }
