@@ -213,7 +213,7 @@
     "@vscode/test-electron": "^2.4.1",
     "chai": "^4.5.0",
     "esbuild": "^0.24.0",
-    "eslint": "^9.15.0",
+    "eslint": "^9.16.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
     "mocha": "^11.0.0",
