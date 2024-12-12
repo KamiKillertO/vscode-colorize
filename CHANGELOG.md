@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.15.1
+
+### Fix
+
+Use Colorjs.io to extract oklab and oklch color and fix text decoration color to ensure maximum contrast.
+
 ## 0.15.0
 
 ### Refactor
