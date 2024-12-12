@@ -11,6 +11,7 @@ import '../colors/strategies/oklch-strategy';
 import ColorExtractor from '../colors/color-extractor';
 import ColorDecoration from '../colors/color-decoration';
 import type { Range, TextEditorDecorationType } from 'vscode';
+import { default as ColorJS } from 'colorjs.io';
 
 interface DocumentLine {
   line: number;
@@ -111,48 +112,13 @@ class ColorUtil {
   }
 }
 
-/**
- * Generate the color luminance.
- * The luminance value is between 0 and 1
- * - 1 means that the color is light
- * - 0 means that the color is dark
- *
- * @static
- * @param {Color} color
- * @returns {number}
- */
-function colorLuminance(color: Color) {
-  const rgb = color.rgb.map((c) => {
-    c = c / 255;
-    if (c < 0.03928) {
-      c = c / 12.92;
-    } else {
-      c = (c + 0.055) / 1.055;
-      c = Math.pow(c, 2.4);
-    }
-    return c;
-  });
-  return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
-}
-
 function generateOptimalTextColor(color: Color) {
-  const luminance: number = colorLuminance(color);
-  const contrastRatioBlack: number = (luminance + 0.05) / 0.05;
+  const c = new ColorJS(color.toRgbaString());
 
-  if (contrastRatioBlack > 7) {
-    return BLACK;
-  }
+  const onWhite = c.contrastWCAG21(WHITE);
+  const onBlack = c.contrastWCAG21(BLACK);
 
-  const contrastRatioWhite: number = 1.05 / (luminance + 0.05);
-  if (contrastRatioWhite > 7) {
-    return WHITE;
-  }
-
-  if (contrastRatioBlack > contrastRatioWhite) {
-    return BLACK;
-  }
-
-  return WHITE;
+  return onWhite > onBlack ? WHITE : BLACK;
 }
 /**
  * Converts an RGB color value to HSL. Conversion formula
@@ -277,7 +243,6 @@ export default ColorUtil;
 export {
   IDecoration,
   convertHslaToRgba,
-  colorLuminance,
   convertRgbaToHsla,
   generateOptimalTextColor,
   flattenLineExtractionsFlatten,
