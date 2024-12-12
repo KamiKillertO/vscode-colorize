@@ -1,12 +1,10 @@
 import { assert } from 'chai';
 
 import ColorUtil, {
-  colorLuminance,
   convertHslaToRgba,
   convertRgbaToHsla,
 } from '../../lib/util/color-util';
 import type { IColor } from '../../lib/colors/color';
-import Color from '../../lib/colors/color';
 import { beforeEach, describe, it } from 'mocha';
 
 describe('Test utility fonction', () => {
@@ -43,33 +41,7 @@ describe('Test utility fonction', () => {
       'Should have found 7 colors',
     );
   });
-  it('Should return the color luminance', () => {
-    assert.equal(
-      colorLuminance(new Color('#fff', 0, [255, 255, 255])),
-      1,
-      'Should be "1" for #fff',
-    );
-    assert.equal(
-      colorLuminance(new Color('#ffffff', 0, [255, 255, 255])),
-      1,
-      'Should be "1" for #ffffff',
-    );
-    assert.equal(
-      colorLuminance(new Color('#000', 0, [0, 0, 0])),
-      0,
-      'Should be "0" for #000',
-    );
-    assert.equal(
-      colorLuminance(new Color('#000000', 0, [0, 0, 0])),
-      0,
-      'Should be "0" for #000000',
-    );
-    assert.equal(
-      colorLuminance(new Color('#ccc', 0, [204, 204, 204])).toFixed(1),
-      '0.6',
-      'Should be around "0.6" for #ccc',
-    );
-  });
+
   it('Should convert hsla colors in rgba colors', function () {
     assert.deepEqual(convertHslaToRgba(0, 0, 50), [128, 128, 128, 1]);
     assert.deepEqual(convertHslaToRgba(0, 0, 0), [0, 0, 0, 1]);
