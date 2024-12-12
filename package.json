@@ -190,7 +190,8 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run package --workspaces --if-present",
+    "vscode:prepublish": "npm run clean; npm run package --workspaces --if-present",
+    "clean": "rimraf server/out client/out out",
     "compile": "npm run compile --workspaces --if-present",
     "watch": "npm-run-all -p watch:*",
     "watch:esbuild": "npm run watch:esbuild --workspaces --if-present",
@@ -218,6 +219,7 @@
     "mocha": "^11.0.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.4.1",
+    "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.16.0"
