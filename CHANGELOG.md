@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.15.2
+
+### Fix
+
+Send correct text extract to colorjs.io when creating oklab and oklch colors.
+
 ## 0.15.1
 
 ### Fix
