@@ -15,7 +15,7 @@ export const REGEXP = new RegExp(`(${OKLCH_SYNTAX})${EOL}`, 'gi');
 export const REGEXP_ONE = new RegExp(`^(${OKLCH_SYNTAX})${EOL}`, 'i');
 
 function getColor(match: RegExpExecArray) {
-  const color = new ColorJS(match[0]);
+  const color = new ColorJS(match[1]);
 
   const [r, g, b] = color.srgb.map((v) => v * 255);
   return new Color(match[1], match.index, [r, g, b], color.alpha);
