@@ -50,7 +50,7 @@ For example, if you want to colorize colors in `javascript` files, you just need
   ]
 ```
 
-### colorize.enable*search_variables \_BOOLEAN* \_default: true
+### colorize.enable_search_variables _BOOLEAN default: true_
 
 By default colorize read and parse all files, in your workspace, that are targeted by the settings [colorize.languages](#colorizelanguages), [colorize.include](#colorizeinclude), and [colorize.exlude](#colorizeexclude) to extract extract all variables. Thanks to this behavior all variables will have colored background even if you never open the file containing the declaration. _⚠️ This setting can slown down vscode at opening_
 
@@ -62,11 +62,46 @@ Configure glob patterns for including files and folders. By default Colorize is 
 
 Configure glob patterns for excluding files and folders. Colorize will not colorized colors in these files and folders and it'll also not search for variables inside. Read more about glob patterns [here](https://code.visualstudio.com/docs/editor/codebasics#_advanced-search-options).
 
-### colorize.hide*current_line_decorations \_BOOLEAN* _default: true_
+### colorize.hide_current_line_decorations _BOOLEAN default: true_
 
 By default, decorations for the current line are hidden. Set this setting to `false` if you want to deactivate this behavior.
 
-### colorize.colorized*colors \_ARRAY*
+### colorize.decoration_type _STRING default: "background"_
+
+Defines the type of decoration to use. The possible values are:
+
+<table>
+  <tr>
+    <th>background</th>
+    <th>underline</th>
+    <th>outline</th>
+  </tr>
+  <tr>
+    <td>
+      <img src='https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/decoration_background.png'/>
+    </td>
+    <td>
+      <img src='https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/decoration_underline.png'/>
+    </td>
+    <td>
+      <img src='https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/decoration_outline.png'/>
+    </td>
+  </tr>
+  <tr>
+    <th>dot</th>
+    <th>square-dot</th>
+  </tr>
+  <tr>
+    <td>
+      <img src='https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/decoration_dot.png'/>
+    </td>
+    <td>
+      <img src='https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/decoration_square-dot.png'/>
+    </td>
+  </tr>
+</table>
+
+### colorize.colorized_colors _ARRAY_
 
 This options allow you to enable/disable colorization for a type of colors.
 
