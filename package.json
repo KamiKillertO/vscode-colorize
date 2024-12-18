@@ -149,7 +149,10 @@
           "type": "string",
           "enum": [
             "background",
-            "underline"
+            "underline",
+            "outline",
+            "dot",
+            "square-dot"
           ],
           "default": "background"
         },
