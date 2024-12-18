@@ -1,9 +1,5 @@
 import { unique } from './util/array';
-import type {
-  WorkspaceConfiguration,
-  Extension,
-  TextEditorDecorationType,
-} from 'vscode';
+import type { Extension, TextEditorDecorationType } from 'vscode';
 import { workspace, extensions, window, DecorationRangeBehavior } from 'vscode';
 import { generateOptimalTextColor } from './util/color-util';
 import type Color from './colors/color';
@@ -24,7 +20,7 @@ interface ColorizeConfig {
 }
 
 function getColorizeConfig(): ColorizeConfig {
-  const configuration: WorkspaceConfiguration = workspace.getConfiguration(
+  const configuration = workspace.getConfiguration(
     'colorize',
     window.activeTextEditor?.document,
   );
@@ -70,6 +66,40 @@ function generateDecorationType(
           borderWidth: '0 0 2px 0',
           borderStyle: 'solid',
           borderColor: color.toRgbString(),
+          rangeBehavior: DecorationRangeBehavior.ClosedClosed,
+        });
+      };
+    case 'outline':
+      return function (color: Color) {
+        return window.createTextEditorDecorationType({
+          borderWidth: '1px',
+          borderStyle: 'solid',
+          borderColor: color.toRgbString(),
+          rangeBehavior: DecorationRangeBehavior.ClosedClosed,
+        });
+      };
+    case 'dot':
+      return function (color: Color) {
+        return window.createTextEditorDecorationType({
+          after: {
+            margin: '0 0 0 5px',
+            contentText: '⬤',
+            color: color.toRgbaString(),
+          },
+          rangeBehavior: DecorationRangeBehavior.ClosedClosed,
+        });
+      };
+    case 'square-dot':
+      return function (color: Color) {
+        const fontSize = workspace.getConfiguration('editor').get('fontSize');
+        return window.createTextEditorDecorationType({
+          after: {
+            height: `${fontSize as string}px`,
+            width: `${fontSize as string}px`,
+            margin: '0 0 0 5px',
+            backgroundColor: color.toRgbaString(),
+            contentText: '',
+          },
           rangeBehavior: DecorationRangeBehavior.ClosedClosed,
         });
       };
