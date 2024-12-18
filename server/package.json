@@ -1,0 +1,36 @@
+{
+  "name": "vscode-colorize-server",
+  "version": "0.1.0",
+  "license": "Apache License 2.0",
+  "author": "Benjamin JEGARD",
+  "publisher": "kamikillerto",
+  "type": "module",
+  "engines": {
+    "node": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/linthtml/vscode-linthtml"
+  },
+  "scripts": {
+    "compile": "tsc -b",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && npm run lint && webpack --mode production --config ./webpack.config.cjs",
+    "watch": "npm-run-all -p watch:*",
+    "compile-tests": "tsc -p . --outDir out",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src/"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.9",
+    "webpack-cli": "5.1.4",
+    "webpack": "5.97.1",
+    "ts-loader": "9.5.1"
+  },
+  "dependencies": {
+    "vscode-uri": "^3.0.8",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.12",
+    "globby": "^14.0.2"
+  }
+}

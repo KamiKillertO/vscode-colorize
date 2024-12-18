@@ -75,8 +75,10 @@ Available colors are :
 - `HEXA`: for hexadecimal colors: `#RGB`, `#RGBA`, `#RRGGBB`, `#RRGGBBAA`, `0xRGB`, `0xRGBA`, `0xRRGGBB` or `0xRRGGBBAA`
 - `ARGB`: for argb colors: `#RGB`, `#ARGB`, `#RRGGBB` or `#AARRGGBB`
 - `RGB`: for rgb colors: `rgb(r,g,b)` or `rgba(r,g,b,a)`
-- `HSL`: for HSL colors: `hsl(h,s,l)` or `hsla(h,s,l,a)`
+- `HSL`: for [HSL colors](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl)
 - `BROWSERS_COLORS`: for native browser's colors like `white`, `red`, `blue`...
+- `OKLAB`: for [oklab colors](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklab)
+- `OKLCH`: for [oklch colors](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch)
 
 For example, if you want to only colorize hexa colors (`#fff, #ffffff, 0xFFF`) in your files you can update the option like this :
 

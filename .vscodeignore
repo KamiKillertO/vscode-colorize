@@ -2,8 +2,10 @@
 .vscode-test/**
 out/test/**
 test/**
-src/**
+{client,server}/src/**
 **/*.map
 .gitignore
-tsconfig.json
-vsc-extension-quickstart.md
+.github
+node_modules
+client/node_modules/**
+server/node_modules/**

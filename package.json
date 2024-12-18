@@ -2,12 +2,12 @@
   "name": "vscode-colorize",
   "displayName": "colorize",
   "description": "A vscode extension to help visualize css colors in files.",
-  "version": "0.12.1",
+  "version": "0.15.2",
   "publisher": "kamikillerto",
   "license": "Apache-2.0",
   "icon": "assets/logo.png",
   "engines": {
-    "vscode": "^1.54.0"
+    "vscode": "^1.82.0"
   },
   "categories": [
     "Other"
@@ -34,7 +34,11 @@
   "activationEvents": [
     "*"
   ],
-  "main": "./out/src/extension",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "main": "./client/out/extension.js",
   "contributes": {
     "configuration": {
       "title": "Colorize",
@@ -155,7 +159,9 @@
             "BROWSERS_COLORS",
             "HEXA",
             "RGB",
-            "HSL"
+            "HSL",
+            "OKLAB",
+            "OKLCH"
           ],
           "items": {
             "enum": [
@@ -163,7 +169,9 @@
               "HEXA",
               "RGB",
               "HSL",
-              "ARGB"
+              "ARGB",
+              "OKLAB",
+              "OKLCH"
             ],
             "description": "You should enter a valid extractor",
             "uniqueItems": true
@@ -182,32 +190,38 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "lint": "eslint .",
-    "test": "npm run vscode:prepublish && node ./out/test/runTest.js"
+    "vscode:prepublish": "npm run clean; npm run package --workspaces --if-present",
+    "clean": "rimraf server/out client/out out",
+    "compile": "npm run compile --workspaces --if-present",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "npm run watch:esbuild --workspaces --if-present",
+    "watch:tsc": "npm run watch:tsc --workspaces --if-present",
+    "check-types": "npm run check-types --workspaces --if-present",
+    "package": "npm run package --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test-e2e": "npm run compile-tests --workspaces --if-present && sh ./scripts/e2e.sh",
+    "test": "npm run test --workspaces --if-present && npm run test-e2e"
   },
   "devDependencies": {
+    "@eslint/js": "^9.15.0",
     "@types/chai": "5.0.0",
-    "@types/glob": "^8.1.0",
-    "@types/mocha": "^10.0.9",
-    "@types/node": "^12.0.0",
-    "@types/vscode": "^1.54.0",
-    "@typescript-eslint/eslint-plugin": "^8.8.1",
-    "@typescript-eslint/parser": "^8.8.1",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^20.17.9",
+    "@types/vscode": "^1.82.0",
+    "@typescript-eslint/eslint-plugin": "^8.16.0",
+    "@typescript-eslint/parser": "^8.16.0",
     "@vscode/test-electron": "^2.4.1",
     "chai": "^4.5.0",
-    "eslint": "^8.57.0",
-    "eslint-plugin-prettier": "^5.2.1",
+    "esbuild": "^0.24.0",
+    "eslint": "^9.15.0",
     "eslint-config-prettier": "^9.1.0",
-    "globby": "^14.0.2",
-    "mocha": "^10.7.3",
+    "eslint-plugin-prettier": "^5.2.1",
+    "mocha": "^11.0.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.4.1",
+    "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
-    "prettier": "^3.3.3",
-    "typescript": "^5.6.2"
-  },
-  "dependencies": {
-    "minimatch": "^10.0.1"
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.16.0"
   }
 }

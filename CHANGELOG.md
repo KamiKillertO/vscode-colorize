@@ -1,5 +1,41 @@
 # Changelog
 
+## 0.15.2
+
+### Fix
+
+Send correct text extract to colorjs.io when creating oklab and oklch colors.
+
+## 0.15.1
+
+### Fix
+
+Use Colorjs.io to extract oklab and oklch color and fix text decoration color to ensure maximum contrast.
+
+## 0.15.0
+
+### Refactor
+
+Moving to an [LSP](https://code.visualstudio.com/api/language-extensions/language-server-extension-guide) extension, this will allow the extension to perform heavy operations on a node server without slowing down the VSCode app.
+For now only the initial variables search and extraction has been moved to the server side.
+
+## 0.14.0
+
+### Features
+
+- Activate oklab and oklch colorization by default
+- Use default color theme for colorize status item
+
+## Chore
+
+- Use esbuild to bundle extension
+
+## 0.13.0
+
+### Features
+
+- Generate colorization for oklab and oklch colors
+
 ## 0.12.0
 
 ### Features
