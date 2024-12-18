@@ -1,7 +1,7 @@
 {
   "name": "vscode-colorize-client",
   "description": "Client side of vscode-colorize",
-  "version": "0.15.2",
+  "version": "0.16.0",
   "publisher": "kamikillerto",
   "license": "Apache-2.0",
   "repository": {

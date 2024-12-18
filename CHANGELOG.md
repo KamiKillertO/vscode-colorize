@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.16.0
+
+- [FEAT] Add 3 new decorations type `outline`, `dot` and `square-dot`
+
 ## 0.15.2
 
 ### Fix
