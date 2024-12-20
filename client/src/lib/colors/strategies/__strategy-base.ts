@@ -19,9 +19,16 @@ export default class ColorStrategy implements IColorStrategy {
         const colors: Color[] = [];
 
         while ((match = this.REGEXP.exec(text)) !== null) {
-          const color = this.colorFromRegexp(match);
-          if (color) {
-            colors.push(color);
+          try {
+            const color = this.colorFromRegexp(match);
+            if (color) {
+              colors.push(color);
+            }
+          } catch (error) {
+            console.error(
+              `Color extractor ${this.name}: Failed to extract color with following error.`,
+            );
+            console.error(error);
           }
         }
         return {

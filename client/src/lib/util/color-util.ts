@@ -7,6 +7,9 @@ import '../colors/strategies/browser-strategy';
 import '../colors/strategies/hsl-strategy';
 import '../colors/strategies/oklab-strategy';
 import '../colors/strategies/oklch-strategy';
+import '../colors/strategies/hwb-strategy';
+import '../colors/strategies/lab-strategy';
+import '../colors/strategies/lch-strategy';
 
 import ColorExtractor from '../colors/color-extractor';
 import ColorDecoration from '../colors/color-decoration';
