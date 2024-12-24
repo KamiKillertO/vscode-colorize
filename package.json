@@ -212,7 +212,7 @@
     "@types/node": "^20.17.9",
     "@types/vscode": "^1.82.0",
     "@typescript-eslint/eslint-plugin": "^8.16.0",
-    "@typescript-eslint/parser": "^8.16.0",
+    "@typescript-eslint/parser": "^8.18.2",
     "@vscode/test-electron": "^2.4.1",
     "chai": "^4.5.0",
     "esbuild": "^0.24.0",
