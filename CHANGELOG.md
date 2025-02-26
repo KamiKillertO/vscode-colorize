@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.17.0
+
+- [FEAT] Add new config `colorize.ruler_decoration` to show the decorated colors in the ruler overview.
+- [FIX] Correctly extract hsl(a) colors when they are followed by a comma.
+
 ## 0.16.0
 
 - [FEAT] Add 3 new decorations type `outline`, `dot` and `square-dot`
