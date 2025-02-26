@@ -188,6 +188,11 @@
           "default": true,
           "type": "boolean",
           "markdownDescription": "When vscode starts, Colorize fetch all files targeted by the settings `colorize.include` and `colorize.languages` but not the ones targeted by the setting `colorize.exclude`. When the fetch is done, colorize open and parse all files searching for variables. That way variables will be colorized in every files. _⚠️ this setting can slown down your editor a little at opening time, read this [issue](https://github.com/KamiKillertO/vscode-colorize/issues/174) to learn more about it._"
+        },
+        "colorize.ruler_decoration": {
+          "default": true,
+          "description": "Show colors on the overview ruler (scroll bar)",
+          "type": "boolean"
         }
       }
     }

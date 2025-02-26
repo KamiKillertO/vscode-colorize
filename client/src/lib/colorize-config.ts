@@ -1,5 +1,9 @@
 import { unique } from './util/array';
-import type { Extension, TextEditorDecorationType } from 'vscode';
+import type {
+  DecorationRenderOptions,
+  Extension,
+  TextEditorDecorationType,
+} from 'vscode';
 import { workspace, extensions, window, DecorationRangeBehavior } from 'vscode';
 import { generateOptimalTextColor } from './util/color-util';
 import type Color from './colors/color';
@@ -52,47 +56,60 @@ function getColorizeConfig(): ColorizeConfig {
     filesToExcludes,
     inferredFilesToInclude,
     searchVariables,
-    decorationFn: generateDecorationType(configuration.get('decoration_type')),
+    decorationFn: generateDecorationType(
+      configuration.get('decoration_type'),
+      configuration.get('ruler_decoration'),
+    ),
   };
 }
 
 function generateDecorationType(
   decorationType = 'background',
+  rulerDecoration?: boolean,
 ): (color: Color) => TextEditorDecorationType {
-  switch (decorationType) {
-    case 'underline':
-      return function (color: Color) {
-        return window.createTextEditorDecorationType({
+  return function (color: Color) {
+    let decorationOptions: DecorationRenderOptions = {
+      rangeBehavior: DecorationRangeBehavior.ClosedClosed,
+    };
+
+    if (rulerDecoration) {
+      decorationOptions = {
+        ...decorationOptions,
+        overviewRulerColor: color.toRgbaString(),
+      };
+    }
+
+    switch (decorationType) {
+      case 'underline':
+        decorationOptions = {
+          ...decorationOptions,
           borderWidth: '0 0 2px 0',
           borderStyle: 'solid',
           borderColor: color.toRgbString(),
-          rangeBehavior: DecorationRangeBehavior.ClosedClosed,
-        });
-      };
-    case 'outline':
-      return function (color: Color) {
-        return window.createTextEditorDecorationType({
+        };
+        break;
+      case 'outline':
+        decorationOptions = {
+          ...decorationOptions,
           borderWidth: '1px',
           borderStyle: 'solid',
           borderColor: color.toRgbString(),
-          rangeBehavior: DecorationRangeBehavior.ClosedClosed,
-        });
-      };
-    case 'dot':
-      return function (color: Color) {
-        return window.createTextEditorDecorationType({
+        };
+        break;
+      case 'dot':
+        decorationOptions = {
+          ...decorationOptions,
           after: {
             margin: '0 0 0 5px',
             contentText: '⬤',
             color: color.toRgbaString(),
           },
-          rangeBehavior: DecorationRangeBehavior.ClosedClosed,
-        });
-      };
-    case 'square-dot':
-      return function (color: Color) {
+        };
+        break;
+      case 'square-dot':
         const fontSize = workspace.getConfiguration('editor').get('fontSize');
-        return window.createTextEditorDecorationType({
+        decorationOptions = {
+          ...decorationOptions,
           after: {
             height: `${fontSize as string}px`,
             width: `${fontSize as string}px`,
@@ -100,14 +117,13 @@ function generateDecorationType(
             backgroundColor: color.toRgbaString(),
             contentText: '',
           },
-          rangeBehavior: DecorationRangeBehavior.ClosedClosed,
-        });
-      };
-    case 'background':
-    default:
-      return function (color: Color) {
+        };
+        break;
+      case 'background':
+      default:
         const rgbaString = color.toRgbaString();
-        return window.createTextEditorDecorationType({
+        decorationOptions = {
+          ...decorationOptions,
           borderWidth: '1px',
           borderStyle: 'solid',
           borderColor: rgbaString,
@@ -120,10 +136,12 @@ function generateDecorationType(
             background-position: 0 0, 5px 5px;
           `,
           color: generateOptimalTextColor(color),
-          rangeBehavior: DecorationRangeBehavior.ClosedClosed,
-        });
-      };
-  }
+        };
+        break;
+    }
+
+    return window.createTextEditorDecorationType(decorationOptions);
+  };
 }
 
 function inferFilesToInclude(languagesConfig: string[]) {
