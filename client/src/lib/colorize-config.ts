@@ -78,6 +78,8 @@ function generateDecorationType(
         overviewRulerColor: color.toRgbaString(),
       };
     }
+    const fontSize = workspace.getConfiguration('editor').get('fontSize');
+    const rgbaString = color.toRgbaString();
 
     switch (decorationType) {
       case 'underline':
@@ -102,26 +104,24 @@ function generateDecorationType(
           after: {
             margin: '0 0 0 5px',
             contentText: '⬤',
-            color: color.toRgbaString(),
+            color: rgbaString,
           },
         };
         break;
       case 'square-dot':
-        const fontSize = workspace.getConfiguration('editor').get('fontSize');
         decorationOptions = {
           ...decorationOptions,
           after: {
             height: `${fontSize as string}px`,
             width: `${fontSize as string}px`,
             margin: '0 0 0 5px',
-            backgroundColor: color.toRgbaString(),
+            backgroundColor: rgbaString,
             contentText: '',
           },
         };
         break;
       case 'background':
       default:
-        const rgbaString = color.toRgbaString();
         decorationOptions = {
           ...decorationOptions,
           borderWidth: '1px',
