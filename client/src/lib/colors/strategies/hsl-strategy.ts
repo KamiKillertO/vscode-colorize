@@ -66,7 +66,7 @@ function extractHSLValue(value: string) {
 }
 
 function getColor(match: RegExpExecArray) {
-  const value = match[0];
+  const value = match[1];
   const [h, s, l, a] = extractHSLValue(value);
   if (s <= 100 && l <= 100) {
     const [r, g, b] = convertHslaToRgba(h, s, l, a);
