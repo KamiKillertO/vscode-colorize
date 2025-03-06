@@ -23,6 +23,9 @@ interface LineExtraction {
   colors: IColor[];
 }
 
+export const clearDecoration = (decoration: IDecoration) =>
+  decoration.dispose();
+
 const flattenLineExtractionsFlatten = (
   arr: LineExtraction[][] | LineExtraction[],
 ) => arr.flat(2).filter((_) => _.colors.length !== 0);

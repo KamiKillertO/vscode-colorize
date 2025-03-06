@@ -16,7 +16,7 @@ import type {
   DocumentLine,
   LineExtraction,
 } from './lib/util/color-util';
-import ColorUtil from './lib/util/color-util';
+import ColorUtil, { clearDecoration } from './lib/util/color-util';
 import Queue from './lib/queue';
 import VariablesManager from './lib/variables/variables-manager';
 import CacheManager from './lib/cache-manager';
@@ -372,6 +372,9 @@ function cleanDecorationList(context: ColorizeContext, cb: () => void) {
 }
 
 function clearCache() {
+  extension.deco.forEach((line) => {
+    line.forEach(clearDecoration);
+  });
   extension.deco.clear();
   extension.deco = new Map();
   CacheManager.clearCache();

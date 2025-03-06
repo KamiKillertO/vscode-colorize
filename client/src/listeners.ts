@@ -21,7 +21,7 @@ import type {
   DocumentLine,
   LineExtraction,
 } from './lib/util/color-util';
-import ColorUtil from './lib/util/color-util';
+import ColorUtil, { clearDecoration } from './lib/util/color-util';
 import VariablesManager from './lib/variables/variables-manager';
 import EditorManager from './lib/editor-manager';
 import { mutEditedLine } from './lib/util/mut-edited-line';
@@ -29,8 +29,6 @@ import { equals } from './lib/util/array';
 import TasksRunner from './lib/tasks-runner';
 
 const taskRuner = new TasksRunner();
-
-const clearDecoration = (decoration: IDecoration) => decoration.dispose();
 
 interface DecoPositionMaybeUpdate {
   old: number;
