@@ -43,7 +43,7 @@ let client: LanguageClient;
 
 let config: ColorizeConfig = {
   languages: [],
-  isHideCurrentLineDecorations: true,
+  shouldHideCurrentLineDecorations: true,
   colorizedVariables: [],
   colorizedColors: [],
   filesToExcludes: [],
@@ -110,11 +110,11 @@ async function initDecorations(context: ColorizeContext) {
   const colors: LineExtraction[] = await ColorUtil.findColors(lines);
   generateDecorations(colors, variables, context.deco);
 
-  return EditorManager.decorate(
-    context.editor,
-    context.deco,
-    context.currentSelection ?? [],
-  );
+  const skipLines = config.shouldHideCurrentLineDecorations
+    ? (context.currentSelection ?? [])
+    : [];
+
+  return EditorManager.decorate(context.editor, context.deco, skipLines);
 }
 
 function updateContextDecorations(
@@ -260,7 +260,7 @@ function handleTextSelectionChange(
   cb: () => void,
 ) {
   if (
-    !config.isHideCurrentLineDecorations ||
+    !config.shouldHideCurrentLineDecorations ||
     event.textEditor !== extension.editor
   ) {
     return cb();
@@ -313,9 +313,11 @@ async function colorize(editor: TextEditor, cb: () => void) {
   }
   extension.updateStatusBar(true);
   extension.editor = editor;
-  extension.currentSelection = editor.selections.map(
-    (selection: Selection) => selection.active.line,
-  );
+  if (config.shouldHideCurrentLineDecorations) {
+    extension.currentSelection = editor.selections.map(
+      (selection: Selection) => selection.active.line,
+    );
+  }
   const deco = CacheManager.getCachedDecorations(editor.document);
   if (deco) {
     extension.deco = deco;
@@ -324,7 +326,7 @@ async function colorize(editor: TextEditor, cb: () => void) {
     EditorManager.decorate(
       extension.editor,
       extension.deco,
-      extension.currentSelection,
+      extension.currentSelection ?? [],
     );
   } else {
     extension.nbLine = editor.document.lineCount;
@@ -460,9 +462,9 @@ function getVisibleFileEditors() {
 
 function colorizeVisibleTextEditors() {
   extension.nbLine = 65;
-  getVisibleFileEditors().forEach((editor) => {
-    q.push((cb) => colorize(editor, cb));
-  });
+  getVisibleFileEditors().forEach((editor) =>
+    q.push((cb) => colorize(editor, cb)),
+  );
 }
 
 let extension: ColorizeContext;

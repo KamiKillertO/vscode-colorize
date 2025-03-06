@@ -15,8 +15,6 @@ export const getDocPath = (p: string) => {
   return path.resolve(__dirname, '../../testFixture', p);
 };
 export const getDocUri = (p: string) => {
-  console.log(path.resolve(__dirname, '../../testFixture'));
-  console.log(getDocPath(p));
   return vscode.Uri.file(getDocPath(p));
 };
 

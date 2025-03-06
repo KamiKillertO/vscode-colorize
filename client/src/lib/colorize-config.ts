@@ -13,7 +13,7 @@ const backgroundImage =
 
 interface ColorizeConfig {
   languages: string[];
-  isHideCurrentLineDecorations: boolean;
+  shouldHideCurrentLineDecorations: boolean;
   colorizedVariables: string[];
   colorizedColors: string[];
   filesToExcludes: string[];
@@ -48,7 +48,7 @@ function getColorizeConfig(): ColorizeConfig {
   const searchVariables = configuration.get('enable_search_variables', false);
   return {
     languages,
-    isHideCurrentLineDecorations:
+    shouldHideCurrentLineDecorations:
       configuration.get('hide_current_line_decorations') ?? true,
     colorizedColors,
     colorizedVariables,
