@@ -9,6 +9,7 @@ import type {
   Selection,
   Range,
   StatusBarItem,
+  ConfigurationChangeEvent,
 } from 'vscode';
 import { window, workspace, StatusBarAlignment, ThemeColor } from 'vscode';
 import type {
@@ -380,7 +381,12 @@ function clearCache() {
   CacheManager.clearCache();
 }
 
-function handleConfigurationChanged() {
+function handleConfigurationChanged(event: ConfigurationChangeEvent) {
+  const is_colorize_affected = event.affectsConfiguration('colorize');
+  if (!is_colorize_affected) {
+    return;
+  }
+
   const newConfig = getColorizeConfig();
   clearCache();
   // delete current decorations then regenerate decorations
