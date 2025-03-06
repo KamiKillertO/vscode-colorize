@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.17.1
+
+- [FIX] #1010 Ignore config update event not affecting colorize settings. Also make sure to dispose decorations when clearing decoration cache.
+- [FIX] Make sur to respect `hide_current_line_decorations` value when generating/updating decorations.
+
 ## 0.17.0
 
 - [FEAT] Add new config `colorize.ruler_decoration` to show the decorated colors in the ruler overview.
