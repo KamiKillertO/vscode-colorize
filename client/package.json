@@ -12,16 +12,17 @@
     "vscode": "^1.82.0"
   },
   "scripts": {
-    "build": "node esbuild.js",
+    "build": "rolldown -c ./rolldown.config.ts",
     "watch:esbuild": "node esbuild.js --watch",
-    "package": "npm run build --- --production",
+    "package": "NODE_ENV=production npm run build",
     "compile-tests": "rm -rf out; tsc -p . --outDir out/",
     "check-types": "tsc --noEmit",
     "lint": "eslint src/"
   },
   "devDependencies": {
-    "vscode-languageclient": "^9.0.1",
-    "glob": "11.0.0"
+    "glob": "11.0.0",
+    "rolldown": "^1.0.0-beta.4",
+    "vscode-languageclient": "^9.0.1"
   },
   "dependencies": {
     "colorjs.io": "^0.5.2",
