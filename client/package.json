@@ -12,12 +12,10 @@
     "vscode": "^1.82.0"
   },
   "scripts": {
-    "compile": "node esbuild.js",
-    "watch": "npm-run-all -p watch:*",
+    "build": "node esbuild.js",
     "watch:esbuild": "node esbuild.js --watch",
-    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
-    "package": "npm run check-types && npm run lint && npm run compile --- --production",
-    "compile-tests": "tsc -p . --outDir out",
+    "package": "npm run build --- --production",
+    "compile-tests": "rm -rf out; tsc -p . --outDir out/",
     "check-types": "tsc --noEmit",
     "lint": "eslint src/"
   },
