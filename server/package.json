@@ -13,10 +13,9 @@
     "url": "https://github.com/linthtml/vscode-linthtml"
   },
   "scripts": {
-    "compile": "tsc -b",
+    "build": "tsc -b",
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
-    "package": "npm run check-types && npm run lint && webpack --mode production --config ./webpack.config.cjs",
-    "watch": "npm-run-all -p watch:*",
+    "package": "webpack --mode production --config ./webpack.config.cjs",
     "compile-tests": "tsc -p . --outDir out",
     "check-types": "tsc --noEmit",
     "lint": "eslint src/"

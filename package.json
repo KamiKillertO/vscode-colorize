@@ -38,6 +38,7 @@
     "client",
     "server"
   ],
+  "packageManager": "npm@10.8.0",
   "main": "./client/out/extension.js",
   "contributes": {
     "configuration": {
@@ -198,15 +199,15 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run clean; npm run package --workspaces --if-present",
-    "clean": "rimraf server/out client/out out",
-    "compile": "npm run compile --workspaces --if-present",
+    "vscode:prepublish": "npm run package",
+    "package": "npm run clean; turbo package",
+    "clean": "rimraf dist",
+    "build": "turbo build",
     "watch": "npm-run-all -p watch:*",
-    "watch:esbuild": "npm run watch:esbuild --workspaces --if-present",
     "watch:tsc": "npm run watch:tsc --workspaces --if-present",
-    "check-types": "npm run check-types --workspaces --if-present",
-    "package": "npm run package --workspaces --if-present",
-    "lint": "npm run lint --workspaces --if-present",
+    "watch:esbuild": "npm run watch:esbuild --workspaces --if-present",
+    "check-types": "turbo check-types",
+    "lint": "turbo lint",
     "test-e2e": "npm run compile-tests --workspaces --if-present && sh ./scripts/e2e.sh",
     "test": "npm run test --workspaces --if-present && npm run test-e2e"
   },
@@ -223,13 +224,18 @@
     "esbuild": "^0.24.0",
     "eslint": "^9.15.0",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-config-turbo": "^2.4.4",
     "eslint-plugin-prettier": "^5.2.1",
     "mocha": "^11.0.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.4.1",
     "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
+    "turbo": "^2.4.4",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.16.0"
+  },
+  "volta": {
+    "node": "20.19.0"
   }
 }
