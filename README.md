@@ -1,10 +1,10 @@
 # **Colorize**
 
 [![codebeat badge](https://codebeat.co/badges/aec222e1-64ae-4360-a849-d077040694ca)](https://codebeat.co/projects/github-com-kamikillerto-vscode-colorize)
-[![Build Status](https://travis-ci.org/KamiKillertO/vscode-colorize.svg?branch=master)](https://travis-ci.org/KamiKillertO/vscode-colorize)
+[![Build Status](https://travis-ci.org/KamiKillertO/vscode-colorize.svg?branch=main)](https://travis-ci.org/KamiKillertO/vscode-colorize)
 [![Build status](https://ci.appveyor.com/api/projects/status/db69dsx996bdnj4p/branch/develop?svg=true)](https://ci.appveyor.com/project/KamiKillertO/vscode-colorize/branch/develop)
 [![Licence](https://img.shields.io/github/license/KamiKillertO/vscode_colorize.svg)](https://github.com/KamiKillertO/vscode_colorize)
-[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/main/LICENSE)
 
 <!-- [![Version](https://vsmarketplacebadges.dev/version-short/kamikillerto.vscode-colorize.svg)]
 [![Installs](https://vsmarketplacebadge.apphb.com/installs/KamiKillertO.vscode-colorize.svg)](https://marketplace.visualstudio.com/items?itemName=kamikillerto.vscode-colorize)
@@ -14,9 +14,9 @@ Instantly visualize css colors in your css/sass/less/postcss/stylus/XML... files
 
 This extension your styles files looking for colors and generate a colored background (using the color) for each of them.
 
-![](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/demo.gif)
+![](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/main/assets/demo.gif)
 
-![](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/demo_variables.gif)
+![](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/main/assets/demo_variables.gif)
 
 💡 [How to enable variables support](#colorizecolorized_variables)
 
@@ -78,13 +78,13 @@ Defines the type of decoration to use. The possible values are:
   </tr>
   <tr>
     <td>
-      <img src='https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/decoration_background.png'/>
+      <img src='https://raw.githubusercontent.com/kamikillerto/vscode-colorize/main/assets/decoration_background.png'/>
     </td>
     <td>
-      <img src='https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/decoration_underline.png'/>
+      <img src='https://raw.githubusercontent.com/kamikillerto/vscode-colorize/main/assets/decoration_underline.png'/>
     </td>
     <td>
-      <img src='https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/decoration_outline.png'/>
+      <img src='https://raw.githubusercontent.com/kamikillerto/vscode-colorize/main/assets/decoration_outline.png'/>
     </td>
   </tr>
   <tr>
@@ -93,10 +93,10 @@ Defines the type of decoration to use. The possible values are:
   </tr>
   <tr>
     <td>
-      <img src='https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/decoration_dot.png'/>
+      <img src='https://raw.githubusercontent.com/kamikillerto/vscode-colorize/main/assets/decoration_dot.png'/>
     </td>
     <td>
-      <img src='https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/decoration_square-dot.png'/>
+      <img src='https://raw.githubusercontent.com/kamikillerto/vscode-colorize/main/assets/decoration_square-dot.png'/>
     </td>
   </tr>
 </table>

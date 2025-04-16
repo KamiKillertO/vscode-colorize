@@ -84,8 +84,8 @@ Now colorize render backgrounds with alpha value 🎉.
 
 Now, there's an item in the status bar indicating if colorize is activated for the current file or not.
 
-![Status bar item when colorize is activated](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/colorize-activated.png)
-![Status bar item when colorize is not activated](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/colorize-not-activated.png)
+![Status bar item when colorize is activated](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/main/assets/colorize-activated.png)
+![Status bar item when colorize is not activated](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/main/assets/colorize-not-activated.png)
 
 #### New decoration type
 
@@ -95,11 +95,11 @@ This setting accepts the two values `background` and `underline`:
 
 - `background`, colors are rendered as a background for the text.
 
-![color displayed as background](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/decoration-background.png)
+![color displayed as background](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/main/assets/decoration-background.png)
 
 - `underline`, colors are displayed as a line below the text.
 
-![color displayed as underline](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/master/assets/decoration-underline.png)
+![color displayed as underline](https://raw.githubusercontent.com/kamikillerto/vscode-colorize/main/assets/decoration-underline.png)
 
 ## 0.9.2
 
