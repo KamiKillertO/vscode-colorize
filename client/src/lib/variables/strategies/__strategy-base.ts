@@ -112,6 +112,7 @@ export default class VariableStrategy {
       // variable = this.store.findClosestDeclaration(match[2], fileName);
       return variable ? variable.color : undefined;
     }
+    return null;
   }
 
   /**

@@ -17,12 +17,7 @@ function equals<T>(arr1: Array<T>, arr2: Array<T>) {
     return false;
   }
 
-  arr1.forEach((_value, i) => {
-    if (arr1[i] !== arr2[i]) {
-      return false;
-    }
-  });
-  return true;
+  return arr1.findIndex((_value, i) => arr1[i] === arr2[i]) !== -1;
 }
 
 export { unique, equals };

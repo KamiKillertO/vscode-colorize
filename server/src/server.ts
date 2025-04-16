@@ -22,7 +22,6 @@ const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
 
 let hasConfigurationCapability: boolean = false;
 let hasWorkspaceFolderCapability: boolean = false;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 let hasDiagnosticRelatedInformationCapability: boolean = false;
 
 connection.onInitialize((params: InitializeParams) => {
@@ -69,6 +68,10 @@ connection.onInitialized(() => {
       DidChangeConfigurationNotification.type,
       undefined,
     );
+  }
+
+  if (hasDiagnosticRelatedInformationCapability) {
+    // TODO?
   }
 
   if (hasWorkspaceFolderCapability) {
