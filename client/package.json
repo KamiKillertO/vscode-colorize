@@ -20,7 +20,7 @@
     "lint": "eslint src/"
   },
   "devDependencies": {
-    "glob": "11.0.0",
+    "glob": "11.0.1",
     "rolldown": "^1.0.0-beta.4",
     "vscode-languageclient": "^9.0.1"
   },
