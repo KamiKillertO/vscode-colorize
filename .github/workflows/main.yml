@@ -6,7 +6,8 @@ name: Node.js CI
 on:
   push:
     branches: [main, develop]
-  pull_request: {}
+  pull_request:
+    types: [opened, synchronize]
 
 jobs:
   test:
@@ -21,12 +22,24 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: volta-cli/action@v4
         with:
           node-version: ${{ matrix.node-version }}
+
       - run: npm ci
+
       - run: xvfb-run -a npm test
         if: runner.os == 'Linux'
+
       - run: npm test
         if: runner.os != 'Linux'
