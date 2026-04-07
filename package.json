@@ -200,7 +200,7 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
-    "package": "npm run clean; turbo package",
+    "package": "npm run clean && turbo package",
     "clean": "rimraf dist",
     "build": "turbo build",
     "watch": "npm-run-all -p watch:*",
