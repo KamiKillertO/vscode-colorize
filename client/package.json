@@ -26,6 +26,6 @@
   },
   "dependencies": {
     "colorjs.io": "^0.5.2",
-    "minimatch": "^10.0.1"
+    "minimatch": "^10.2.3"
   }
 }
