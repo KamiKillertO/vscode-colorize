@@ -58,6 +58,7 @@ function getColorizeConfig(): ColorizeConfig {
     searchVariables,
     decorationFn: generateDecorationType(
       configuration.get('decoration_type'),
+      configuration.get('radius_type'),
       configuration.get('ruler_decoration'),
     ),
   };
@@ -65,6 +66,7 @@ function getColorizeConfig(): ColorizeConfig {
 
 function generateDecorationType(
   decorationType = 'background',
+  radiusType?: string,
   rulerDecoration?: boolean,
 ): (color: Color) => TextEditorDecorationType {
   return function (color: Color) {
@@ -77,6 +79,26 @@ function generateDecorationType(
         ...decorationOptions,
         overviewRulerColor: color.toRgbaString(),
       };
+    }
+
+    let borderRadiusStyle = ""
+
+    if (radiusType) {
+      switch (radiusType) {
+        case "none":
+          break;
+        case "small":
+          borderRadiusStyle = "3px"
+          break;
+        case "mid":
+          borderRadiusStyle = "6px"
+          break;
+        case "large":
+          borderRadiusStyle = "12px"
+          break;
+        default:
+          break;
+      }
     }
     const fontSize = workspace.getConfiguration('editor').get('fontSize');
     const rgbaString = color.toRgbaString();
@@ -95,6 +117,7 @@ function generateDecorationType(
           ...decorationOptions,
           borderWidth: '1px',
           borderStyle: 'solid',
+          borderRadius: borderRadiusStyle,
           borderColor: color.toRgbString(),
         };
         break;
@@ -127,6 +150,7 @@ function generateDecorationType(
           borderWidth: '1px',
           borderStyle: 'solid',
           borderColor: rgbaString,
+          borderRadius: borderRadiusStyle,
           backgroundColor: `transparent;
             background-image:
               linear-gradient(${rgbaString}, ${rgbaString}),
