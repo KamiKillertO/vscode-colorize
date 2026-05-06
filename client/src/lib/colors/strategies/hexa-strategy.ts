@@ -4,12 +4,14 @@ import { EOL, HEXA_VALUE } from '../../util/regexp';
 import Color from '../color';
 
 const HEXA_PREFIX = '(?:#|0x)';
+const QUOTED_BARE_HEX = `"(${HEXA_VALUE}{6})"`;
+
 export const REGEXP = new RegExp(
-  `(${HEXA_PREFIX}(?:${HEXA_VALUE}{3,4}|${HEXA_VALUE}{6}|${HEXA_VALUE}{8}))${EOL}`,
+  `(${HEXA_PREFIX}(?:${HEXA_VALUE}{3,4}|${HEXA_VALUE}{6}|${HEXA_VALUE}{8})|${QUOTED_BARE_HEX})${EOL}`,
   'gi',
 );
 export const REGEXP_ONE = new RegExp(
-  `^(${HEXA_PREFIX}(?:${HEXA_VALUE}{3,4}|${HEXA_VALUE}{6}|${HEXA_VALUE}{8}))${EOL}`,
+  `^(${HEXA_PREFIX}(?:${HEXA_VALUE}{3,4}|${HEXA_VALUE}{6}|${HEXA_VALUE}{8})|${QUOTED_BARE_HEX})${EOL}`,
   'i',
 );
 
@@ -50,13 +52,32 @@ function hexaToInt(argb: string) {
   return argb.split('').map((_) => parseInt(_, 16));
 }
 
+function normalizeValue(value: string) {
+  const quotedBareHex = /^"([0-9A-Fa-f]{6})"$/.exec(value);
+  if (quotedBareHex) {
+    return {
+      original: value,
+      normalized: `#${quotedBareHex[1]}`,
+      colorIndex: 1,
+    };
+  }
+
+  return {
+    original: value,
+    normalized: value,
+    colorIndex: 0,
+  };
+}
+
 function getColor(match: RegExpExecArray) {
   const value = match[1];
-  const str = removePrefix(value)[1];
+  const { original, normalized, colorIndex } = normalizeValue(value);
+  const str = removePrefix(normalized)[1];
   const values = hexaToInt(str);
   const rgb = extractRGB(values);
   const alpha = extractAlpha(values);
-  return new Color(value, match.index, rgb, alpha);
+
+  return new Color(original, match.index + colorIndex, rgb, alpha);
 }
 
 const strategy = new ColorStrategy('HEXA', REGEXP, REGEXP_ONE, getColor);
