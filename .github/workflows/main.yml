@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        node-version: [22, 24, latest]
         os: [macos-latest, ubuntu-latest]
         # Windows not working for now, need to update build before
         # os: [macos-latest, ubuntu-latest, windows-latest]
@@ -32,9 +32,11 @@ jobs:
             ${{ runner.os }}-turbo-
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: volta-cli/action@v4
+        uses: jdx/mise-action@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          mise_toml: |
+            [tools]
+            node = "${{ matrix.node-version }}"
 
       - run: npm ci
 
