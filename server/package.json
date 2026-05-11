@@ -23,7 +23,7 @@
   "devDependencies": {
     "@types/node": "^20.17.9",
     "webpack-cli": "5.1.4",
-    "webpack": "5.97.1",
+    "webpack": "5.104.1",
     "ts-loader": "9.5.7"
   },
   "dependencies": {
