@@ -217,8 +217,8 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "^20.17.9",
     "@types/vscode": "^1.82.0",
-    "@typescript-eslint/eslint-plugin": "^8.59.2",
-    "@typescript-eslint/parser": "^8.59.2",
+    "@typescript-eslint/eslint-plugin": "^8.59.3",
+    "@typescript-eslint/parser": "^8.59.3",
     "@vscode/test-electron": "^2.5.2",
     "chai": "^4.5.0",
     "eslint": "^9.15.0",
@@ -232,6 +232,6 @@
     "ts-node": "^10.9.2",
     "turbo": "^2.4.4",
     "typescript": "^5.7.2",
-    "typescript-eslint": "^8.59.2"
+    "typescript-eslint": "^8.59.3"
   }
 }
