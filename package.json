@@ -230,7 +230,7 @@
     "prettier": "^3.4.1",
     "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
-    "turbo": "^2.4.4",
+    "turbo": "^2.9.16",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.59.2"
   }
