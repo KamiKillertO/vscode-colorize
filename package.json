@@ -157,6 +157,18 @@
           ],
           "default": "background"
         },
+        "colorize.radius_type": {
+          "title": "Radius of the border",
+          "type": "string",
+          "enum": [
+            "none",
+            "small",
+            "mid",
+            "large"
+          ],
+          "default": "none",
+          "markdownDescription": "Only works for 'background' and 'outline' decoration types."
+        },
         "colorize.colorized_colors": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "default": [
